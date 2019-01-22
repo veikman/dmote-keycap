@@ -11,7 +11,8 @@
 
 (def basenames-to-functions
   "Application-specific pairs of filenames and producing functions."
-  {"smallflat" models/smallflat-model})
+  {"smallflat" models/smallflat-model
+   "mediumflat" models/mediumflat-model})
 
 (defn- render-to-stl
   "Call OpenSCAD to render an SCAD file to STL."
