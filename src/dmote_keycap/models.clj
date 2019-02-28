@@ -2,7 +2,8 @@
 
 (ns dmote-keycap.models
   (:require [scad-clj.model :as model]
-            [scad-tarmi.dfm :refer [error-fn]]))
+            [scad-tarmi.dfm :refer [error-fn]]
+            [scad-tarmi.maybe :as maybe]))
 
 ;;;;;;;;;;;;;;;
 ;; Constants ;;
@@ -116,6 +117,17 @@
                   (compensator-positive (get-in matias [:stem :y]))]
                  0.4)))))
 
+(defn- keycap
+  [{:keys [sectioned] :as options} body-model]
+  (maybe/intersection
+    (model/union
+      body-model
+      (stem options))
+    (when sectioned
+      (model/translate [100 0 0]
+        (model/cube 200 200 200)))))
+
+
 ;;;;;;;;;;;;;;;
 ;; Interface ;;
 ;;;;;;;;;;;;;;;
@@ -123,13 +135,9 @@
 (defn smallflat-model
   "A flat keycap that barely covers the uppermost part of a Matias switch."
   [options]
-  (model/union
-    (smallflat-composite-body)
-    (stem options)))
+  (keycap options (smallflat-composite-body)))
 
 (defn mediumflat-model
   "A flat keycap that covers a Matias switch tightly."
   [options]
-  (model/union
-    (mediumflat-composite-body)
-    (stem options)))
+  (keycap options (mediumflat-composite-body)))

@@ -14,7 +14,8 @@
   [["-V" "--version" "Print program version and exit"]
    ["-h" "--help" "Print this message and exit"]
    ["-r" "--render" "Render SCAD to STL"]
-   [nil "--rendering-program PATH" "Path to OpenSCAD" :default "openscad"]])
+   [nil "--rendering-program PATH" "Path to OpenSCAD" :default "openscad"]
+   [nil "--sectioned" "Show models in section (cut in half)"]])
 
 (defn -main
   "Basic command-line interface logic."
