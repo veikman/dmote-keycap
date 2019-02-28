@@ -115,7 +115,7 @@
         {:height z, :center false}
         (rounded [(compensator-positive (get-in matias [:stem :x]))
                   (compensator-positive (get-in matias [:stem :y]))]
-                 0.4)))))
+                 0.2)))))
 
 (defn- keycap
   [{:keys [sectioned] :as options} body-model]
