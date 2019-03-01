@@ -40,23 +40,28 @@
          (model/offset radius))))
 
 (defn- rounded-square
-  [{:keys [footprint radius thickness] :or {radius 2, thickness 1}}]
-  (inset-corner (map #(+ % thickness) footprint) radius))
+  [{:keys [footprint radius xy-thickness] :or {radius 2, xy-thickness 1}}]
+  (inset-corner (map #(+ % xy-thickness) footprint) radius))
 
-(defn- hollow-3d
-  [{:keys [z-offset] :or {z-offset 0} :as dimensions}]
+(defn- rounded-block
+  [{:keys [z-offset z-thickness]
+    :or {z-offset 0, z-thickness 1} :as dimensions}]
   (->> (rounded-square dimensions)
-       (model/extrude-linear {:height 1, :center false})
+       (model/extrude-linear {:height z-thickness, :center false})
        (maybe/translate [0 0 z-offset])))
 
 (defn- shell
   [sequence]
-  [(map hollow-3d sequence)
-   (map #(hollow-3d (assoc % :thickness 0)) sequence)])
+  [(map rounded-block sequence)
+   (map #(rounded-block (assoc % :xy-thickness 0)) sequence)])
 
 (defn- non-standard-body
-  [{:keys [style]}]
-  (let [top-footprint
+  [{:keys [style plate-dimensions bowl-dimensions bowl-offset]
+    :or {plate-dimensions [12.5 (dec (get-in matias [:body :top :y])) 2]
+         bowl-dimensions [50 30 15]
+         bowl-offset -1}}]
+  (let [[plate-x plate-y plate-z] plate-dimensions
+        top-footprint
           (map compensator-general
             [(get-in matias [:body :top :x])
              (get-in matias [:body :top :y])])
@@ -65,20 +70,25 @@
             [(get-in matias [:body :main :x])
              (get-in matias [:body :main :y])])
         shell-base
-          (case style
-            :small [{:footprint top-footprint}
-                    {:footprint main-footprint
-                     :z-offset (- (get-in matias [:body :top :z]))}]
-            :medium [{:footprint top-footprint}
-                     {:footprint main-footprint
-                      :z-offset (- (get-in matias [:body :top :z]))}
-                     {:footprint main-footprint
-                      :z-offset (inc (- (get-in matias [:body :main :z])))}])
-        [shell-outer shell-inner] (shell shell-base)]
+          [{:footprint top-footprint}
+           {:footprint main-footprint
+            :z-offset (- (get-in matias [:body :top :z]))}
+           (when (= style :medium)
+             {:footprint main-footprint
+              :z-offset (inc (- (get-in matias [:body :main :z])))})]
+        [positive negative] (shell (remove nil? shell-base))
+        positive
+          (cons positive
+            (rounded-block {:z-thickness plate-z
+                            :footprint [plate-x plate-y]}))]
     (model/difference
-      (util/loft shell-outer)
-      (model/intersection
-        (util/loft shell-inner)
+      (util/loft positive)
+      (when bowl-dimensions
+        (model/translate [0 0 (+ plate-z (/ (nth bowl-dimensions 2) 2) bowl-offset)]
+          (model/resize bowl-dimensions
+            (model/sphere 1000))))
+      (model/intersection  ; Make sure the inner negative cuts off at z = 0.
+        (util/loft negative)
         (model/translate [0 0 -100]
           (model/cube 200 200 200))))))
 
