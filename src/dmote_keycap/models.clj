@@ -3,7 +3,8 @@
 (ns dmote-keycap.models
   (:require [scad-clj.model :as model]
             [scad-tarmi.dfm :refer [error-fn]]
-            [scad-tarmi.maybe :as maybe]))
+            [scad-tarmi.maybe :as maybe]
+            [scad-tarmi.util :as util]))
 
 ;;;;;;;;;;;;;;;
 ;; Constants ;;
@@ -24,8 +25,6 @@
             :y 12.95
             :z 6}}})  ; Understated.
 
-(def wall-thickness 1)
-(def scale 0.9)
 
 ;;;;;;;;;;;;;;
 ;; Internal ;;
@@ -34,78 +33,54 @@
 (def compensator-general (error-fn))
 (def compensator-positive (error-fn 0.5))
 
-(defn- rounded
+(defn- inset-corner
   [[x y] radius]
   (let [initial #(- % radius)]
     (->> (model/square (initial x) (initial y))
          (model/offset radius))))
 
-(defn- smallflat-outer-body
-  [footprint]
-  (let [xy (map #(+ % wall-thickness) footprint)]
-    (model/hull
-      (model/translate [0 0 1]
-        (model/extrude-linear
-          {:height (get-in matias [:body :top :z]), :center false, :scale scale}
-          (rounded xy 2)))
-      (model/extrude-linear
-        {:height 1, :center false}
-        (rounded xy 2)))))
+(defn- rounded-square
+  [{:keys [footprint radius thickness] :or {radius 2, thickness 1}}]
+  (inset-corner (map #(+ % thickness) footprint) radius))
 
-(defn- smallflat-inner-body
-  [footprint]
-  (let [xy (map compensator-general footprint)]
-    (model/extrude-linear
-      {:height (get-in matias [:body :top :z]), :center false, :scale scale}
-      (rounded xy 0.6))))
+(defn- hollow-3d
+  [{:keys [z-offset] :or {z-offset 0} :as dimensions}]
+  (->> (rounded-square dimensions)
+       (model/extrude-linear {:height 1, :center false})
+       (maybe/translate [0 0 z-offset])))
 
-(defn- smallflat-composite-body
-  []
-  (let [footprint [(get-in matias [:body :top :x])
-                   (get-in matias [:body :top :y])]]
-    (model/translate [0 0 (- (get-in matias [:body :top :z]))]
-      (model/difference
-        (smallflat-outer-body footprint)
-        (smallflat-inner-body footprint)))))
+(defn- shell
+  [sequence]
+  [(map hollow-3d sequence)
+   (map #(hollow-3d (assoc % :thickness 0)) sequence)])
 
-(defn- mediumflat-outer-body
-  [footprint]
-  (let [xy (map #(+ % wall-thickness) footprint)]
-    (model/hull
-      (model/extrude-linear
-        {:height 1, :center false}
-        (rounded (map #(* scale %) xy) 2))
-      (model/translate [0 0 (- (get-in matias [:body :top :z]))]
-        (model/extrude-linear
-          {:height 1}
-          (rounded xy 2)))
-      (model/translate [0 0 (inc (- (get-in matias [:body :main :z])))]
-        (model/extrude-linear
-          {:height 1, :center false}
-          (rounded xy 2))))))
-
-(defn- mediumflat-inner-body
-  [footprint]
-  (let [xy (map compensator-general footprint)]
-    (model/hull
-      (model/translate [0 0 (- 0.5)]
-        (model/extrude-linear
-          {:height 0.5, :center false}
-          (rounded (map #(* scale %) xy) 0.2)))
-      (model/translate [0 0 (- (get-in matias [:body :main :z]))]
-        (model/extrude-linear
-          {:height (- (get-in matias [:body :main :z])
-                      (get-in matias [:body :top :z]))
-           :center false}
-          (rounded xy 0.6))))))
-
-(defn- mediumflat-composite-body
-  []
-  (let [footprint [(get-in matias [:body :main :x])
-                   (get-in matias [:body :main :y])]]
+(defn- non-standard-body
+  [{:keys [style]}]
+  (let [top-footprint
+          (map compensator-general
+            [(get-in matias [:body :top :x])
+             (get-in matias [:body :top :y])])
+        main-footprint
+          (map compensator-general
+            [(get-in matias [:body :main :x])
+             (get-in matias [:body :main :y])])
+        shell-base
+          (case style
+            :small [{:footprint top-footprint}
+                    {:footprint main-footprint
+                     :z-offset (- (get-in matias [:body :top :z]))}]
+            :medium [{:footprint top-footprint}
+                     {:footprint main-footprint
+                      :z-offset (- (get-in matias [:body :top :z]))}
+                     {:footprint main-footprint
+                      :z-offset (inc (- (get-in matias [:body :main :z])))}])
+        [shell-outer shell-inner] (shell shell-base)]
     (model/difference
-      (mediumflat-outer-body footprint)
-      (mediumflat-inner-body footprint))))
+      (util/loft shell-outer)
+      (model/intersection
+        (util/loft shell-inner)
+        (model/translate [0 0 -100]
+          (model/cube 200 200 200))))))
 
 (defn- stem
   [options]
@@ -113,15 +88,15 @@
     (model/translate [0 0 (- z)]
       (model/extrude-linear
         {:height z, :center false}
-        (rounded [(compensator-positive (get-in matias [:stem :x]))
-                  (compensator-positive (get-in matias [:stem :y]))]
-                 0.2)))))
+        (inset-corner [(compensator-positive (get-in matias [:stem :x]))
+                       (compensator-positive (get-in matias [:stem :y]))]
+                      0.2)))))
 
 (defn- keycap
-  [{:keys [sectioned] :as options} body-model]
+  [{:keys [sectioned] :as options}]
   (maybe/intersection
     (model/union
-      body-model
+      (non-standard-body options)
       (stem options))
     (when sectioned
       (model/translate [100 0 0]
@@ -135,9 +110,9 @@
 (defn smallflat-model
   "A flat keycap that barely covers the uppermost part of a Matias switch."
   [options]
-  (keycap options (smallflat-composite-body)))
+  (keycap (assoc options :style :small)))
 
 (defn mediumflat-model
   "A flat keycap that covers a Matias switch tightly."
   [options]
-  (keycap options (mediumflat-composite-body)))
+  (keycap (assoc options :style :medium)))
