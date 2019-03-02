@@ -122,18 +122,23 @@
        (model/extrude-linear {:height z-thickness, :center false})
        (maybe/translate [0 0 z-offset])))
 
+(defn- switch-body-cube
+  [switch-type part]
+  (let [{:keys [x y z]} (get-in switch-data [switch-type :body part :size])]
+    (model/translate [0 0 (- (/ z 2) (switch-height switch-type))]
+      (model/cube (compensator-general x) (compensator-general y) z))))
+
 (defn- switch-body
-  "Minimal interior space for a switch, starting at z = 0."
+  "Minimal interior space for a switch, starting at z = 0.
+  This model consists of a named core part of the switch with all other parts
+  radiating out from it."
   [switch-type]
-  (apply model/hull
+  (util/radiate
+    (switch-body-cube switch-type :core)
     (reduce
-      (fn [coll part]
-        (let [{:keys [x y z]} (get-in switch-data [switch-type :body part :size])]
-          (conj coll
-            (model/translate [0 0 (- (/ z 2) (switch-height switch-type))]
-              (model/cube (compensator-general x) (compensator-general y) z)))))
+      (fn [coll part] (conj coll (switch-body-cube switch-type part)))
       []
-      (switch-parts switch-type))))
+      (remove (partial = :core) (switch-parts switch-type)))))
 
 (defn- shell
   "Two vectors of rounded blocks, positive and negative."
