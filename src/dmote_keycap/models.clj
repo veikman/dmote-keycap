@@ -44,7 +44,7 @@
 ;;;;;;;;;;;;;;
 
 (def compensator-general (error-fn))
-(def compensator-positive (error-fn 0.5))
+(def compensator-positive (error-fn 0.25))
 
 (defn- switch-parts
   "The keyword names of the parts of a switch body."
@@ -190,9 +190,10 @@
     (model/translate [0 0 (- z)]
       (model/extrude-linear
         {:height z, :center false}
-        (inset-corner [(compensator-positive (get-in switch-data [:alps :stem :x]))
-                       (compensator-positive (get-in switch-data [:alps :stem :y]))]
-                      0.2)))))
+        (inset-corner
+          [(compensator-positive (get-in switch-data [:alps :stem :x]))
+           (compensator-positive (get-in switch-data [:alps :stem :y]))]
+          0.2)))))
 
 
 ;;;;;;;;;;;;;;;
