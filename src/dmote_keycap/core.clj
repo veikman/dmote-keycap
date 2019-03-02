@@ -33,8 +33,5 @@
      :else
        (let [options (:options args)]
          (build-all
-           [{:name "smallflat",
-             :model-main (models/smallflat-model options)}
-            {:name "mediumflat",
-             :model-main (models/mediumflat-model options)}]
+           [{:name "cap", :model-main (models/keycap options)}]
            options)))))
