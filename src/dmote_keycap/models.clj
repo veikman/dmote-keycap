@@ -160,8 +160,7 @@
 (defn- non-standard-body
   [{:keys [switch-type plate-dimensions
            bowl-dimensions bowl-offset max-skirt-length]
-    :or {switch-type :alps
-         plate-dimensions [10 10 2.5]
+    :or {plate-dimensions [10 10 2.5]
          bowl-dimensions [50 30 15]
          bowl-offset -1.5}}]
   (let [max-skirt-length (or max-skirt-length
@@ -190,14 +189,14 @@
         (model/cube 200 200 200)))))
 
 (defn- stem
-  [options]
-  (let [z (get-in switch-data [:alps :stem :z :interior])]
+  [{:keys [switch-type]}]
+  (let [z (get-in switch-data [switch-type :stem :z :interior])]
     (model/translate [0 0 (- z)]
       (model/extrude-linear
         {:height z, :center false}
         (inset-corner
-          [(compensator-positive (get-in switch-data [:alps :stem :x]))
-           (compensator-positive (get-in switch-data [:alps :stem :y]))]
+          [(compensator-positive (get-in switch-data [switch-type :stem :x]))
+           (compensator-positive (get-in switch-data [switch-type :stem :y]))]
           0.2)))))
 
 
@@ -207,10 +206,11 @@
 
 (defn keycap
   [{:keys [sectioned] :as options}]
-  (maybe/intersection
-    (model/union
-      (non-standard-body options)  ; TODO: Standard bodies like DSA.
-      (stem options))
-    (when sectioned
-      (model/translate [100 0 0]
-        (model/cube 200 200 200)))))
+  (let [options (merge {:switch-type :alps} options)]
+    (maybe/intersection
+      (model/union
+        (non-standard-body options)  ; TODO: Standard bodies like DSA.
+        (stem options))
+      (when sectioned
+        (model/translate [100 0 0]
+          (model/cube 200 200 200))))))
