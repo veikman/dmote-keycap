@@ -156,7 +156,7 @@
   [{:keys [switch-type plate-dimensions
            bowl-dimensions bowl-offset max-skirt-length]
     :or {switch-type :alps
-         plate-dimensions [10 10 2]
+         plate-dimensions [10 10 2.5]
          bowl-dimensions [50 30 15]
          bowl-offset -1.5}}]
   (let [max-skirt-length (or max-skirt-length
