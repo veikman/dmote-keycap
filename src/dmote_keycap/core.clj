@@ -15,7 +15,9 @@
    ["-h" "--help" "Print this message and exit"]
    ["-r" "--render" "Render SCAD to STL"]
    [nil "--rendering-program PATH" "Path to OpenSCAD" :default "openscad"]
-   [nil "--sectioned" "Show models in section (cut in half)"]])
+   [nil "--sectioned" "Show models in section (cut in half)"]
+   [nil "--switch-type TYPE" "One of “alps” (default) or “mx”"
+    :parse-fn keyword :validate [(set (keys models/switch-data))]]])
 
 (defn -main
   "Basic command-line interface logic."

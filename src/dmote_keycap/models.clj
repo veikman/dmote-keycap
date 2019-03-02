@@ -13,30 +13,23 @@
 (def switch-data
   {:alps
     {:travel 3.5
-     :stem {:x 4.5
-            :y 2.2
-            :z {:interior 5
-                :exterior 4}}
-     :body {:top  ; The flat upper surface of the switch body.
-             {:size
-               {:x 11.4
-                :y 10.2
-                :z 7.3}}
-            :core
-             {:size
-               {:x 12.35
-                :y 11.34
-                :z 5.75}}
-            :rail-housing
-             {:size
-               {:x 13.35
-                :y 5.95
-                :z 5.15}}
-            :snap
-             {:size
-               {:x 12
-                :y 13.03
-                :z 4.75}}}}})
+     :stem {:core           {:size {:x 4.5,   :y 2.2,   :z 5}
+                             :positive true}}
+     :body {:top            {:size {:x 11.4,  :y 10.2,  :z 7.3}}
+            :core           {:size {:x 12.35, :y 11.34, :z 5.75}}
+            :slider-housing {:size {:x 13.35, :y 5.95,  :z 5.15}}
+            :snap           {:size {:x 12,    :y 13.03, :z 4.75}}}}
+   :mx
+    {:travel 3.6
+     :stem {:shell          {:size {:x 5.6,   :y 5.6,   :z 3.6}
+                             :positive true}
+            :cross-x        {:size {:x 4,     :y 1.25,  :z 3.6}
+                             :positive false}
+            :cross-y        {:size {:x 1.1,   :y 4,     :z 3.6}
+                             :positive false}}
+     :body {:top            {:size {:x 10.2,  :y 11,    :z 6.6}}
+            :core           {:size {:x 14.7,  :y 14.7,  :z 1}}
+            :base           {:size {:x 15.6,  :y 15.6,  :z 0.7}}}}})
 
 
 ;;;;;;;;;;;;;;
@@ -123,10 +116,21 @@
        (maybe/translate [0 0 z-offset])))
 
 (defn- switch-body-cube
-  [switch-type part]
-  (let [{:keys [x y z]} (get-in switch-data [switch-type :body part :size])]
+  [switch-type part-name]
+  (let [{:keys [x y z]} (get-in switch-data [switch-type :body part-name :size])]
     (model/translate [0 0 (- (/ z 2) (switch-height switch-type))]
       (model/cube (compensator-general x) (compensator-general y) z))))
+
+(defn- stem-body-cube
+  "Overly similar to switch-body-cube but for stems."
+  [part-properties]
+  {:pre [(map? part-properties)
+         (:size part-properties)]}
+  (let [{:keys [x y z]} (:size part-properties)
+        compensator (if (:positive part-properties)
+                      compensator-positive compensator-general)]
+    (model/translate [0 0 (/ z -2)]
+      (model/cube (compensator x) (compensator y) z))))
 
 (defn- switch-body
   "Minimal interior space for a switch, starting at z = 0.
@@ -179,7 +183,7 @@
             (model/translate [0 0 (+ plate-z (/ (nth bowl-dimensions 2) 2) bowl-offset)]
               (model/resize bowl-dimensions
                 (model/sphere 1000))))))
-      (switch-body switch-type)
+      (model/-# (switch-body switch-type))
       (model/intersection  ; Make sure the inner negative cuts off at z = 0.
         (util/loft negative)
         (model/translate [0 0 -100]
@@ -188,16 +192,19 @@
       (model/translate [0 0 (- -100 max-skirt-length)]
         (model/cube 200 200 200)))))
 
-(defn- stem
+(defn- stem-builder
+  [switch-type pred]
+  (let [data (get-in switch-data [switch-type :stem])]
+    (map #(stem-body-cube (get data %))
+         (filter (partial pred data) (keys data)))))
+
+(defn- stem-model
   [{:keys [switch-type]}]
-  (let [z (get-in switch-data [switch-type :stem :z :interior])]
-    (model/translate [0 0 (- z)]
-      (model/extrude-linear
-        {:height z, :center false}
-        (inset-corner
-          [(compensator-positive (get-in switch-data [switch-type :stem :x]))
-           (compensator-positive (get-in switch-data [switch-type :stem :y]))]
-          0.2)))))
+  (maybe/difference
+    (apply maybe/union
+      (stem-builder switch-type #(get-in %1 [%2 :positive])))
+    (apply maybe/union
+      (stem-builder switch-type #(not (get-in %1 [%2 :positive]))))))
 
 
 ;;;;;;;;;;;;;;;
@@ -210,7 +217,7 @@
     (maybe/intersection
       (model/union
         (non-standard-body options)  ; TODO: Standard bodies like DSA.
-        (stem options))
+        (stem-model options))
       (when sectioned
         (model/translate [100 0 0]
           (model/cube 200 200 200))))))
