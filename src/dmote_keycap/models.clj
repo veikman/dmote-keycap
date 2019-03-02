@@ -117,7 +117,7 @@
 
 (defn- rounded-block
   [{:keys [z-offset z-thickness]
-    :or {z-offset 0, z-thickness 1} :as dimensions}]
+    :or {z-offset 0, z-thickness 0.01} :as dimensions}]
   (->> (rounded-square dimensions)
        (model/extrude-linear {:height z-thickness, :center false})
        (maybe/translate [0 0 z-offset])))
