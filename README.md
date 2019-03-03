@@ -1,9 +1,15 @@
-# dmote-keycap
+# `dmote-keycap`: Minimal keycaps
 
-An application that produces a three-dimensional geometry.
+An application that produces a three-dimensional geometry for a keycap that
+you can put on a mechanical keyboard.
 
-The output is a simple model of an ALPS- and Matias-compatible keycap for a
-computer keyboard.
+The purpose of this application is to enable keyboard designs more dense than
+the traditional 1u, with better dust protection than a “top only” 0.75u cap.
+
+## Features
+
+* Supports both ALPS- and MX-style switches.
+* Wraps the body of the switch for minimal space requirements.
 
 ## Usage
 
