@@ -10,6 +10,9 @@
 ;; Constants ;;
 ;;;;;;;;;;;;;;;
 
+;; Switch data here is based on real-world observation, not purely on data
+;; sheets. Some components are modelled for printability and may be
+;; incompatible with some versions of real switches.
 (def switch-data
   {:alps
     {:travel 3.5
@@ -21,7 +24,9 @@
             :snap           {:size {:x 12,    :y 13.03, :z 4.75}}}}
    :mx
     {:travel 3.6
-     :stem {:shell          {:size {:x 5.6,   :y 5.6,   :z 3.6}
+     :stem {:shell          {:size {:x 7.5,   :y 5.6,   :z 3.6}
+                             :positive true}
+            :core           {:size {:x 5,     :y 5.8,   :z 3.6}
                              :positive true}
             :cross-x        {:size {:x 4,     :y 1.25,  :z 3.6}
                              :positive false}
@@ -105,7 +110,7 @@
          (model/offset radius))))
 
 (defn- rounded-square
-  [{:keys [footprint radius xy-thickness] :or {radius 2, xy-thickness 2}}]
+  [{:keys [footprint radius xy-thickness] :or {radius 1.8, xy-thickness 2.1}}]
   (inset-corner (map #(+ % xy-thickness) footprint) radius))
 
 (defn- rounded-block
@@ -128,7 +133,10 @@
          (:size part-properties)]}
   (let [{:keys [x y z]} (:size part-properties)
         compensator (if (:positive part-properties)
-                      compensator-positive compensator-general)]
+                      compensator-positive compensator-general)
+        ;; Use of compensators is currently overridden here because they are
+        ;; inconsistently effective at small scales.
+        compensator identity]
     (model/translate [0 0 (/ z -2)]
       (model/cube (compensator x) (compensator y) z))))
 
@@ -183,7 +191,7 @@
             (model/translate [0 0 (+ plate-z (/ (nth bowl-dimensions 2) 2) bowl-offset)]
               (model/resize bowl-dimensions
                 (model/sphere 1000))))))
-      (model/-# (switch-body switch-type))
+      (switch-body switch-type)
       (model/intersection  ; Make sure the inner negative cuts off at z = 0.
         (util/loft negative)
         (model/translate [0 0 -100]
