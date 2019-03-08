@@ -6,6 +6,7 @@
             [clojure.java.io :refer [make-parents]]
             [environ.core :refer [env]]
             [scad-app.core :refer [build-all]]
+            [scad-clj.model :refer [fs!]]
             [dmote-keycap.models :as models])
   (:gen-class :main true))
 
@@ -16,8 +17,14 @@
    ["-r" "--render" "Render SCAD to STL"]
    [nil "--rendering-program PATH" "Path to OpenSCAD" :default "openscad"]
    [nil "--sectioned" "Show models in section (cut in half)"]
+   [nil "--face-size N" "Smaller number gives more detail; CLI default is 0.1"
+    :default 0.1, :parse-fn #(Float/parseFloat %)]
    [nil "--switch-type TYPE" "One of “alps” (default) or “mx”"
-    :parse-fn keyword :validate [(set (keys models/switch-data))]]])
+    :parse-fn keyword, :validate [(set (keys models/switch-data))]]
+   [nil "--error-stem-positive N" "Printer error in mm; CLI default is 0"
+    :default 0, :parse-fn #(Float/parseFloat %)]
+   [nil "--error-stem-negative N" "Printer error in mm; CLI default is -0.15"
+    :default -0.15, :parse-fn #(Float/parseFloat %)]])
 
 (defn -main
   "Basic command-line interface logic."
@@ -35,5 +42,8 @@
      :else
        (let [options (:options args)]
          (build-all
-           [{:name "cap", :model-main (models/keycap options)}]
+           ;; An fs element is created here to control resolution, which is
+           ;; of great practical importance for printing the corners.
+           [{:name "cap", :model-vector [(fs! (:face-size options))
+                                         (models/keycap options)]}]
            options)))))

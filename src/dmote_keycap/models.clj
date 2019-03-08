@@ -24,9 +24,7 @@
             :snap           {:size {:x 12,    :y 13.03, :z 4.75}}}}
    :mx
     {:travel 3.6
-     :stem {:shell          {:size {:x 7.5,   :y 5.6,   :z 3.6}
-                             :positive true}
-            :core           {:size {:x 5,     :y 5.8,   :z 3.6}
+     :stem {:shell          {:size {:x 7,     :y 5.25,  :z 3.6}
                              :positive true}
             :cross-x        {:size {:x 4,     :y 1.25,  :z 3.6}
                              :positive false}
@@ -127,16 +125,21 @@
       (model/cube (compensator-general x) (compensator-general y) z))))
 
 (defn- stem-body-cube
-  "Overly similar to switch-body-cube but for stems."
-  [part-properties]
+  "Overly similar to switch-body-cube but for stems.
+  The stem body is extremely sensitive to printing inaccuracies.
+  Generally, an ALPS-style stem will print OK without compensation for error
+  on a Lulzbot TAZ6, whereas the negatives space inside an MX-style stem will
+  be too tight without compensation and too loose with standard muzzle-width
+  compensation."
+  [{:keys [error-stem-positive error-stem-negative]
+    :or {error-stem-positive 0, error-stem-negative 0}}
+   part-properties]
   {:pre [(map? part-properties)
          (:size part-properties)]}
   (let [{:keys [x y z]} (:size part-properties)
-        compensator (if (:positive part-properties)
-                      compensator-positive compensator-general)
-        ;; Use of compensators is currently overridden here because they are
-        ;; inconsistently effective at small scales.
-        compensator identity]
+        error (if (:positive part-properties) error-stem-positive
+                                              error-stem-negative)
+        compensator (error-fn error)]
     (model/translate [0 0 (/ z -2)]
       (model/cube (compensator x) (compensator y) z))))
 
@@ -201,18 +204,18 @@
         (model/cube 200 200 200)))))
 
 (defn- stem-builder
-  [switch-type pred]
+  [{:keys [switch-type] :as options} pred]
   (let [data (get-in switch-data [switch-type :stem])]
-    (map #(stem-body-cube (get data %))
+    (map #(stem-body-cube options (get data %))
          (filter (partial pred data) (keys data)))))
 
 (defn- stem-model
-  [{:keys [switch-type]}]
+  [options]
   (maybe/difference
     (apply maybe/union
-      (stem-builder switch-type #(get-in %1 [%2 :positive])))
+      (stem-builder options #(get-in %1 [%2 :positive])))
     (apply maybe/union
-      (stem-builder switch-type #(not (get-in %1 [%2 :positive]))))))
+      (stem-builder options #(not (get-in %1 [%2 :positive]))))))
 
 
 ;;;;;;;;;;;;;;;
@@ -220,6 +223,7 @@
 ;;;;;;;;;;;;;;;
 
 (defn keycap
+  "A model of one keycap. Resolution is left at OpenSCAD defaults throughout."
   [{:keys [sectioned] :as options}]
   (let [options (merge {:switch-type :alps} options)]
     (maybe/intersection
