@@ -39,9 +39,6 @@
 ;; Internal ;;
 ;;;;;;;;;;;;;;
 
-(def compensator-general (error-fn))
-(def compensator-positive (error-fn 0.25))
-
 (defn- switch-parts
   "The keyword names of the parts of a switch body."
   [switch-type]
@@ -119,10 +116,12 @@
        (maybe/translate [0 0 z-offset])))
 
 (defn- switch-body-cube
-  [switch-type part-name]
-  (let [{:keys [x y z]} (get-in switch-data [switch-type :body part-name :size])]
+  [{:keys [switch-type error-body-positive] :or {error-body-positive -0.5}}
+   part-name]
+  (let [{:keys [x y z]} (get-in switch-data [switch-type :body part-name :size])
+        compensator (error-fn error-body-positive)]
     (model/translate [0 0 (- (/ z 2) (switch-height switch-type))]
-      (model/cube (compensator-general x) (compensator-general y) z))))
+      (model/cube (compensator x) (compensator y) z))))
 
 (defn- stem-body-cube
   "Overly similar to switch-body-cube but for stems.
@@ -147,11 +146,11 @@
   "Minimal interior space for a switch, starting at z = 0.
   This model consists of a named core part of the switch with all other parts
   radiating out from it."
-  [switch-type]
+  [{:keys [switch-type] :as options}]
   (util/radiate
-    (switch-body-cube switch-type :core)
+    (switch-body-cube options :core)
     (reduce
-      (fn [coll part] (conj coll (switch-body-cube switch-type part)))
+      (fn [coll part] (conj coll (switch-body-cube options part)))
       []
       (remove (partial = :core) (switch-parts switch-type)))))
 
@@ -177,7 +176,8 @@
            bowl-dimensions bowl-offset max-skirt-length]
     :or {plate-dimensions [10 10 2.5]
          bowl-dimensions [50 30 15]
-         bowl-offset -1.5}}]
+         bowl-offset -1.5}
+    :as options}]
   (let [max-skirt-length (or max-skirt-length
                              (dec (switch-height switch-type)))
         [plate-x plate-y plate-z] plate-dimensions
@@ -194,7 +194,7 @@
             (model/translate [0 0 (+ plate-z (/ (nth bowl-dimensions 2) 2) bowl-offset)]
               (model/resize bowl-dimensions
                 (model/sphere 1000))))))
-      (switch-body switch-type)
+      (switch-body options)
       (model/intersection  ; Make sure the inner negative cuts off at z = 0.
         (util/loft negative)
         (model/translate [0 0 -100]
