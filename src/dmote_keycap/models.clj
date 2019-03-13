@@ -4,52 +4,47 @@
   (:require [scad-clj.model :as model]
             [scad-tarmi.dfm :refer [error-fn]]
             [scad-tarmi.maybe :as maybe]
-            [scad-tarmi.util :as util]))
-
-;;;;;;;;;;;;;;;
-;; Constants ;;
-;;;;;;;;;;;;;;;
-
-;; Switch data here is based on real-world observation, not purely on data
-;; sheets. Some components are modelled for printability and may be
-;; incompatible with some versions of real switches.
-(def switch-data
-  {:alps
-    {:travel 3.5
-     :stem {:core           {:size {:x 4.5,   :y 2.2,   :z 5}
-                             :positive true}}
-     :body {:top            {:size {:x 11.4,  :y 10.2,  :z 7.3}}
-            :core           {:size {:x 12.35, :y 11.34, :z 5.75}}
-            :slider-housing {:size {:x 13.35, :y 5.95,  :z 5.15}}
-            :snap           {:size {:x 12,    :y 13.03, :z 4.75}}}}
-   :mx
-    {:travel 3.6
-     :stem {:shell          {:size {:x 7,     :y 5.25,  :z 3.6}
-                             :positive true}
-            :cross-x        {:size {:x 4,     :y 1.25,  :z 3.6}
-                             :positive false}
-            :cross-y        {:size {:x 1.1,   :y 4,     :z 3.6}
-                             :positive false}}
-     :body {:top            {:size {:x 10.2,  :y 11,    :z 6.6}}
-            :core           {:size {:x 14.7,  :y 14.7,  :z 1}}
-            :base           {:size {:x 15.6,  :y 15.6,  :z 0.7}}}}})
-
+            [scad-tarmi.util :as util]
+            [dmote-keycap.data :as data]))
 
 ;;;;;;;;;;;;;;
 ;; Internal ;;
 ;;;;;;;;;;;;;;
 
+(defn- maquette-body
+  "The shape of one keycap, greatly simplified.
+  The simplification is so extensive that this keycap can only be used for
+  previews in keyboard models. It is not hollow and therefore useless if
+  printed.
+  The default height and slope are based on a DSA profile. Passing a
+  non-default ‘top-size’ and ‘top-rotation’ can provide a rough approximation
+  of SA and OEM caps, etc."
+  [{:keys [unit-size slope top-size top-rotation max-skirt-length]
+    :or {slope 0.73, top-size [nil nil 1], top-rotation [0 0 0]}}]
+  (let [top-thickness (nth top-size 2)
+        top-plate
+          (if (every? some? top-size)
+            top-size
+            (conj (mapv #(* slope (data/key-length %)) unit-size)
+                  top-thickness))]
+    (model/hull
+      (maybe/translate [0 0 (/ top-thickness 2)]
+        (maybe/rotate top-rotation
+          (apply model/cube top-plate)))
+      (maybe/translate [0 0 (- max-skirt-length)]
+        (apply model/cube (conj (mapv data/key-length unit-size) 0.01))))))
+
 (defn- switch-parts
   "The keyword names of the parts of a switch body."
   [switch-type]
-  (keys (get-in switch-data [switch-type :body])))
+  (keys (get-in data/switches [switch-type :body])))
 
 (defn- switch-dimension
   "The total height of a switch’s body over the mounting plate."
   [switch-type dimension]
-  {:pre [(get switch-data switch-type)]
+  {:pre [(get data/switches switch-type)]
    :post [(number? %)]}
-  (apply max (map #(get-in switch-data [switch-type :body % :size dimension])
+  (apply max (map #(get-in data/switches [switch-type :body % :size dimension])
                   (switch-parts switch-type))))
 
 (defn- switch-height
@@ -66,11 +61,11 @@
 (defn- switch-level-section
   "Find a vector of vertical sections of a switch."
   [old switch-type min-z]
-  {:pre [(get switch-data switch-type)
+  {:pre [(get data/switches switch-type)
          (number? min-z)]}
   (reduce
     (fn [coll part]
-      (let [{:keys [x y z]} (get-in switch-data [switch-type :body part :size])]
+      (let [{:keys [x y z]} (get-in data/switches [switch-type :body part :size])]
         (if (<= min-z z) (conj coll [x y]) coll)))
     (or old [])
     (switch-parts switch-type)))
@@ -80,7 +75,7 @@
   [switch-type]
   (reduce
     (fn [coll part]
-      (let [z (get-in switch-data [switch-type :body part :size :z])]
+      (let [z (get-in data/switches [switch-type :body part :size :z])]
         (update coll z switch-level-section switch-type z)))
     {0 [(switch-footprint switch-type)]}
     (switch-parts switch-type)))
@@ -110,7 +105,9 @@
 
 (defn- rounded-block
   [{:keys [z-offset z-thickness]
-    :or {z-offset 0, z-thickness 0.01} :as dimensions}]
+    :or {z-offset 0, z-thickness 0.01}
+    :as dimensions}]
+  {:pre [(number? z-offset)]}
   (->> (rounded-square dimensions)
        (model/extrude-linear {:height z-thickness, :center false})
        (maybe/translate [0 0 z-offset])))
@@ -118,7 +115,7 @@
 (defn- switch-body-cube
   [{:keys [switch-type error-body-positive] :or {error-body-positive -0.5}}
    part-name]
-  (let [{:keys [x y z]} (get-in switch-data [switch-type :body part-name :size])
+  (let [{:keys [x y z]} (get-in data/switches [switch-type :body part-name :size])
         compensator (error-fn error-body-positive)]
     (model/translate [0 0 (- (/ z 2) (switch-height switch-type))]
       (model/cube (compensator x) (compensator y) z))))
@@ -154,13 +151,13 @@
       []
       (remove (partial = :core) (switch-parts switch-type)))))
 
-(defn- shell
+(defn- rounded-frames
   "Two vectors of rounded blocks, positive and negative."
   [sequence]
   [(map rounded-block sequence)
    (map #(rounded-block (assoc % :xy-thickness 0)) sequence)])
 
-(defn- tight-shell
+(defn- tight-shell-sequence
   [switch-type]
   (let [rectangles-by-z (rectangular-sections switch-type)]
     (reduce
@@ -171,17 +168,20 @@
       []
       (reverse (sort (keys rectangles-by-z))))))
 
-(defn- non-standard-body
-  [{:keys [switch-type plate-dimensions
-           bowl-dimensions bowl-offset max-skirt-length]
-    :or {plate-dimensions [10 10 2.5]
-         bowl-dimensions [50 30 15]
-         bowl-offset -1.5}
+(defn- minimal-body
+  "A minimal (tight) keycap body with a skirt descending from a top plate.
+  The top plate rises at the edges to form a bowl. The ‘top-size’ argument
+  describes the plate, including the final thickness of the plate at its
+  center. The ‘bowl-radii’ argument describes the sphere used as a negative to
+  carve out the bowl."
+  [{:keys [switch-type top-size bowl-radii bowl-plate-offset max-skirt-length]
+    :or {top-size [9 9 1], bowl-radii [15 10 2], bowl-plate-offset 0}
     :as options}]
-  (let [max-skirt-length (or max-skirt-length
-                             (dec (switch-height switch-type)))
-        [plate-x plate-y plate-z] plate-dimensions
-        [positive negative] (shell (tight-shell switch-type))
+  (let [[plate-x plate-y top-z] top-size
+        bowl-rz (nth (or bowl-radii [0 0 0]) 2)
+        bowl-diameters (map #(* 2 %) bowl-radii)
+        plate-z (+ top-z bowl-rz)
+        [positive negative] (rounded-frames (tight-shell-sequence switch-type))
         positive
           (cons positive
             (rounded-block {:z-thickness plate-z
@@ -190,9 +190,9 @@
       (model/intersection
         (model/difference
           (util/loft positive)
-          (when bowl-dimensions
-            (model/translate [0 0 (+ plate-z (/ (nth bowl-dimensions 2) 2) bowl-offset)]
-              (model/resize bowl-dimensions
+          (when bowl-radii
+            (model/translate [0 0 (+ top-z bowl-rz bowl-plate-offset)]
+              (model/resize bowl-diameters
                 (model/sphere 1000))))))
       (switch-body options)
       (model/intersection  ; Make sure the inner negative cuts off at z = 0.
@@ -205,7 +205,7 @@
 
 (defn- stem-builder
   [{:keys [switch-type] :as options} pred]
-  (let [data (get-in switch-data [switch-type :stem])]
+  (let [data (get-in data/switches [switch-type :stem])]
     (map #(stem-body-cube options (get data %))
          (filter (partial pred data) (keys data)))))
 
@@ -224,12 +224,22 @@
 
 (defn keycap
   "A model of one keycap. Resolution is left at OpenSCAD defaults throughout."
-  [{:keys [sectioned] :as options}]
-  (let [options (merge {:switch-type :alps} options)]
+  [{:keys [switch-type body-style sectioned]
+    :or {switch-type :alps, body-style :minimal}
+    :as options}]
+  {:pre [(contains? (set (keys data/switches)) switch-type)
+         (contains? data/body-styles body-style)]}
+  (let [options (merge {:switch-type switch-type
+                        :unit-size [1 1]
+                        :max-skirt-length (dec (switch-height switch-type))}
+                       options)]
     (maybe/intersection
       (model/union
-        (non-standard-body options)  ; TODO: Standard bodies like DSA.
-        (stem-model options))
+        (case body-style
+          :maquette (maquette-body options)
+          :minimal (minimal-body options))
+        (when-not (= body-style :maquette)
+          (stem-model options)))
       (when sectioned
         (model/translate [100 0 0]
           (model/cube 200 200 200))))))
