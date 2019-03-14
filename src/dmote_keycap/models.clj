@@ -1,7 +1,8 @@
 ;;; Geometry.
 
 (ns dmote-keycap.models
-  (:require [scad-clj.model :as model]
+  (:require [clojure.spec.alpha :as spec]
+            [scad-clj.model :as model]
             [scad-tarmi.dfm :refer [error-fn]]
             [scad-tarmi.maybe :as maybe]
             [scad-tarmi.util :as util]
@@ -227,8 +228,7 @@
   [{:keys [switch-type body-style sectioned]
     :or {switch-type :alps, body-style :minimal}
     :as options}]
-  {:pre [(contains? (set (keys data/switches)) switch-type)
-         (contains? data/body-styles body-style)]}
+  {:pre [(spec/valid? ::data/keycap-parameters options)]}
   (let [options (merge {:switch-type switch-type
                         :unit-size [1 1]
                         :max-skirt-length (dec (switch-height switch-type))}

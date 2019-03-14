@@ -1,7 +1,8 @@
 ;;; A CLI application for generating 3D models.
 
 (ns dmote-keycap.core
-  (:require [clojure.tools.cli :refer [parse-opts]]
+  (:require [clojure.spec.alpha :as spec]
+            [clojure.tools.cli :refer [parse-opts]]
             [clojure.java.shell :refer [sh]]
             [clojure.java.io :refer [make-parents]]
             [environ.core :refer [env]]
@@ -21,9 +22,9 @@
    [nil "--face-size N" "Smaller number gives more detail; CLI default is 0.1"
     :default 0.1, :parse-fn #(Float/parseFloat %)]
    [nil "--switch-type TYPE" "One of “alps” (default) or “mx”"
-    :parse-fn keyword, :validate [(set (keys data/switches))]]
+    :parse-fn keyword, :validate [(partial spec/valid? ::data/switch-type)]]
    [nil "--body-style TYPE" "One of “minimal” (default) or “maquette”"
-    :parse-fn keyword, :validate [data/body-styles]]
+    :parse-fn keyword, :validate [(partial spec/valid? ::data/body-style)]]
    [nil "--error-stem-positive N" "Printer error in mm; CLI default is 0"
     :default 0, :parse-fn #(Float/parseFloat %)]
    [nil "--error-stem-negative N" "Printer error in mm; CLI default is -0.15"
