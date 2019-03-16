@@ -23,8 +23,9 @@
     :default 0.1, :parse-fn #(Float/parseFloat %)]
    [nil "--switch-type TYPE" "One of “alps” (default) or “mx”"
     :parse-fn keyword, :validate [(partial spec/valid? ::data/switch-type)]]
-   [nil "--body-style TYPE" "One of “minimal” (default) or “maquette”"
-    :parse-fn keyword, :validate [(partial spec/valid? ::data/body-style)]]
+   [nil "--style TYPE"
+    "Main body style; one of “minimal” (default) or “maquette”"
+    :parse-fn keyword, :validate [(partial spec/valid? ::data/style)]]
    [nil "--error-stem-positive N" "Printer error in mm; CLI default is 0"
     :default 0, :parse-fn #(Float/parseFloat %)]
    [nil "--error-stem-negative N" "Printer error in mm; CLI default is -0.15"

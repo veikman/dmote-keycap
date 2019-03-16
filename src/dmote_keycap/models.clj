@@ -35,30 +35,6 @@
       (maybe/translate [0 0 (- max-skirt-length)]
         (apply model/cube (conj (mapv data/key-length unit-size) 0.01))))))
 
-(defn- switch-parts
-  "The keyword names of the parts of a switch body."
-  [switch-type]
-  (keys (get-in data/switches [switch-type :body])))
-
-(defn- switch-dimension
-  "The total height of a switch’s body over the mounting plate."
-  [switch-type dimension]
-  {:pre [(get data/switches switch-type)]
-   :post [(number? %)]}
-  (apply max (map #(get-in data/switches [switch-type :body % :size dimension])
-                  (switch-parts switch-type))))
-
-(defn- switch-height
-  "The total height of a switch’s body over the mounting plate."
-  [switch-type]
-  (switch-dimension switch-type :z))
-
-(defn- switch-footprint
-  "The footprint of a switch’s body on the mounting plate."
-  [switch-type]
-  [(switch-dimension switch-type :x)
-   (switch-dimension switch-type :y)])
-
 (defn- switch-level-section
   "Find a vector of vertical sections of a switch."
   [old switch-type min-z]
@@ -69,7 +45,7 @@
       (let [{:keys [x y z]} (get-in data/switches [switch-type :body part :size])]
         (if (<= min-z z) (conj coll [x y]) coll)))
     (or old [])
-    (switch-parts switch-type)))
+    (data/switch-parts switch-type)))
 
 (defn- switch-sections
   "A map of xy slices through a composited switch body."
@@ -78,8 +54,8 @@
     (fn [coll part]
       (let [z (get-in data/switches [switch-type :body part :size :z])]
         (update coll z switch-level-section switch-type z)))
-    {0 [(switch-footprint switch-type)]}
-    (switch-parts switch-type)))
+    {0 [(data/switch-footprint switch-type)]}
+    (data/switch-parts switch-type)))
 
 (defn- rectangular-sections
   "Simplified switch sections for a squarish outer body of a keycap."
@@ -118,7 +94,7 @@
    part-name]
   (let [{:keys [x y z]} (get-in data/switches [switch-type :body part-name :size])
         compensator (error-fn error-body-positive)]
-    (model/translate [0 0 (- (/ z 2) (switch-height switch-type))]
+    (model/translate [0 0 (- (/ z 2) (data/switch-height switch-type))]
       (model/cube (compensator x) (compensator y) z))))
 
 (defn- stem-body-cube
@@ -150,7 +126,7 @@
     (reduce
       (fn [coll part] (conj coll (switch-body-cube options part)))
       []
-      (remove (partial = :core) (switch-parts switch-type)))))
+      (remove (partial = :core) (data/switch-parts switch-type)))))
 
 (defn- rounded-frames
   "Two vectors of rounded blocks, positive and negative."
@@ -165,7 +141,7 @@
       (fn [coll z]
         (conj coll
           {:footprint (get rectangles-by-z z)
-           :z-offset (- z (switch-height switch-type))}))
+           :z-offset (- z (data/switch-height switch-type))}))
       []
       (reverse (sort (keys rectangles-by-z))))))
 
@@ -225,20 +201,21 @@
 
 (defn keycap
   "A model of one keycap. Resolution is left at OpenSCAD defaults throughout."
-  [{:keys [switch-type body-style sectioned]
-    :or {switch-type :alps, body-style :minimal}
+  [{:keys [switch-type style sectioned]
+    :or {switch-type :alps, style :minimal}
     :as options}]
   {:pre [(spec/valid? ::data/keycap-parameters options)]}
   (let [options (merge {:switch-type switch-type
                         :unit-size [1 1]
-                        :max-skirt-length (dec (switch-height switch-type))}
+                        :max-skirt-length
+                          (dec (data/switch-height switch-type))}
                        options)]
     (maybe/intersection
       (model/union
-        (case body-style
+        (case style
           :maquette (maquette-body options)
           :minimal (minimal-body options))
-        (when-not (= body-style :maquette)
+        (when-not (= style :maquette)
           (stem-model options)))
       (when sectioned
         (model/translate [100 0 0]
