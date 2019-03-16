@@ -38,13 +38,24 @@
             :core           {:size {:x 14.7,  :y 14.7,  :z 1}}
             :base           {:size {:x 15.6,  :y 15.6,  :z 0.7}}}}})
 
+;; The keycap function exposed by dmote-keycap.models takes a number of options
+;; whose global default values are exposed here.
+(def option-defaults {:style :minimal
+                      :switch-type :alps
+                      :unit-size [1 1]
+                      :slope 0.73
+                      :bowl-plate-offset 0
+                      :error-body-positive -0.5
+                      :error-stem-positive 0
+                      :error-stem-negative 0})
+
 
 ;;;;;;;;;;;;
 ;; Schema ;;
 ;;;;;;;;;;;;
 
-(spec/def ::switch-type (set (keys switches)))
 (spec/def ::style #{:maquette :minimal})
+(spec/def ::switch-type (set (keys switches)))
 (spec/def ::unit-size ::tarmi/point-2d)
 (spec/def ::top-size
   (spec/tuple (spec/nilable number?) (spec/nilable number?) number?))
@@ -60,7 +71,7 @@
 
 ;; A composite spec for all valid parameters going into the keycap model.
 (spec/def ::keycap-parameters
-  (spec/keys :opt-un [::switch-type ::style ::unit-size
+  (spec/keys :opt-un [::style ::switch-type ::unit-size
                       ::top-size ::top-rotation
                       ::bowl-radii ::bowl-plate-offset
                       ::max-skirt-length ::slope
@@ -85,6 +96,12 @@
   [switch-type]
   (switch-dimension switch-type :z))
 
+(defn default-skirt-length
+  "The default height of a keycap over the mounting plate is 1 mm less than the
+  height of the switch."
+  [switch-type]
+  (dec (switch-height switch-type)))
+
 (defn switch-footprint
   "The xy footprint of a switch’s body on the mounting plate."
   [switch-type]
@@ -102,12 +119,14 @@
 (defn pressed-clearance
   "The height of the skirt of a keycap above the mounting plate, depressed."
   [switch-type skirt-length]
+  {:pre [(spec/valid? ::switch-type switch-type)
+         (spec/valid? number? skirt-length)]}
   (- (switch-height switch-type) skirt-length))
 
 (defn resting-clearance
   "The height of the skirt of a keycap above the mounting plate, at rest."
   [switch-type skirt-length]
-  (+ (pressed-clearance switch-type)
+  (+ (pressed-clearance switch-type skirt-length)
      (get-in switches [switch-type :travel])))
 
 

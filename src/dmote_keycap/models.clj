@@ -21,7 +21,7 @@
   non-default ‘top-size’ and ‘top-rotation’ can provide a rough approximation
   of SA and OEM caps, etc."
   [{:keys [unit-size slope top-size top-rotation max-skirt-length]
-    :or {slope 0.73, top-size [nil nil 1], top-rotation [0 0 0]}}]
+    :or {top-size [nil nil 1], top-rotation [0 0 0]}}]
   (let [top-thickness (nth top-size 2)
         top-plate
           (if (every? some? top-size)
@@ -90,7 +90,7 @@
        (maybe/translate [0 0 z-offset])))
 
 (defn- switch-body-cube
-  [{:keys [switch-type error-body-positive] :or {error-body-positive -0.5}}
+  [{:keys [switch-type error-body-positive]}
    part-name]
   (let [{:keys [x y z]} (get-in data/switches [switch-type :body part-name :size])
         compensator (error-fn error-body-positive)]
@@ -104,8 +104,7 @@
   on a Lulzbot TAZ6, whereas the negatives space inside an MX-style stem will
   be too tight without compensation and too loose with standard muzzle-width
   compensation."
-  [{:keys [error-stem-positive error-stem-negative]
-    :or {error-stem-positive 0, error-stem-negative 0}}
+  [{:keys [error-stem-positive error-stem-negative]}
    part-properties]
   {:pre [(map? part-properties)
          (:size part-properties)]}
@@ -152,7 +151,7 @@
   center. The ‘bowl-radii’ argument describes the sphere used as a negative to
   carve out the bowl."
   [{:keys [switch-type top-size bowl-radii bowl-plate-offset max-skirt-length]
-    :or {top-size [9 9 1], bowl-radii [15 10 2], bowl-plate-offset 0}
+    :or {top-size [9 9 1], bowl-radii [15 10 2]}
     :as options}]
   (let [[plate-x plate-y top-z] top-size
         bowl-rz (nth (or bowl-radii [0 0 0]) 2)
@@ -202,14 +201,14 @@
 (defn keycap
   "A model of one keycap. Resolution is left at OpenSCAD defaults throughout."
   [{:keys [switch-type style sectioned]
-    :or {switch-type :alps, style :minimal}
-    :as options}]
-  {:pre [(spec/valid? ::data/keycap-parameters options)]}
-  (let [options (merge {:switch-type switch-type
-                        :unit-size [1 1]
-                        :max-skirt-length
-                          (dec (data/switch-height switch-type))}
-                       options)]
+    :or {switch-type (:switch-type data/option-defaults)
+         style (:style data/option-defaults)}
+    :as input-options}]
+  {:pre [(spec/valid? ::data/keycap-parameters input-options)]}
+  (let [options
+          (merge data/option-defaults
+                 {:max-skirt-length (data/default-skirt-length switch-type)}
+                 input-options)]
     (maybe/intersection
       (model/union
         (case style
