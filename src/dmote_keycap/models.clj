@@ -169,7 +169,7 @@
           (when bowl-radii
             (model/translate [0 0 (+ top-z bowl-rz bowl-plate-offset)]
               (model/resize bowl-diameters
-                (model/sphere 1000))))))
+                (model/sphere 3))))))  ; Low detail for quick previews.
       (switch-body options)
       (model/intersection  ; Make sure the inner negative cuts off at z = 0.
         (util/loft negative)
@@ -199,7 +199,8 @@
 ;;;;;;;;;;;;;;;
 
 (defn keycap
-  "A model of one keycap. Resolution is left at OpenSCAD defaults throughout."
+  "A model of one keycap. Resolution is left at OpenSCAD defaults throughout.
+  For a guide to the parameters, see README.md."
   [{:keys [switch-type style sectioned]
     :or {switch-type (:switch-type data/option-defaults)
          style (:style data/option-defaults)}
