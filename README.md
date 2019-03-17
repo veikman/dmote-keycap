@@ -1,19 +1,22 @@
 # `dmote-keycap`: Keycap models for mechanical keyboards
 
 `dmote-keycap` produces a three-dimensional geometry for a keycap: Either a
-featureless maquette for use in easily rendered previews, or a featureful
-“minimal” keycap that you can print and use.
+featureless maquette for use in easily rendered previews, or a keycap that you
+can print and use.
 
 Horizontal keycap size is measured in a traditional unit: The u, where 1 u is
 19.05 mm (0.75”) per key mount. A 1 u cap is smaller at about 18.25 mm to allow
-for space between caps on adjacent mounts.
+for space between caps on adjacent mounts. For the same reason, a 2 u cap is
+more than twice as a wide as a 1 u cap, and so on.
 
 ## Features
 
 * Supports both ALPS- and MX-style switches.
-* The “minimal” style hugs the body of the switch. It enables keyboard designs
-  more dense than the traditional 1 u, which can have ergonomic advantages.
-  It offers better dust protection than a “top only” 0.75 u cap.
+* A “minimal” style that hugs the body of the switch. This style enables
+  keyboard designs more dense than the traditional 1 u, which can have
+  ergonomic advantages. Dust protection is better than a 0.75 u cap that does
+  not extend down the sides of the switch.
+* A “maquette” style for previewing keyboard designs.
 
 `dmote-keycap` does not provide models of switches.
 
@@ -42,10 +45,11 @@ a number of parameters, in a flat map, and returns a `scad-clj` specification:
   a non-rectangular shape, as is typical for the Enter key, is not yet
   supported by this library, nor are stabilizer mounts.
 * `:top-size`: A 3-tuple describing the finger contact surface, including its
-  thickness above the stem of the keycap. The first two numbers in this
-  3-tuple can be omitted. All measurements in mm.
+  thickness in the middle, directly above the stem of the keycap. The first two
+  numbers in this 3-tuple can be omitted by replacing them with `nil`, in which
+  case `:slope` (see below) will take precedence. All measurements in mm.
 * `:slope`: A ratio between the top and bottom of the keycap. This setting is
-  only used if `top-size` is left incomplete.
+  only used if `:top-size` is left incomplete.
 * `:top-rotation`: A 3-tuple describing the angle of the finger contact
   surface, in radians. This would be `[0 0 0]` for a DSA profile and would have
   a different non-zero first value for each row of an OEM profile.
@@ -63,12 +67,16 @@ a number of parameters, in a flat map, and returns a `scad-clj` specification:
   This is useful in previews and development.
 
 Some of these parameters have global default values, while others have default
-values associated with particular styles, for ease of use.
+values associated with particular styles, for ease of use. The long-term plan
+is to model a variety of traditional “families” with just a few parameters.
 
 ### As a command-line application
 
 Use `lein run` with command-line arguments corresponding to the parameters
-listed above. This will generate files of OpenSCAD code under `output/scad`
+listed above. Not all parameters are supported; try `lein run --help`.
+The CLI takes an additional parameter for resolution
+
+The application will generate files of OpenSCAD code under `output/scad`
 and, optionally, STL files for slicing and 3D printing.
 
 ## License
