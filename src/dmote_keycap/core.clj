@@ -19,16 +19,16 @@
    ["-r" "--render" "Render SCAD to STL"]
    [nil "--rendering-program PATH" "Path to OpenSCAD" :default "openscad"]
    [nil "--sectioned" "Show models in section (cut in half)"]
-   [nil "--face-size N" "Smaller number gives more detail; CLI default is 0.1"
+   [nil "--face-size N" "Smaller number gives more detail"
     :default 0.1, :parse-fn #(Float/parseFloat %)]
    [nil "--switch-type TYPE" "One of “alps” (default) or “mx”"
     :parse-fn keyword, :validate [(partial spec/valid? ::data/switch-type)]]
    [nil "--style TYPE"
     "Main body style; one of “minimal” (default) or “maquette”"
     :parse-fn keyword, :validate [(partial spec/valid? ::data/style)]]
-   [nil "--error-stem-positive N" "Printer error in mm; CLI default is 0"
+   [nil "--error-stem-positive N" "Printer error in mm"
     :default 0, :parse-fn #(Float/parseFloat %)]
-   [nil "--error-stem-negative N" "Printer error in mm; CLI default is -0.15"
+   [nil "--error-stem-negative N" "Printer error in mm"
     :default -0.15, :parse-fn #(Float/parseFloat %)]])
 
 (defn -main
