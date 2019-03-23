@@ -4,6 +4,8 @@
 featureless maquette for use in easily rendered previews, or a keycap that you
 can print and use.
 
+[![Clojars Project](https://img.shields.io/clojars/v/dmote-keycap.svg)](https://clojars.org/dmote-keycap)
+
 Horizontal keycap size is measured in a traditional unit: The u, where 1 u is
 19.05 mm (0.75”) per key mount. A 1 u cap is smaller at about 18.25 mm to allow
 for space between caps on adjacent mounts. For the same reason, a 2 u cap is
