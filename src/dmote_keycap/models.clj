@@ -73,13 +73,14 @@
 
 (defn- inset-corner
   [[x y] radius]
+  {:pre [(number? x) (number? y) (number? radius)]}
   (let [initial #(- % (* 2 radius))]
     (->> (model/square (initial x) (initial y))
          (model/offset radius))))
 
 (defn- rounded-square
-  [{:keys [footprint radius xy-thickness] :or {radius 1.8, xy-thickness 2.1}}]
-  (inset-corner (map #(+ % xy-thickness) footprint) radius))
+  [{:keys [footprint radius skirt-thickness] :or {radius 1.8}}]
+  (inset-corner (map #(+ % skirt-thickness) footprint) radius))
 
 (defn- rounded-block
   [{:keys [z-offset z-thickness]
@@ -129,19 +130,21 @@
       (remove (partial = :core) (data/switch-parts switch-type)))))
 
 (defn- rounded-frames
-  "Two vectors of rounded blocks, positive and negative."
+  "Two vectors of rounded blocks, positive and negative.
+  The inner sequence uses a horizontal (skirt) thickness of zero."
   [sequence]
   [(map rounded-block sequence)
-   (map #(rounded-block (assoc % :xy-thickness 0)) sequence)])
+   (map #(rounded-block (assoc % :skirt-thickness 0)) sequence)])
 
 (defn- tight-shell-sequence
-  [switch-type]
+  [{:keys [switch-type] :as options}]
   (let [rectangles-by-z (rectangular-sections switch-type)]
     (reduce
       (fn [coll z]
         (conj coll
-          {:footprint (get rectangles-by-z z)
-           :z-offset (- z (data/switch-height switch-type))}))
+          (merge options
+                 {:footprint (get rectangles-by-z z)
+                  :z-offset (- z (data/switch-height switch-type))})))
       []
       (reverse (sort (keys rectangles-by-z))))))
 
@@ -159,11 +162,13 @@
         bowl-rz (nth (or bowl-radii [0 0 0]) 2)
         bowl-diameters (map #(* 2 %) bowl-radii)
         plate-z (+ top-z bowl-rz)
-        [positive negative] (rounded-frames (tight-shell-sequence switch-type))
+        [positive negative] (rounded-frames (tight-shell-sequence options))
         positive
           (cons positive
-            (rounded-block {:z-thickness plate-z
-                            :footprint [plate-x plate-y]}))]
+            (rounded-block (merge options
+                                  {:footprint [plate-x plate-y]
+                                   :z-thickness plate-z})))]
+
     (model/difference
       (model/intersection
         (model/difference
@@ -204,8 +209,7 @@
   "A model of one keycap. Resolution is left at OpenSCAD defaults throughout.
   For a guide to the parameters, see README.md."
   [{:keys [switch-type style sectioned]
-    :or {switch-type (:switch-type data/option-defaults)
-         style (:style data/option-defaults)}
+    :or {style (:style data/option-defaults)}
     :as input-options}]
   {:pre [(spec/valid? ::data/keycap-parameters input-options)]}
   (let [options (merge data/option-defaults input-options)]

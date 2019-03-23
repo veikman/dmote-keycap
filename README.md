@@ -58,7 +58,9 @@ a number of parameters, in a flat map, and returns a `scad-clj` specification:
   If this option is set to `nil`, no bowl is used.
 * `:bowl-plate-offset`: An optional modification of the vertical distance in
   mm between the bowl and the top of the keycap.
-* `:max-skirt-length`: The maximum length of material from the top of the stem
+* `:skirt-thickness`: The horizontal thickness of material in the outer walls
+  of a `minimal` cap.
+* `:skirt-length`: The length of material from the top of the stem
   down toward the switch mounting plate. By default, on a `minimal` cap, this
   is 1 mm less than the space available when the switch is pressed.
 * `:error-stem-positive`, `:error-stem-negative`, `:error-body-positive`:

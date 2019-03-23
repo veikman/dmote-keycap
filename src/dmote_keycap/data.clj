@@ -45,6 +45,7 @@
                       :unit-size [1 1]
                       :slope 0.73
                       :bowl-plate-offset 0
+                      :skirt-thickness 2.1
                       :error-body-positive -0.5
                       :error-stem-positive 0
                       :error-stem-negative 0})
@@ -62,6 +63,7 @@
 (spec/def ::top-rotation ::tarmi/point-3d)
 (spec/def ::bowl-radii ::tarmi/point-3d)
 (spec/def ::bowl-plate-offset number?)
+(spec/def ::skirt-thickness number?)
 (spec/def ::skirt-length (spec/and number? #(>= % 0)))
 (spec/def ::slope (spec/and number? #(>= % 0)))
 (spec/def ::error-stem-positive number?)
@@ -74,7 +76,7 @@
   (spec/keys :opt-un [::style ::switch-type ::unit-size
                       ::top-size ::top-rotation
                       ::bowl-radii ::bowl-plate-offset
-                      ::skirt-length ::slope
+                      ::skirt-thickness ::skirt-length ::slope
                       ::error-stem-positive ::error-stem-negative
                       ::error-body-positive ::sectioned]))
 
@@ -104,15 +106,31 @@
   (dec (switch-height switch-type)))
 
 (defn switch-footprint
-  "The xy footprint of a switch’s body on the mounting plate."
+  "The xy footprint of a switch’s body on the mounting plate. This is not to be
+  confused with notches extending from the body to rest on top of the plate."
   [switch-type]
   [(switch-dimension switch-type :x)
    (switch-dimension switch-type :y)])
 
+(defn skirt-footprint
+  "The maximum horizontal size of a keycap.
+  This measurement should describe the keycap at its widest point, coinciding
+  with the lower edge of the skirt. The function is exposed to allow for
+  clearing negative space around the keycap in a keyboard model."
+  [options]
+  {:pre [(spec/valid? ::keycap-parameters options)]
+   :post [(spec/valid? ::tarmi/point-2d %)]}
+  (let [options-final (merge option-defaults options)
+        {:keys [style switch-type unit-size skirt-thickness]} options-final]
+    (if (= style :minimal)
+      (mapv #(+ % skirt-thickness) (switch-footprint switch-type))
+      (mapv key-length unit-size))))
+
 (defn plate-to-stem-end
-  "The distance from the switch mount plate to the end of the switch stem.
+  "The distance from the switch mount plate to the end of the switch stem,
+  in the resting (open) state of the switch.
   This is exposed because dmote-keycap models place z 0 at the end of the
-  stem, not on or in the mounting plate."
+  stem, not on the mounting plate."
   [switch-type]
   (+ (switch-height switch-type)
      (get-in switches [switch-type :travel])))
