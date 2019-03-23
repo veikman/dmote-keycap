@@ -20,8 +20,9 @@
   The default height and slope are based on a DSA profile. Passing a
   non-default ‘top-size’ and ‘top-rotation’ can provide a rough approximation
   of SA and OEM caps, etc."
-  [{:keys [unit-size slope top-size top-rotation max-skirt-length]
-    :or {top-size [nil nil 1], top-rotation [0 0 0]}}]
+  [{:keys [switch-type unit-size slope top-size top-rotation skirt-length]
+    :or {top-size [nil nil 1], top-rotation [0 0 0],
+         skirt-length (data/default-skirt-length switch-type)}}]
   (let [top-thickness (nth top-size 2)
         top-plate
           (if (every? some? top-size)
@@ -32,7 +33,7 @@
       (maybe/translate [0 0 (/ top-thickness 2)]
         (maybe/rotate top-rotation
           (apply model/cube top-plate)))
-      (maybe/translate [0 0 (- max-skirt-length)]
+      (maybe/translate [0 0 (- skirt-length)]
         (apply model/cube (conj (mapv data/key-length unit-size) 0.01))))))
 
 (defn- switch-level-section
@@ -150,8 +151,9 @@
   describes the plate, including the final thickness of the plate at its
   center. The ‘bowl-radii’ argument describes the sphere used as a negative to
   carve out the bowl."
-  [{:keys [switch-type top-size bowl-radii bowl-plate-offset max-skirt-length]
-    :or {top-size [9 9 1], bowl-radii [15 10 2]}
+  [{:keys [switch-type top-size bowl-radii bowl-plate-offset skirt-length]
+    :or {top-size [9 9 1], bowl-radii [15 10 2],
+         skirt-length (data/default-skirt-length switch-type)}
     :as options}]
   (let [[plate-x plate-y top-z] top-size
         bowl-rz (nth (or bowl-radii [0 0 0]) 2)
@@ -176,7 +178,7 @@
         (model/translate [0 0 -100]
           (model/cube 200 200 200)))
       ;; Cut everything before hitting the mounting plate:
-      (model/translate [0 0 (- -100 max-skirt-length)]
+      (model/translate [0 0 (- -100 skirt-length)]
         (model/cube 200 200 200)))))
 
 (defn- stem-builder
@@ -206,10 +208,7 @@
          style (:style data/option-defaults)}
     :as input-options}]
   {:pre [(spec/valid? ::data/keycap-parameters input-options)]}
-  (let [options
-          (merge data/option-defaults
-                 {:max-skirt-length (data/default-skirt-length switch-type)}
-                 input-options)]
+  (let [options (merge data/option-defaults input-options)]
     (maybe/intersection
       (model/union
         (case style

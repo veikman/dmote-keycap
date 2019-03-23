@@ -26,6 +26,8 @@
    [nil "--style TYPE"
     "Main body style; one of “minimal” (default) or “maquette”"
     :parse-fn keyword, :validate [(partial spec/valid? ::data/style)]]
+   [nil "--skirt-length N" "Height of keycap up to top of switch stem."
+    :parse-fn #(Float/parseFloat %)]
    [nil "--error-stem-positive N" "Printer error in mm"
     :default 0, :parse-fn #(Float/parseFloat %)]
    [nil "--error-stem-negative N" "Printer error in mm"

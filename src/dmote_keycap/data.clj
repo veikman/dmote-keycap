@@ -62,8 +62,8 @@
 (spec/def ::top-rotation ::tarmi/point-3d)
 (spec/def ::bowl-radii ::tarmi/point-3d)
 (spec/def ::bowl-plate-offset number?)
-(spec/def ::max-skirt-length (spec/and number? #(>= % 0)))
-(spec/def ::slope number?)
+(spec/def ::skirt-length (spec/and number? #(>= % 0)))
+(spec/def ::slope (spec/and number? #(>= % 0)))
 (spec/def ::error-stem-positive number?)
 (spec/def ::error-stem-negative number?)
 (spec/def ::error-body-positive number?)
@@ -74,7 +74,7 @@
   (spec/keys :opt-un [::style ::switch-type ::unit-size
                       ::top-size ::top-rotation
                       ::bowl-radii ::bowl-plate-offset
-                      ::max-skirt-length ::slope
+                      ::skirt-length ::slope
                       ::error-stem-positive ::error-stem-negative
                       ::error-body-positive ::sectioned]))
 
@@ -98,7 +98,8 @@
 
 (defn default-skirt-length
   "The default height of a keycap over the mounting plate is 1 mm less than the
-  height of the switch."
+  height of the switch. This is a rough estimate based on frobnicating OEM
+  caps."
   [switch-type]
   (dec (switch-height switch-type)))
 
