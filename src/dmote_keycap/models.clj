@@ -214,7 +214,7 @@
   {:pre [(spec/valid? ::data/keycap-parameters input-options)]}
   (let [options (merge data/option-defaults input-options)]
     (maybe/intersection
-      (model/union
+      (maybe/union
         (case style
           :maquette (maquette-body options)
           :minimal (minimal-body options))
