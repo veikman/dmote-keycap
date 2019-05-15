@@ -1,4 +1,4 @@
-# `dmote-keycap`: Keycap models for mechanical keyboards
+# Keycaps for mechanical keyboards
 
 `dmote-keycap` produces a three-dimensional geometry for a keycap: Either a
 featureless maquette for use in easily rendered previews, or a keycap that you
@@ -20,7 +20,8 @@ more than twice as a wide as a 1 u cap, and so on.
   not extend down the sides of the switch.
 * A “maquette” style for previewing keyboard designs.
 
-`dmote-keycap` does not provide models of switches.
+`dmote-keycap` does not provide models of switches and has no support for
+stabilizers.
 
 ## Usage
 
@@ -40,21 +41,22 @@ a number of parameters, in a flat map, and returns a `scad-clj` specification:
   preview).
 * `:switch-type`: One of `:alps` (ALPS style, including Matias) or
   `:mx` (Cherry MX style).
-* `:unit-size`: A 2-tuple of horizontal size measured in u (hence non-linear).
+* `:unit-size`: A 2-tuple of horizontal size measured in u, hence non-linear.
   On a traditional ISO keyboard, the first value in this tuple (the width)
   varies from 1 for most keys to about 6 for a space bar. The second value
   (the depth) is 2 for the Enter key and 1 for all other keys. Please note that
   a non-rectangular shape, as is typical for the Enter key, is not yet
-  supported by this library, nor are stabilizer mounts.
+  supported by this library.
 * `:top-size`: A 3-tuple describing the finger contact surface, including its
   thickness in the middle, directly above the stem of the keycap. The first two
   numbers in this 3-tuple can be omitted by replacing them with `nil`, in which
   case `:slope` (see below) will take precedence. All measurements in mm.
-* `:slope`: A ratio between the top and bottom of the keycap. This setting is
-  only used if `:top-size` is left incomplete.
+* `:slope`: A ratio between the top and bottom widths of the keycap. This
+  setting is used only if `:top-size` is left incomplete.
 * `:top-rotation`: A 3-tuple describing the angle of the finger contact
-  surface, in radians. This would be `[0 0 0]` for a DSA profile and would have
-  a different non-zero first value for each row of an OEM profile.
+  surface, in radians. This would be `[0 0 0]` for a (row 3 or standard) DSA
+  profile and would have a different non-zero first value for each row of an
+  OEM profile.
 * `:bowl-radii`: A 3-tuple describing the radii of a spheroid used as
   negative space to carve a bowl out of the top of a non-maquette keycap.
   If this option is set to `nil`, no bowl is used.
@@ -78,7 +80,7 @@ is to model a variety of traditional “families” with just a few parameters.
 
 Use `lein run` with command-line arguments corresponding to the parameters
 listed above. Not all parameters are supported; try `lein run --help`.
-The CLI takes an additional parameter for resolution
+The CLI takes an additional parameter for resolution (i.e. level of detail).
 
 The application will generate files of OpenSCAD code under `output/scad`
 and, optionally, STL files for slicing and 3D printing.

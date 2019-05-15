@@ -1,4 +1,4 @@
-(defproject dmote-keycap "0.1.1"
+(defproject dmote-keycap "0.2.0-SNAPSHOT"
   :description "Printable keycap models for mechanical keyboards"
   :url "http://viktor.eikman.se/article/the-dmote/"
   :license {:name "EPL-2.0 OR GPL-3.0-or-later"
