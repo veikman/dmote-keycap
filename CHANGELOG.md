@@ -4,6 +4,8 @@ This log follows the conventions of
 
 ## [Unreleased]
 - Added print support for stems shorter than skirts.
+- Added horizontal print supports between skirt and stem.
+  Alignment with the skirt at print-bed level quick and dirty.
 - Added pitched ceilings to the interior of minimal caps.
 
 ## [Version 0.1.1] - 2019-03-24

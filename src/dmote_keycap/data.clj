@@ -47,6 +47,7 @@
                       :bowl-plate-offset 0
                       :skirt-thickness 2.1
                       :nozzle-width 0.5
+                      :horizontal-support-height 0.3
                       :error-body-positive -0.5
                       :error-stem-positive 0
                       :error-stem-negative 0})
@@ -67,6 +68,8 @@
 (spec/def ::skirt-thickness number?)
 (spec/def ::skirt-length (spec/and number? #(>= % 0)))
 (spec/def ::slope (spec/and number? #(>= % 0)))
+(spec/def ::nozzle-width (spec/and number? #(> % 0)))
+(spec/def ::horizontal-support-height (spec/and number? #(>= % 0)))
 (spec/def ::error-stem-positive number?)
 (spec/def ::error-stem-negative number?)
 (spec/def ::error-body-positive number?)
@@ -78,6 +81,7 @@
                       ::top-size ::top-rotation
                       ::bowl-radii ::bowl-plate-offset
                       ::skirt-thickness ::skirt-length ::slope
+                      ::nozzle-width ::horizontal-support-height
                       ::error-stem-positive ::error-stem-negative
                       ::error-body-positive ::sectioned]))
 

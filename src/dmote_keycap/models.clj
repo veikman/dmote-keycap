@@ -122,7 +122,7 @@
   The stem body is extremely sensitive to printing inaccuracies.
   Generally, an ALPS-style stem will print OK without compensation for error
   on a Lulzbot TAZ6, whereas the negative space inside an MX-style stem will
-  be too tight without compensation and too loose with standard muzzle-width
+  be too tight without compensation and too loose with standard nozzle-width
   compensation."
   [{:keys [error-stem-positive error-stem-negative]}
    part-properties]
@@ -252,7 +252,6 @@
       (model/translate [0 0 (- -100 skirt-length)]
         (model/cube 200 200 200)))))
 
-
 (defn- stem-builder
   [{:keys [switch-type] :as options} pred]
   (let [data (switch-data switch-type :stem)]
@@ -264,6 +263,21 @@
   (maybe/difference
     (apply maybe/union (stem-builder options positives))
     (apply maybe/union (stem-builder options negatives))))
+
+(defn- horizontal-support
+  "A cross connecting the stem and skirt. The purpose of this structure is to
+  increase the surface contact between bed and cap while stabilizing the
+  delicate stem in particular."
+  [{:keys [switch-type nozzle-width horizontal-support-height] :as options}]
+  (let [[stem-x stem-y] (stem-footprint switch-type 0)
+        [skirt-x skirt-y] (map dec (data/skirt-footprint options))]  ;; Rough!
+    (model/translate [0 0 (+ (print-bed-level options)
+                             (/ horizontal-support-height 2))]
+      (model/difference
+        (model/union
+          (model/cube skirt-x nozzle-width horizontal-support-height)
+          (model/cube nozzle-width skirt-y horizontal-support-height))
+        (model/cube stem-x stem-y horizontal-support-height)))))
 
 (defn- stem-support
   "A completely hollow rectangular support structure with the width of the
@@ -280,10 +294,12 @@
         (when (every? pos? [foot-xᵢ foot-yᵢ])
           (model/cube foot-xᵢ foot-yᵢ difference))))))
 
+
 (defn- support-model
   [{:keys [switch-type skirt-length] :as options}]
   (let [stem-z (stem-length switch-type)]
     (maybe/union
+      (horizontal-support options)
       (if (> skirt-length stem-z)
         (stem-support options)))))
 
