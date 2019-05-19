@@ -17,6 +17,20 @@
 (defn- switch-data [switch-type key] (get-in data/switches [switch-type key]))
 (defn- section-keys [data pred] (filter (partial pred data) (keys data)))
 
+(defn- stem-length
+  "The length of the longest positive piece of the stem on a keycap.
+  This should be the full interior height of the slider on a switch."
+  [switch-type]
+  (let [data (switch-data switch-type :stem)]
+    (apply max (map #(get-in data [% :size :z])
+                    (section-keys data positives)))))
+
+(defn- print-bed-level
+  "The level of the print bed (i.e. the bottom of an upright keycap model)
+  relative to the top of the stem."
+  [{:keys [switch-type skirt-length]}]
+  (- (max (stem-length switch-type) skirt-length)))
+
 (defn- maquette-body
   "The shape of one keycap, greatly simplified.
   The simplification is so extensive that this keycap can only be used for
@@ -26,8 +40,7 @@
   non-default ‘top-size’ and ‘top-rotation’ can provide a rough approximation
   of SA and OEM caps, etc."
   [{:keys [switch-type unit-size slope top-size top-rotation skirt-length]
-    :or {top-size [nil nil 1], top-rotation [0 0 0],
-         skirt-length (data/default-skirt-length switch-type)}}]
+    :or {top-size [nil nil 1], top-rotation [0 0 0]}}]
   (let [top-thickness (nth top-size 2)
         top-plate
           (if (every? some? top-size)
@@ -206,8 +219,7 @@
   center. The ‘bowl-radii’ argument describes the sphere used as a negative to
   carve out the bowl."
   [{:keys [switch-type top-size bowl-radii bowl-plate-offset skirt-length]
-    :or {top-size [9 9 1], bowl-radii [15 10 2],
-         skirt-length (data/default-skirt-length switch-type)}
+    :or {top-size [9 9 1], bowl-radii [15 10 2]}
     :as options}]
   (let [merged-opts (merge {:top-size top-size
                             :bowl-radii bowl-radii}
@@ -240,6 +252,7 @@
       (model/translate [0 0 (- -100 skirt-length)]
         (model/cube 200 200 200)))))
 
+
 (defn- stem-builder
   [{:keys [switch-type] :as options} pred]
   (let [data (switch-data switch-type :stem)]
@@ -252,6 +265,28 @@
     (apply maybe/union (stem-builder options positives))
     (apply maybe/union (stem-builder options negatives))))
 
+(defn- stem-support
+  "A completely hollow rectangular support structure with the width of the
+  printer nozzle, underneath the keycap stem."
+  [{:keys [switch-type skirt-length nozzle-width] :as options}]
+  (let [stem-z (stem-length switch-type)
+        difference (- skirt-length stem-z)
+        footprint (stem-footprint switch-type 0)
+        [foot-xₒ foot-yₒ] footprint
+        [foot-xᵢ foot-yᵢ] (map #(max 0 (- % (* 2 nozzle-width))) footprint)]
+    (model/translate [0 0 (+ (print-bed-level options) (/ difference 2))]
+      (maybe/difference
+        (model/cube foot-xₒ foot-yₒ difference)
+        (when (every? pos? [foot-xᵢ foot-yᵢ])
+          (model/cube foot-xᵢ foot-yᵢ difference))))))
+
+(defn- support-model
+  [{:keys [switch-type skirt-length] :as options}]
+  (let [stem-z (stem-length switch-type)]
+    (maybe/union
+      (if (> skirt-length stem-z)
+        (stem-support options)))))
+
 
 ;;;;;;;;;;;;;;;
 ;; Interface ;;
@@ -260,18 +295,23 @@
 (defn keycap
   "A model of one keycap. Resolution is left at OpenSCAD defaults throughout.
   For a guide to the parameters, see README.md."
-  [{:keys [switch-type style sectioned]
-    :or {style (:style data/option-defaults)}
+  [{:keys [switch-type style skirt-length supported sectioned]
+    :or {switch-type (:switch-type data/option-defaults)
+         style (:style data/option-defaults)}
     :as input-options}]
   {:pre [(spec/valid? ::data/keycap-parameters input-options)]}
-  (let [options (merge data/option-defaults input-options)]
+  (let [options (merge data/option-defaults
+                       {:skirt-length (data/default-skirt-length switch-type)}
+                       input-options)]
     (maybe/intersection
       (maybe/union
         (case style
           :maquette (maquette-body options)
           :minimal (minimal-body options))
         (when-not (= style :maquette)
-          (stem-model options)))
+          (stem-model options))
+        (when (and supported (not (= style :maquette)))
+          (support-model options)))
       (when sectioned
         (model/translate [100 0 0]
           (model/cube 200 200 200))))))

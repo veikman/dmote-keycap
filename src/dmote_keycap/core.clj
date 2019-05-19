@@ -17,6 +17,7 @@
    ["-h" "--help" "Print this message and exit"]
    ["-r" "--render" "Render SCAD to STL"]
    [nil "--rendering-program PATH" "Path to OpenSCAD" :default "openscad"]
+   [nil "--supported" "Include print supports underneath models"]
    [nil "--sectioned" "Show models in section (cut in half)"]
    [nil "--face-size N" "Smaller number gives more detail"
     :default 0.1, :parse-fn #(Float/parseFloat %),
@@ -27,6 +28,8 @@
     "Main body style; one of “minimal” (default) or “maquette”"
     :parse-fn keyword, :validate [(partial spec/valid? ::data/style)]]
    [nil "--skirt-length N" "Height of keycap up to top of switch stem."
+    :parse-fn #(Float/parseFloat %)]
+   [nil "--nozzle-width N" "Printer nozzle (aperture) width in mm"
     :parse-fn #(Float/parseFloat %)]
    [nil "--error-stem-positive N" "Printer error in mm"
     :default 0, :parse-fn #(Float/parseFloat %)]

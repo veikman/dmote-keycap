@@ -67,10 +67,14 @@ a number of parameters, in a flat map, and returns a `scad-clj` specification:
 * `:skirt-length`: The length of material from the top of the stem
   down toward the switch mounting plate. By default, on a `minimal` cap, this
   is 1 mm less than the space available when the switch is pressed.
-* `:error-stem-positive`, `:error-stem-negative`, `:error-body-positive`:
-  Printer-dependent measurements of error for different parts of the cap.
 * `:sectioned`: If true, the model is cut in half for a sectioned view.
   This is useful in previews and development.
+* `:supported`: If true, support structures are added underneath the model.
+* `:nozzle-width`: The width of the printer nozzle that will be used to print
+  the cap. This parameter is only used to build supports, which will have the
+  width of the nozzle because this improves print speed and quality.
+* `:error-stem-positive`, `:error-stem-negative`, `:error-body-positive`:
+  Printer-dependent measurements of error for different parts of the cap.
 
 Some of these parameters have global default values, while others have default
 values associated with particular styles, for ease of use. The long-term plan
@@ -84,6 +88,26 @@ The CLI takes an additional parameter for resolution (i.e. level of detail).
 
 The application will generate files of OpenSCAD code under `output/scad`
 and, optionally, STL files for slicing and 3D printing.
+
+## Printing
+
+Several of the parameters listed above are intended to aid manufacturability.
+This includes the `supported` parameter, which is intended to reduce the need
+for building supports in slicing software.
+
+With single-head FDM printing in a material like PLA, a relatively simple way
+to get a good result is to print each key in an upright position, with
+`supported`. In general, a `minimal`-style cap with a tall top plate (hence
+a pitched ceiling) should not need further support.
+
+Consider the main alternative: Printing each key upside down. This will often
+give you a cleaner stem and skirt, but with an uneven face (i.e. non-nil
+`bowl-radii`), cleaning up the print will be difficult. In particular, even
+with fairly dense supports added by a slicer, you will probably find tiny
+cavities behind the face, to such a depth that a really good surface finish is
+hard to achieve even with a suitable rotary tool. Still, if you intend to
+paint your prints anyway, or if you have a dual-head printer with a soluble
+support material, this may ultimately be a better option.
 
 ## License
 
