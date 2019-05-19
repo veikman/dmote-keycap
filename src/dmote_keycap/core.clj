@@ -32,9 +32,9 @@
    [nil "--nozzle-width N" "Printer nozzle (aperture) width in mm"
     :parse-fn #(Float/parseFloat %)]
    [nil "--error-stem-positive N" "Printer error in mm"
-    :default 0, :parse-fn #(Float/parseFloat %)]
+    :parse-fn #(Float/parseFloat %)]
    [nil "--error-stem-negative N" "Printer error in mm"
-    :default -0.15, :parse-fn #(Float/parseFloat %)]])
+    :parse-fn #(Float/parseFloat %)]])
 
 (defn -main
   "Basic command-line interface logic."
