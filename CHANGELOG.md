@@ -3,7 +3,7 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
-Nothing yet.
+- Added pitched ceilings to the interior of minimal caps.
 
 ## [Version 0.1.1] - 2019-03-24
 ### Fixed

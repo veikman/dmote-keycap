@@ -12,6 +12,11 @@
 ;; Internal ;;
 ;;;;;;;;;;;;;;
 
+(defn- positives [coll key] (get-in coll [key :positive]))
+(defn- negatives [coll key] (not (get-in coll [key :positive])))
+(defn- switch-data [switch-type key] (get-in data/switches [switch-type key]))
+(defn- section-keys [data pred] (filter (partial pred data) (keys data)))
+
 (defn- maquette-body
   "The shape of one keycap, greatly simplified.
   The simplification is so extensive that this keycap can only be used for
@@ -99,11 +104,11 @@
     (model/translate [0 0 (- (/ z 2) (data/switch-height switch-type))]
       (model/cube (compensator x) (compensator y) z))))
 
-(defn- stem-body-cube
+(defn- stem-body-cuboid
   "Overly similar to switch-body-cube but for stems.
   The stem body is extremely sensitive to printing inaccuracies.
   Generally, an ALPS-style stem will print OK without compensation for error
-  on a Lulzbot TAZ6, whereas the negatives space inside an MX-style stem will
+  on a Lulzbot TAZ6, whereas the negative space inside an MX-style stem will
   be too tight without compensation and too loose with standard muzzle-width
   compensation."
   [{:keys [error-stem-positive error-stem-negative]}
@@ -128,6 +133,52 @@
       (fn [coll part] (conj coll (switch-body-cube options part)))
       []
       (remove (partial = :core) (data/switch-parts switch-type)))))
+
+(defn- switch-top-sizes
+  "A sequence of size descriptors for the topmost rectangle(s) on a switch."
+  [switch-type]
+  (let [data (switch-data switch-type :body)
+        sizes (map #(get-in data [% :size]) (keys data))
+        max-z (apply max (map :z sizes))]
+    (filter #(= max-z (:z %)) sizes)))
+
+(defn- switch-top-rectangles
+  [switch-type error thickness]
+  (let [compensator (error-fn error)
+        rect #(model/cube (compensator (:x %)) (compensator (:y %)) thickness)]
+    (map rect (switch-top-sizes switch-type))))
+
+(defn- stem-footprint
+  "The maximal rectangular footprint of the positive features of a stem."
+  [switch-type error]
+  (let [data (switch-data switch-type :stem)
+        sizes (map #(get-in data [% :size]) (section-keys data positives))
+        compensator (error-fn error)]
+    (mapv #(compensator (apply max (map % sizes))) [:x :y])))
+
+(defn- pitched-ceiling
+  "An interior triangular profile resembling a gabled roof. The purpose of this
+  shape is to reduce the need for printed supports while also saving some
+  material in the top plate of a tall minimal-style cap."
+  [{:keys [switch-type top-size error-stem-positive error-body-positive]
+    :as options}]
+  (let [top-z (last top-size)
+        peak-z (dec top-z)
+        overshoot (* 2 peak-z)
+        shim-z 0.001
+        outer-profile
+          (apply maybe/hull
+            (switch-top-rectangles switch-type error-body-positive shim-z))
+        [stem-x stem-y] (stem-footprint switch-type error-stem-positive)
+        inner-profile (model/cube stem-x stem-y shim-z)]
+    (when (pos? peak-z)
+      (model/difference
+        (model/hull
+          (model/translate [0 0 overshoot] inner-profile)
+          outer-profile)
+        (model/hull
+          (model/translate [0 0 overshoot] outer-profile)
+          inner-profile)))))
 
 (defn- rounded-frames
   "Two vectors of rounded blocks, positive and negative.
@@ -158,26 +209,29 @@
     :or {top-size [9 9 1], bowl-radii [15 10 2],
          skirt-length (data/default-skirt-length switch-type)}
     :as options}]
-  (let [[plate-x plate-y top-z] top-size
+  (let [merged-opts (merge {:top-size top-size
+                            :bowl-radii bowl-radii}
+                           options)
+        [plate-x plate-y top-z] top-size
         bowl-rz (nth (or bowl-radii [0 0 0]) 2)
         bowl-diameters (map #(* 2 %) bowl-radii)
         plate-z (+ top-z bowl-rz)
-        [positive negative] (rounded-frames (tight-shell-sequence options))
+        [positive negative] (rounded-frames (tight-shell-sequence merged-opts))
         positive
           (cons positive
-            (rounded-block (merge options
+            (rounded-block (merge merged-opts
                                   {:footprint [plate-x plate-y]
                                    :z-thickness plate-z})))]
-
     (model/difference
       (model/intersection
-        (model/difference
+        (maybe/difference
           (util/loft positive)
           (when bowl-radii
             (model/translate [0 0 (+ top-z bowl-rz bowl-plate-offset)]
               (model/resize bowl-diameters
                 (model/sphere 3))))))  ; Low detail for quick previews.
-      (switch-body options)
+      (switch-body merged-opts)
+      (pitched-ceiling merged-opts)
       (model/intersection  ; Make sure the inner negative cuts off at z = 0.
         (util/loft negative)
         (model/translate [0 0 -100]
@@ -188,17 +242,15 @@
 
 (defn- stem-builder
   [{:keys [switch-type] :as options} pred]
-  (let [data (get-in data/switches [switch-type :stem])]
-    (map #(stem-body-cube options (get data %))
-         (filter (partial pred data) (keys data)))))
+  (let [data (switch-data switch-type :stem)]
+    (map #(stem-body-cuboid options (get data %))
+         (section-keys data pred))))
 
 (defn- stem-model
   [options]
   (maybe/difference
-    (apply maybe/union
-      (stem-builder options #(get-in %1 [%2 :positive])))
-    (apply maybe/union
-      (stem-builder options #(not (get-in %1 [%2 :positive]))))))
+    (apply maybe/union (stem-builder options positives))
+    (apply maybe/union (stem-builder options negatives))))
 
 
 ;;;;;;;;;;;;;;;
