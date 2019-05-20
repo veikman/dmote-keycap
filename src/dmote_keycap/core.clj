@@ -2,6 +2,7 @@
 
 (ns dmote-keycap.core
   (:require [clojure.spec.alpha :as spec]
+            [clojure.string :refer [split]]
             [clojure.tools.cli :refer [parse-opts]]
             [clojure.java.shell :refer [sh]]
             [clojure.java.io :refer [make-parents]]
@@ -10,6 +11,8 @@
             [dmote-keycap.data :as data]
             [dmote-keycap.models :as models])
   (:gen-class :main true))
+
+(defn- nilable-number [raw] (when-not (= raw "nil") (Float/parseFloat raw)))
 
 (def cli-options
   "Define command-line interface flags."
@@ -27,7 +30,10 @@
    [nil "--style TYPE"
     "Main body style; one of “minimal” (default) or “maquette”"
     :parse-fn keyword, :validate [(partial spec/valid? ::data/style)]]
-   [nil "--skirt-length N" "Height of keycap up to top of switch stem."
+   [nil "--top-size 'X Y Z'" "Size of keycap finger plate in mm"
+    :parse-fn (fn [raw] (mapv nilable-number (split raw #"\s+")))
+    :validate [(partial spec/valid? ::data/top-size)]]
+   [nil "--skirt-length N" "Height of keycap up to top of switch stem"
     :parse-fn #(Float/parseFloat %)]
    [nil "--nozzle-width N" "Printer nozzle (aperture) width in mm"
     :parse-fn #(Float/parseFloat %)]

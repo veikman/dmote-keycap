@@ -3,10 +3,16 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+### Changed
+- Removed CLI-only defaults for DFM error measurements. This reduces
+  potential differences between library and CLI results.
+
+### Added
 - Added print support for stems shorter than skirts.
 - Added horizontal print supports between skirt and stem.
   Alignment with the skirt at print-bed level quick and dirty.
-- Added pitched ceilings to the interior of minimal caps.
+- Added vaulted ceilings to the interior of minimal caps.
+- Exposed the `top-size` parameter through the CLI.
 
 ## [Version 0.1.1] - 2019-03-24
 ### Fixed

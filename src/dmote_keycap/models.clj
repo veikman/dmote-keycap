@@ -169,7 +169,7 @@
         compensator (error-fn error)]
     (mapv #(compensator (apply max (map % sizes))) [:x :y])))
 
-(defn- pitched-ceiling
+(defn- vaulted-ceiling
   "An interior triangular profile resembling a gabled roof. The purpose of this
   shape is to reduce the need for printed supports while also saving some
   material in the top plate of a tall minimal-style cap."
@@ -216,15 +216,18 @@
   "A minimal (tight) keycap body with a skirt descending from a top plate.
   The top plate rises at the edges to form a bowl. The ‘top-size’ argument
   describes the plate, including the final thickness of the plate at its
-  center. The ‘bowl-radii’ argument describes the sphere used as a negative to
-  carve out the bowl."
+  center. Nils in ‘top-size’ are simply replaced with a constant since the
+  ‘slope’ argument has no meaning for a minimal cap. The ‘bowl-radii’ argument
+  describes the sphere used as a negative to carve out the bowl."
   [{:keys [switch-type top-size bowl-radii bowl-plate-offset skirt-length]
     :or {top-size [9 9 1], bowl-radii [15 10 2]}
     :as options}]
-  (let [merged-opts (merge {:top-size top-size
+  (let [[plate-x plate-y top-z] top-size
+        plate-x (or plate-x 9)
+        plate-y (or plate-y 9)
+        merged-opts (merge {:top-size [plate-x plate-y top-z]
                             :bowl-radii bowl-radii}
                            options)
-        [plate-x plate-y top-z] top-size
         bowl-rz (nth (or bowl-radii [0 0 0]) 2)
         bowl-diameters (map #(* 2 %) bowl-radii)
         plate-z (+ top-z bowl-rz)
@@ -243,7 +246,7 @@
               (model/resize bowl-diameters
                 (model/sphere 3))))))  ; Low detail for quick previews.
       (switch-body merged-opts)
-      (pitched-ceiling merged-opts)
+      (vaulted-ceiling merged-opts)
       (model/intersection  ; Make sure the inner negative cuts off at z = 0.
         (util/loft negative)
         (model/translate [0 0 -100]

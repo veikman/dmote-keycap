@@ -98,7 +98,7 @@ for building supports in slicing software.
 With single-head FDM printing in a material like PLA, a relatively simple way
 to get a good result is to print each key in an upright position, with
 `supported`. In general, a `minimal`-style cap with a tall top plate (hence
-a pitched ceiling) should not need further support.
+a vaulted ceiling) should not need further support.
 
 Consider the main alternative: Printing each key upside down. This will often
 give you a cleaner stem and skirt, but with an uneven face (i.e. non-nil
