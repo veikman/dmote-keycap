@@ -35,6 +35,9 @@
     :validate [(partial spec/valid? ::data/top-size)]]
    [nil "--skirt-length N" "Height of keycap up to top of switch stem"
     :parse-fn #(Float/parseFloat %)]
+   [nil "--skirt-thickness N" "Thickness of walls descending around switch"
+    :default (:skirt-thickness data/option-defaults)
+    :parse-fn #(Float/parseFloat %)]
    [nil "--nozzle-width N" "Printer nozzle (aperture) width in mm"
     :parse-fn #(Float/parseFloat %)]
    [nil "--error-stem-positive N" "Printer error in mm"

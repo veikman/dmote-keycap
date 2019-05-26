@@ -12,7 +12,7 @@ This log follows the conventions of
 - Added horizontal print supports between skirt and stem.
   Alignment with the skirt at print-bed level quick and dirty.
 - Added vaulted ceilings to the interior of minimal caps.
-- Exposed the `top-size` parameter through the CLI.
+- Exposed the `top-size` and `skirt-thickness` parameters through the CLI.
 
 ## [Version 0.1.1] - 2019-03-24
 ### Fixed
