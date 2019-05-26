@@ -8,9 +8,8 @@ This log follows the conventions of
   potential differences between library and CLI results.
 
 ### Added
-- Added print support for stems shorter than skirts.
-- Added horizontal print supports between skirt and stem.
-  Alignment with the skirt at print-bed level quick and dirty.
+- Added the option of print supports: For stems shorter than skirts, for skirts
+  longer than stems, and horizontally, between skirt and stem.
 - Added vaulted ceilings to the interior of minimal caps.
 - Exposed the `top-size` and `skirt-thickness` parameters through the CLI.
 

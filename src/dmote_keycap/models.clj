@@ -12,6 +12,8 @@
 ;; Internal ;;
 ;;;;;;;;;;;;;;
 
+(def wafer 0.01)
+
 (defn- positives [coll key] (get-in coll [key :positive]))
 (defn- negatives [coll key] (not (get-in coll [key :positive])))
 (defn- switch-data [switch-type key] (get-in data/switches [switch-type key]))
@@ -52,7 +54,7 @@
         (maybe/rotate top-rotation
           (apply model/cube top-plate)))
       (maybe/translate [0 0 (- skirt-length)]
-        (apply model/cube (conj (mapv data/key-length unit-size) 0.01))))))
+        (apply model/cube (conj (mapv data/key-length unit-size) wafer))))))
 
 (defn- switch-level-section
   "Find a vector of vertical sections of a switch."
@@ -102,7 +104,7 @@
 
 (defn- rounded-block
   [{:keys [z-offset z-thickness]
-    :or {z-offset 0, z-thickness 0.01}
+    :or {z-offset 0, z-thickness wafer}
     :as dimensions}]
   {:pre [(number? z-offset)]}
   (->> (rounded-square dimensions)
@@ -178,12 +180,11 @@
   (let [top-z (last top-size)
         peak-z (dec top-z)
         overshoot (* 2 peak-z)
-        shim-z 0.001
         outer-profile
           (apply maybe/hull
-            (switch-top-rectangles switch-type error-body-positive shim-z))
+            (switch-top-rectangles switch-type error-body-positive wafer))
         [stem-x stem-y] (stem-footprint switch-type error-stem-positive)
-        inner-profile (model/cube stem-x stem-y shim-z)]
+        inner-profile (model/cube stem-x stem-y wafer)]
     (when (pos? peak-z)
       (model/difference
         (model/hull
@@ -212,6 +213,43 @@
       []
       (reverse (sort (keys rectangles-by-z))))))
 
+(defn- minimal-options
+  "An option mapping enriched with derived values for the minimal style."
+  [{:keys [switch-type top-size bowl-radii]
+    :or {top-size [9 9 1], bowl-radii [15 10 2]}
+    :as explicit}]
+  (let [bowl-rz (nth (or bowl-radii [0 0 0]) 2)
+        [plate-x plate-y top-z] top-size]
+    (merge {:bowl-rz bowl-rz
+            :bowl-radii bowl-radii
+            :bowl-diameters (map #(* 2 %) bowl-radii)
+            :top-z top-z
+            :plate-x (or plate-x 9)
+            :plate-y (or plate-y 9)
+            :plate-z (+ top-z bowl-rz)
+            :top-size [plate-x plate-y top-z]}
+           explicit)))
+
+(defn- minimal-shell-sequences
+  "Positive and negative stages of a minimal keycap shell.
+  The positive sequences is extended away from the switch by the top plate."
+  [options]
+  (let [{:keys [plate-x plate-y plate-z] :as merged} (minimal-options options)
+        [positive negative] (rounded-frames (tight-shell-sequence merged))]
+    [(cons positive
+           (rounded-block (merge merged {:footprint [plate-x plate-y]
+                                         :z-thickness plate-z})))
+     negative]))
+
+(defn- bowl-model
+  "A sphere for use as negative space."
+  [{:keys [bowl-radii bowl-plate-offset] :as options}]
+  (when bowl-radii
+    (let [{:keys [top-z bowl-rz bowl-diameters]} (minimal-options options)]
+      (model/translate [0 0 (+ top-z bowl-rz bowl-plate-offset)]
+        (model/resize bowl-diameters
+          (model/sphere 3))))))  ; Low detail for quick previews.
+
 (defn- minimal-body
   "A minimal (tight) keycap body with a skirt descending from a top plate.
   The top plate rises at the edges to form a bowl. The ‘top-size’ argument
@@ -219,32 +257,14 @@
   center. Nils in ‘top-size’ are simply replaced with a constant since the
   ‘slope’ argument has no meaning for a minimal cap. The ‘bowl-radii’ argument
   describes the sphere used as a negative to carve out the bowl."
-  [{:keys [switch-type top-size bowl-radii bowl-plate-offset skirt-length]
-    :or {top-size [9 9 1], bowl-radii [15 10 2]}
-    :as options}]
-  (let [[plate-x plate-y top-z] top-size
-        plate-x (or plate-x 9)
-        plate-y (or plate-y 9)
-        merged-opts (merge {:top-size [plate-x plate-y top-z]
-                            :bowl-radii bowl-radii}
-                           options)
-        bowl-rz (nth (or bowl-radii [0 0 0]) 2)
-        bowl-diameters (map #(* 2 %) bowl-radii)
-        plate-z (+ top-z bowl-rz)
-        [positive negative] (rounded-frames (tight-shell-sequence merged-opts))
-        positive
-          (cons positive
-            (rounded-block (merge merged-opts
-                                  {:footprint [plate-x plate-y]
-                                   :z-thickness plate-z})))]
+  [{:keys [skirt-length] :as options}]
+  (let [merged-opts (minimal-options options)
+        [positive negative] (minimal-shell-sequences merged-opts)]
     (model/difference
       (model/intersection
         (maybe/difference
           (util/loft positive)
-          (when bowl-radii
-            (model/translate [0 0 (+ top-z bowl-rz bowl-plate-offset)]
-              (model/resize bowl-diameters
-                (model/sphere 3))))))  ; Low detail for quick previews.
+          (bowl-model merged-opts)))
       (switch-body merged-opts)
       (vaulted-ceiling merged-opts)
       (model/intersection  ; Make sure the inner negative cuts off at z = 0.
@@ -282,6 +302,25 @@
           (model/cube nozzle-width skirt-y horizontal-support-height))
         (model/cube stem-x stem-y horizontal-support-height)))))
 
+(defn- skirt-support
+  "A hollow outer perimeter beneath the skirt."
+  [{:keys [switch-type style skirt-length nozzle-width] :as options}]
+  (let [stem-z (stem-length switch-type)
+        difference (- stem-z skirt-length)
+        merged-opts (minimal-options options)
+        sequence (case style
+                   :minimal (minimal-shell-sequences merged-opts))
+        outline (->> sequence
+                     (first)
+                     (util/loft)
+                     (model/translate [0 0 skirt-length])
+                     (model/cut))]
+    (model/translate [0 0 (- (+ skirt-length difference))]
+      (model/extrude-linear {:height difference, :center false}
+        (model/difference
+          outline
+          (model/offset (- nozzle-width) outline))))))
+
 (defn- stem-support
   "A completely hollow rectangular support structure with the width of the
   printer nozzle, underneath the keycap stem."
@@ -297,14 +336,14 @@
         (when (every? pos? [foot-xᵢ foot-yᵢ])
           (model/cube foot-xᵢ foot-yᵢ difference))))))
 
-
 (defn- support-model
-  [{:keys [switch-type skirt-length] :as options}]
+  [{:keys [switch-type style skirt-length] :as options}]
   (let [stem-z (stem-length switch-type)]
     (maybe/union
       (horizontal-support options)
-      (if (> skirt-length stem-z)
-        (stem-support options)))))
+      (cond
+        (< skirt-length stem-z) (skirt-support options)
+        (> skirt-length stem-z) (stem-support options)))))
 
 
 ;;;;;;;;;;;;;;;
