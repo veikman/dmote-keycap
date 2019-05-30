@@ -47,7 +47,7 @@
                       :bowl-plate-offset 0
                       :skirt-thickness 2.1
                       :nozzle-width 0.5
-                      :horizontal-support-height 0.3
+                      :horizontal-support-height 0.5
                       :error-body-positive -0.5
                       :error-stem-positive 0
                       :error-stem-negative 0})
@@ -74,6 +74,7 @@
 (spec/def ::error-stem-negative number?)
 (spec/def ::error-body-positive number?)
 (spec/def ::sectioned boolean?)
+(spec/def ::supported boolean?)
 
 ;; A composite spec for all valid parameters going into the keycap model.
 (spec/def ::keycap-parameters
@@ -83,7 +84,7 @@
                       ::skirt-thickness ::skirt-length ::slope
                       ::nozzle-width ::horizontal-support-height
                       ::error-stem-positive ::error-stem-negative
-                      ::error-body-positive ::sectioned]))
+                      ::error-body-positive ::sectioned ::supported]))
 
 ;;;;;;;;;;;;;;;
 ;; Functions ;;

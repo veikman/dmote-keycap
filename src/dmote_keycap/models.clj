@@ -3,6 +3,7 @@
 (ns dmote-keycap.models
   (:require [clojure.spec.alpha :as spec]
             [scad-clj.model :as model]
+            [scad-tarmi.core :refer [abs]]
             [scad-tarmi.dfm :refer [error-fn]]
             [scad-tarmi.maybe :as maybe]
             [scad-tarmi.util :as util]
@@ -13,6 +14,8 @@
 ;;;;;;;;;;;;;;
 
 (def wafer 0.01)
+(def plenty 100)
+(def big (* 2 plenty))
 
 (defn- positives [coll key] (get-in coll [key :positive]))
 (defn- negatives [coll key] (not (get-in coll [key :positive])))
@@ -29,9 +32,12 @@
 
 (defn- print-bed-level
   "The level of the print bed (i.e. the bottom of an upright keycap model)
-  relative to the top of the stem."
+  relative to the top of the stem.
+  This is built on the assumption that there is no need to build a keycap whose
+  interior is taller than the body of its switch above the mounting plate."
   [{:keys [switch-type skirt-length]}]
-  (- (max (stem-length switch-type) skirt-length)))
+  (- (min (max (stem-length switch-type) skirt-length)
+          (data/switch-height switch-type))))
 
 (defn- maquette-body
   "The shape of one keycap, greatly simplified.
@@ -269,11 +275,11 @@
       (vaulted-ceiling merged-opts)
       (model/intersection  ; Make sure the inner negative cuts off at z = 0.
         (util/loft negative)
-        (model/translate [0 0 -100]
-          (model/cube 200 200 200)))
+        (model/translate [0 0 (- plenty)]
+          (model/cube big big big)))
       ;; Cut everything before hitting the mounting plate:
-      (model/translate [0 0 (- -100 skirt-length)]
-        (model/cube 200 200 200)))))
+      (model/translate [0 0 (- (- plenty) skirt-length)]
+        (model/cube big big big)))))
 
 (defn- stem-builder
   [{:keys [switch-type] :as options} pred]
@@ -287,34 +293,47 @@
     (apply maybe/union (stem-builder options positives))
     (apply maybe/union (stem-builder options negatives))))
 
+(defn- minimal-skirt-perimeter
+  "A 2D object describing the perimeter of the skirt where it cuts off."
+  [{:keys [skirt-length] :as options}]
+  (->> (minimal-options options)
+       (minimal-shell-sequences)
+       (first)
+       (util/loft)
+       (model/translate [0 0 skirt-length])
+       (model/cut)))
+
 (defn- horizontal-support
   "A cross connecting the stem and skirt. The purpose of this structure is to
   increase the surface contact between bed and cap while stabilizing the
-  delicate stem in particular."
-  [{:keys [switch-type nozzle-width horizontal-support-height] :as options}]
+  delicate stem in particular.
+  The mechanism that limits the extent of the cross is much more complicated
+  than the cross itself: It’s anded with the overall outer profile of the
+  keycap and with its outline at the end of the skirt, to ensure that no sharp
+  edges extend outside the skirt even if the cutoff somehow occurs on a slope."
+  [{:keys [switch-type style unit-size nozzle-width horizontal-support-height]
+    :as options}]
   (let [[stem-x stem-y] (stem-footprint switch-type 0)
-        [skirt-x skirt-y] (map dec (data/skirt-footprint options))]  ;; Rough!
-    (model/translate [0 0 (+ (print-bed-level options)
-                             (/ horizontal-support-height 2))]
-      (model/difference
-        (model/union
-          (model/cube skirt-x nozzle-width horizontal-support-height)
-          (model/cube nozzle-width skirt-y horizontal-support-height))
-        (model/cube stem-x stem-y horizontal-support-height)))))
+        [skirt-x skirt-y] (mapv data/key-length unit-size)
+        positive (first (minimal-shell-sequences (minimal-options options)))
+        outline (minimal-skirt-perimeter options)]
+    (model/intersection
+      (util/loft positive)
+      (model/extrude-linear {:height plenty} outline)
+      (model/translate [0 0 (+ (print-bed-level options)
+                               (/ horizontal-support-height 2))]
+        (model/difference
+          (model/union
+            (model/cube skirt-x nozzle-width horizontal-support-height)
+            (model/cube nozzle-width skirt-y horizontal-support-height))
+          (model/cube stem-x stem-y horizontal-support-height))))))
 
 (defn- skirt-support
   "A hollow outer perimeter beneath the skirt."
   [{:keys [switch-type style skirt-length nozzle-width] :as options}]
   (let [stem-z (stem-length switch-type)
         difference (- stem-z skirt-length)
-        merged-opts (minimal-options options)
-        sequence (case style
-                   :minimal (minimal-shell-sequences merged-opts))
-        outline (->> sequence
-                     (first)
-                     (util/loft)
-                     (model/translate [0 0 skirt-length])
-                     (model/cut))]
+        outline (minimal-skirt-perimeter options)]
     (model/translate [0 0 (- (+ skirt-length difference))]
       (model/extrude-linear {:height difference, :center false}
         (model/difference
@@ -326,7 +345,7 @@
   printer nozzle, underneath the keycap stem."
   [{:keys [switch-type skirt-length nozzle-width] :as options}]
   (let [stem-z (stem-length switch-type)
-        difference (- skirt-length stem-z)
+        difference (- (abs (print-bed-level options)) stem-z)
         footprint (stem-footprint switch-type 0)
         [foot-xₒ foot-yₒ] footprint
         [foot-xᵢ foot-yᵢ] (map #(max 0 (- % (* 2 nozzle-width))) footprint)]
