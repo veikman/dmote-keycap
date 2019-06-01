@@ -3,7 +3,7 @@
 (ns dmote-keycap.models
   (:require [clojure.spec.alpha :as spec]
             [scad-clj.model :as model]
-            [scad-tarmi.core :refer [abs]]
+            [scad-tarmi.core :refer [abs] :as tarmi]
             [scad-tarmi.dfm :refer [error-fn]]
             [scad-tarmi.maybe :as maybe]
             [scad-tarmi.util :as util]
@@ -16,6 +16,8 @@
 (def wafer 0.01)
 (def plenty 100)
 (def big (* 2 plenty))
+
+(defn- third [coll] (nth coll 2))
 
 (defn- positives [coll key] (get-in coll [key :positive]))
 (defn- negatives [coll key] (not (get-in coll [key :positive])))
@@ -47,20 +49,13 @@
   The default height and slope are based on a DSA profile. Passing a
   non-default ‘top-size’ and ‘top-rotation’ can provide a rough approximation
   of SA and OEM caps, etc."
-  [{:keys [switch-type unit-size slope top-size top-rotation skirt-length]
-    :or {top-size [nil nil 1], top-rotation [0 0 0]}}]
-  (let [top-thickness (nth top-size 2)
-        top-plate
-          (if (every? some? top-size)
-            top-size
-            (conj (mapv #(* slope (data/key-length %)) unit-size)
-                  top-thickness))]
-    (model/hull
-      (maybe/translate [0 0 (/ top-thickness 2)]
-        (maybe/rotate top-rotation
-          (apply model/cube top-plate)))
-      (maybe/translate [0 0 (- skirt-length)]
-        (apply model/cube (conj (mapv data/key-length unit-size) wafer))))))
+  [{:keys [unit-size top-size top-rotation skirt-length]}]
+  (model/hull
+    (maybe/translate [0 0 (/ (third top-size) 2)]
+      (maybe/rotate top-rotation
+        (apply model/cube top-size)))
+    (maybe/translate [0 0 (- skirt-length)]
+      (apply model/cube (conj (mapv data/key-length unit-size) wafer)))))
 
 (defn- switch-level-section
   "Find a vector of vertical sections of a switch."
@@ -106,6 +101,7 @@
 
 (defn- rounded-square
   [{:keys [footprint radius skirt-thickness] :or {radius 1.8}}]
+  {:pre [(spec/valid? ::tarmi/point-2d footprint)]}
   (inset-corner (map #(+ % skirt-thickness) footprint) radius))
 
 (defn- rounded-block
@@ -183,8 +179,7 @@
   material in the top plate of a tall minimal-style cap."
   [{:keys [switch-type top-size error-stem-positive error-body-positive]
     :as options}]
-  (let [top-z (last top-size)
-        peak-z (dec top-z)
+  (let [peak-z (dec (third top-size))
         overshoot (* 2 peak-z)
         outer-profile
           (apply maybe/hull
@@ -219,60 +214,43 @@
       []
       (reverse (sort (keys rectangles-by-z))))))
 
-(defn- minimal-options
-  "An option mapping enriched with derived values for the minimal style."
-  [{:keys [switch-type top-size bowl-radii]
-    :or {top-size [9 9 1], bowl-radii [15 10 2]}
-    :as explicit}]
-  (let [bowl-rz (nth (or bowl-radii [0 0 0]) 2)
-        [plate-x plate-y top-z] top-size]
-    (merge {:bowl-rz bowl-rz
-            :bowl-radii bowl-radii
-            :bowl-diameters (map #(* 2 %) bowl-radii)
-            :top-z top-z
-            :plate-x (or plate-x 9)
-            :plate-y (or plate-y 9)
-            :plate-z (+ top-z bowl-rz)
-            :top-size [plate-x plate-y top-z]}
-           explicit)))
-
 (defn- minimal-shell-sequences
   "Positive and negative stages of a minimal keycap shell.
   The positive sequences is extended away from the switch by the top plate."
-  [options]
-  (let [{:keys [plate-x plate-y plate-z] :as merged} (minimal-options options)
-        [positive negative] (rounded-frames (tight-shell-sequence merged))]
+  [{:keys [top-size bowl-radii] :as options}]
+  (let [[x y top-z] top-size
+        z (+ top-z (third bowl-radii))
+        [positive negative] (rounded-frames (tight-shell-sequence options))]
     [(cons positive
-           (rounded-block (merge merged {:footprint [plate-x plate-y]
-                                         :z-thickness plate-z})))
+           (rounded-block (merge options {:footprint [x y]
+                                          :z-thickness z})))
      negative]))
 
 (defn- bowl-model
   "A sphere for use as negative space."
-  [{:keys [bowl-radii bowl-plate-offset] :as options}]
-  (when bowl-radii
-    (let [{:keys [top-z bowl-rz bowl-diameters]} (minimal-options options)]
-      (model/translate [0 0 (+ top-z bowl-rz bowl-plate-offset)]
-        (model/resize bowl-diameters
+  [{:keys [top-size bowl-radii bowl-plate-offset]
+    :as options}]
+  (let [bowl-z (third bowl-radii)]
+    (when-not (zero? bowl-z)
+      (model/translate [0 0 (+ (third top-size) bowl-z bowl-plate-offset)]
+        (model/resize (map #(* 2 %) bowl-radii)  ; Bowl diameters.
           (model/sphere 3))))))  ; Low detail for quick previews.
 
 (defn- minimal-body
   "A minimal (tight) keycap body with a skirt descending from a top plate.
   The top plate rises at the edges to form a bowl. The ‘top-size’ argument
   describes the plate, including the final thickness of the plate at its
-  center. Nils in ‘top-size’ are simply replaced with a constant since the
-  ‘slope’ argument has no meaning for a minimal cap. The ‘bowl-radii’ argument
-  describes the sphere used as a negative to carve out the bowl."
-  [{:keys [skirt-length] :as options}]
-  (let [merged-opts (minimal-options options)
-        [positive negative] (minimal-shell-sequences merged-opts)]
+  center. The ‘bowl-radii’ argument describes the sphere used as a negative to
+  carve out the bowl."
+  [{:keys [skirt-length shell-sequence-fn] :as options}]
+  (let [[positive negative] (shell-sequence-fn options)]
     (model/difference
       (model/intersection
         (maybe/difference
           (util/loft positive)
-          (bowl-model merged-opts)))
-      (switch-body merged-opts)
-      (vaulted-ceiling merged-opts)
+          (bowl-model options)))
+      (switch-body options)
+      (vaulted-ceiling options)
       (model/intersection  ; Make sure the inner negative cuts off at z = 0.
         (util/loft negative)
         (model/translate [0 0 (- plenty)]
@@ -295,13 +273,13 @@
 
 (defn- minimal-skirt-perimeter
   "A 2D object describing the perimeter of the skirt where it cuts off."
-  [{:keys [skirt-length] :as options}]
-  (->> (minimal-options options)
-       (minimal-shell-sequences)
-       (first)
-       (util/loft)
+  [{:keys [skirt-length shell-sequence-fn] :as options}]
+  (->> options
+       shell-sequence-fn
+       first
+       util/loft
        (model/translate [0 0 skirt-length])
-       (model/cut)))
+       model/cut))
 
 (defn- horizontal-support
   "A cross connecting the stem and skirt. The purpose of this structure is to
@@ -311,12 +289,13 @@
   than the cross itself: It’s anded with the overall outer profile of the
   keycap and with its outline at the end of the skirt, to ensure that no sharp
   edges extend outside the skirt even if the cutoff somehow occurs on a slope."
-  [{:keys [switch-type style unit-size nozzle-width horizontal-support-height]
+  [{:keys [switch-type style unit-size nozzle-width horizontal-support-height
+           shell-sequence-fn skirt-perimeter-fn]
     :as options}]
   (let [[stem-x stem-y] (stem-footprint switch-type 0)
         [skirt-x skirt-y] (mapv data/key-length unit-size)
-        positive (first (minimal-shell-sequences (minimal-options options)))
-        outline (minimal-skirt-perimeter options)]
+        positive (first (shell-sequence-fn options))
+        outline (skirt-perimeter-fn options)]
     (model/intersection
       (util/loft positive)
       (model/extrude-linear {:height plenty} outline)
@@ -330,10 +309,11 @@
 
 (defn- skirt-support
   "A hollow outer perimeter beneath the skirt."
-  [{:keys [switch-type style skirt-length nozzle-width] :as options}]
+  [{:keys [switch-type style skirt-length nozzle-width skirt-perimeter-fn]
+    :as options}]
   (let [stem-z (stem-length switch-type)
         difference (- stem-z skirt-length)
-        outline (minimal-skirt-perimeter options)]
+        outline (skirt-perimeter-fn options)]
     (model/translate [0 0 (- (+ skirt-length difference))]
       (model/extrude-linear {:height difference, :center false}
         (model/difference
@@ -364,6 +344,53 @@
         (< skirt-length stem-z) (skirt-support options)
         (> skirt-length stem-z) (stem-support options)))))
 
+(defn- enrich-options
+  "Take merged global-default and explicit user arguments. Merge these further
+  with defaults that depend on other options."
+  [{:keys [switch-type style] :as explicit}]
+  (merge {:top-size [nil nil 1]
+          :top-rotation [0 0 0]
+          :bowl-radii [0 0 0]
+          :skirt-length (data/default-skirt-length switch-type)
+          :stem-fn stem-model
+          :support-fn support-model}
+         (case style
+           :maquette {:body-fn maquette-body
+                      :stem-fn (constantly nil)
+                      :support-fn (constantly nil)}
+           :minimal {:top-size [9 9 1]
+                     :bowl-radii [15 10 2]
+                     :body-fn minimal-body
+                     :shell-sequence-fn minimal-shell-sequences
+                     :skirt-perimeter-fn minimal-skirt-perimeter})
+         explicit))
+
+(defn- finalize-top
+  "Pick a top size where the user has omitted some part(s) of the parameter.
+  In the maquette style, the ‘slope’ argument is used to calculate the size
+  of the top plate, whereas in the minimal style, nils in ‘top-size’ are
+  simply replaced with a constant."
+  [{:keys [style unit-size slope]} old]
+  (if (every? some? old)
+    old
+    (case style
+      :maquette (conj (mapv #(* slope (data/key-length %)) unit-size)
+                      (third old))
+      :minimal (mapv #(if (some? %1) %1 9) old))))
+
+(defn- interpolate-options
+  "Resolve ambiguities in user input."
+  [options]
+  (update options :top-size (partial finalize-top options)))
+
+(defn- finalize-options
+  "Reconcile explicit user arguments with defaults at various levels."
+  [explicit-arguments]
+  (->> explicit-arguments
+       (merge data/option-defaults)
+       enrich-options
+       interpolate-options))
+
 
 ;;;;;;;;;;;;;;;
 ;; Interface ;;
@@ -372,23 +399,16 @@
 (defn keycap
   "A model of one keycap. Resolution is left at OpenSCAD defaults throughout.
   For a guide to the parameters, see README.md."
-  [{:keys [switch-type style skirt-length supported sectioned]
-    :or {switch-type (:switch-type data/option-defaults)
-         style (:style data/option-defaults)}
-    :as input-options}]
-  {:pre [(spec/valid? ::data/keycap-parameters input-options)]}
-  (let [options (merge data/option-defaults
-                       {:skirt-length (data/default-skirt-length switch-type)}
-                       input-options)]
+  [explicit-arguments]
+  {:pre [(spec/valid? ::data/keycap-parameters explicit-arguments)]}
+  (let [{:keys [supported sectioned body-fn stem-fn support-fn]
+         :as options} (finalize-options explicit-arguments)]
     (maybe/intersection
       (maybe/union
-        (case style
-          :maquette (maquette-body options)
-          :minimal (minimal-body options))
-        (when-not (= style :maquette)
-          (stem-model options))
-        (when (and supported (not (= style :maquette)))
-          (support-model options)))
+        (body-fn options)
+        (stem-fn options)
+        (when supported
+          (support-fn options)))
       (when sectioned
         (model/translate [100 0 0]
           (model/cube 200 200 200))))))
