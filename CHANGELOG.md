@@ -3,6 +3,9 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+Nothing yet.
+
+## [Version 0.2.0] - 2019-06-01
 ### Changed
 - Removed CLI-only defaults for DFM error measurements. This reduces
   potential differences between library and CLI results.
@@ -24,5 +27,6 @@ This log follows the conventions of
 ### Added
 - Minimal and maquette styles.
 
-[Unreleased]: https://github.com/veikman/dmote-keycap/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/veikman/dmote-keycap/compare/v0.2.0...HEAD
+[Version 0.1.1]: https://github.com/veikman/dmote-keycap/compare/v0.1.1...v0.2.0
 [Version 0.1.1]: https://github.com/veikman/dmote-keycap/compare/v0.1.0...v0.1.1
