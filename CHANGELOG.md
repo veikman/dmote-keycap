@@ -3,7 +3,8 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
-Nothing yet.
+### Added
+- Added an output filename parameter to the CLI, for scripting.
 
 ## [Version 0.2.0] - 2019-06-01
 ### Changed
@@ -28,5 +29,5 @@ Nothing yet.
 - Minimal and maquette styles.
 
 [Unreleased]: https://github.com/veikman/dmote-keycap/compare/v0.2.0...HEAD
-[Version 0.1.1]: https://github.com/veikman/dmote-keycap/compare/v0.1.1...v0.2.0
+[Version 0.2.0]: https://github.com/veikman/dmote-keycap/compare/v0.1.1...v0.2.0
 [Version 0.1.1]: https://github.com/veikman/dmote-keycap/compare/v0.1.0...v0.1.1

@@ -18,6 +18,7 @@
    ["-h" "--help" "Print this message and exit"]
    ["-r" "--render" "Render SCAD to STL"]
    [nil "--rendering-program PATH" "Path to OpenSCAD" :default "openscad"]
+   [nil "--filename NAME" "Output filename; no suffix" :default "cap"]
    [nil "--supported" "Include print supports underneath models"]
    [nil "--sectioned" "Show models in section (cut in half)"]
    [nil "--face-size N" "Smaller number gives more detail"
@@ -58,7 +59,7 @@
      (:errors args) (error)
      :else
        (let [options (:options args)]
-         (build-all [{:name "cap",
+         (build-all [{:name (:filename options)
                       :model-main (models/keycap options)
                       :minimum-face-size (:face-size options)}]
                     options)))))
