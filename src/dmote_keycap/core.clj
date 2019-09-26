@@ -4,8 +4,6 @@
   (:require [clojure.spec.alpha :as spec]
             [clojure.string :refer [split]]
             [clojure.tools.cli :refer [parse-opts]]
-            [clojure.java.shell :refer [sh]]
-            [clojure.java.io :refer [make-parents]]
             [environ.core :refer [env]]
             [scad-app.core :refer [build-all] :as app-core]
             [dmote-keycap.data :as data]

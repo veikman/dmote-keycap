@@ -177,8 +177,7 @@
   "An interior triangular profile resembling a gabled roof. The purpose of this
   shape is to reduce the need for printed supports while also saving some
   material in the top plate of a tall minimal-style cap."
-  [{:keys [switch-type top-size error-stem-positive error-body-positive]
-    :as options}]
+  [{:keys [switch-type top-size error-stem-positive error-body-positive]}]
   (let [peak-z (dec (third top-size))
         overshoot (* 2 peak-z)
         outer-profile
@@ -228,8 +227,7 @@
 
 (defn- bowl-model
   "A sphere for use as negative space."
-  [{:keys [top-size bowl-radii bowl-plate-offset]
-    :as options}]
+  [{:keys [top-size bowl-radii bowl-plate-offset]}]
   (let [bowl-z (third bowl-radii)]
     (when-not (zero? bowl-z)
       (model/translate [0 0 (+ (third top-size) bowl-z bowl-plate-offset)]
@@ -289,7 +287,7 @@
   than the cross itself: It’s anded with the overall outer profile of the
   keycap and with its outline at the end of the skirt, to ensure that no sharp
   edges extend outside the skirt even if the cutoff somehow occurs on a slope."
-  [{:keys [switch-type style unit-size nozzle-width horizontal-support-height
+  [{:keys [switch-type unit-size nozzle-width horizontal-support-height
            shell-sequence-fn skirt-perimeter-fn]
     :as options}]
   (let [[stem-x stem-y] (stem-footprint switch-type 0)
@@ -309,7 +307,7 @@
 
 (defn- skirt-support
   "A hollow outer perimeter beneath the skirt."
-  [{:keys [switch-type style skirt-length nozzle-width skirt-perimeter-fn]
+  [{:keys [switch-type skirt-length nozzle-width skirt-perimeter-fn]
     :as options}]
   (let [stem-z (stem-length switch-type)
         difference (- stem-z skirt-length)
@@ -323,7 +321,7 @@
 (defn- stem-support
   "A completely hollow rectangular support structure with the width of the
   printer nozzle, underneath the keycap stem."
-  [{:keys [switch-type skirt-length nozzle-width] :as options}]
+  [{:keys [switch-type nozzle-width] :as options}]
   (let [stem-z (stem-length switch-type)
         difference (- (abs (print-bed-level options)) stem-z)
         footprint (stem-footprint switch-type 0)
@@ -336,7 +334,7 @@
           (model/cube foot-xᵢ foot-yᵢ difference))))))
 
 (defn- support-model
-  [{:keys [switch-type style skirt-length] :as options}]
+  [{:keys [switch-type skirt-length] :as options}]
   (let [stem-z (stem-length switch-type)]
     (maybe/union
       (horizontal-support options)
