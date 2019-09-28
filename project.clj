@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/tools.cli "0.4.1"]
                  [environ "1.1.0"]
+                 [hiccup "2.0.0-alpha2"]
                  [scad-app "0.2.0"]
                  [scad-clj "0.5.3"]
                  [scad-tarmi "0.4.0"]]
