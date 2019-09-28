@@ -40,7 +40,8 @@
 
 ;; The keycap function exposed by dmote-keycap.models takes a number of options
 ;; whose global default values are exposed here.
-(def option-defaults {:style :minimal
+(def option-defaults {:filename "cap"
+                      :style :minimal
                       :switch-type :alps
                       :unit-size [1 1]
                       :slope 0.73

@@ -12,13 +12,14 @@
 
 (defn- nilable-number [raw] (when-not (= raw "nil") (Float/parseFloat raw)))
 
-(def cli-options
+(def static-cli-options
   "Define command-line interface flags."
   [["-V" "--version" "Print program version and exit"]
    ["-h" "--help" "Print this message and exit"]
    ["-r" "--render" "Render SCAD to STL"]
    [nil "--rendering-program PATH" "Path to OpenSCAD" :default "openscad"]
-   [nil "--filename NAME" "Output filename; no suffix" :default "cap"]
+   [nil "--filename NAME" "Output filename; no suffix"
+    :default (:filename data/option-defaults)]
    [nil "--supported" "Include print supports underneath models"]
    [nil "--sectioned" "Show models in section (cut in half)"]
    [nil "--face-size N" "Smaller number gives more detail"
@@ -44,10 +45,27 @@
    [nil "--error-stem-negative N" "Printer error in mm"
     :parse-fn #(Float/parseFloat %)]])
 
+(defn- assoc-legend
+  [face key]
+  (fn [coll _ value] (assoc-in coll [:legend face key] value)))
+
+(def legend-cli-options
+  (apply concat
+    (for [face [:top :north :east :south :west]]
+      (let [string (name face)]
+        [[nil
+          (format "--legend-%s-filepath PATH" string)
+          (format "Path to a 2D file for the %s face" string)
+          :assoc-fn (assoc-legend face :path)]
+         [nil
+          (format "--legend-%s-char CHAR" string)
+          (format "Text to render on the %s face" string)
+          :assoc-fn (assoc-legend face :char)]]))))
+
 (defn -main
   "Basic command-line interface logic."
   [& raw]
-  (let [args (parse-opts raw cli-options)
+  (let [args (parse-opts raw (concat static-cli-options legend-cli-options))
         help-text (fn [] (println "dmote-keycap options:")
                          (println (:summary args)))
         version (fn [] (println "dmote-keycap version"
