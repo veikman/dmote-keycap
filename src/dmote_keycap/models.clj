@@ -243,10 +243,9 @@
   [{:keys [skirt-length shell-sequence-fn] :as options}]
   (let [[positive negative] (shell-sequence-fn options)]
     (model/difference
-      (model/intersection
-        (maybe/difference
-          (util/loft positive)
-          (bowl-model options)))
+      (maybe/difference
+        (util/loft positive)
+        (bowl-model options))
       (switch-body options)
       (vaulted-ceiling options)
       (model/intersection  ; Make sure the inner negative cuts off at z = 0.
