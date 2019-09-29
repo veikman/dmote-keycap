@@ -34,6 +34,9 @@
    [nil "--top-size 'X Y Z'" "Size of keycap finger plate in mm"
     :parse-fn (fn [raw] (mapv nilable-number (split raw #"\s+")))
     :validate [(partial spec/valid? ::data/top-size)]]
+   [nil "--bowl-radii 'X Y Z'" "Radii of a spheroid that rounds out the top"
+    :parse-fn (fn [raw] (mapv nilable-number (split raw #"\s+")))
+    :validate [(partial spec/valid? ::data/bowl-radii)]]
    [nil "--skirt-length N" "Height of keycap up to top of switch stem"
     :parse-fn #(Float/parseFloat %)]
    [nil "--skirt-thickness N" "Thickness of walls descending around switch"

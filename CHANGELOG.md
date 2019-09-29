@@ -5,6 +5,7 @@ This log follows the conventions of
 ## [Unreleased]
 ### Added
 - Added an output filename parameter to the CLI, for scripting.
+- Exposed the `bowl-radii` parameter through the CLI.
 
 ## [Version 0.2.0] - 2019-06-01
 ### Changed
