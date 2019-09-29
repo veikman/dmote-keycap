@@ -8,7 +8,7 @@
             [scad-tarmi.maybe :as maybe]
             [scad-tarmi.util :as util]
             [dmote-keycap.data :as data]
-            [dmote-keycap.legend :refer [svg-path-file]]))
+            [dmote-keycap.legend :as legend]))
 
 ;;;;;;;;;;;;;;
 ;; Internal ;;
@@ -377,19 +377,22 @@
       :minimal (mapv #(if (some? %1) %1 9) old))))
 
 (defn- finalize-face-source
-  [basename face {:keys [path char] :as properties}]
-  (case (mapv boolean [path char])
-    [true false] path
-    [false true] (svg-path-file (format "%s_%s" basename (name face)) char)
-    (throw (ex-info "Either :path or :char must be supplied for a legend."
-                    properties))))
+  [basename face {:keys [unimportable importable char] :as properties}]
+  (let [intname (format "%s_%s" basename (name face))]
+    (cond
+      (some? importable)   importable
+      (some? unimportable) (legend/make-importable intname unimportable)
+      (some? char)         (legend/make-from-char intname char)
+      :else (throw (ex-info "No source supplied for legend." properties)))))
 
 (defn- finalize-legend
   "Generate file paths for all configured faces with a legend."
   [{:keys [filename]} old]
-  (into {}
-    (for [[face properties] old]
-      [face (finalize-face-source filename face properties)])))
+  (-> old
+      (assoc :face
+        (into {}
+          (for [[face properties] (:face old)]
+            [face (finalize-face-source filename face properties)])))))
 
 (defn- interpolate-options
   "Resolve ambiguities in user input."
@@ -418,7 +421,6 @@
   {:pre [(spec/valid? ::data/keycap-parameters explicit-arguments)]}
   (let [{:keys [supported sectioned body-fn stem-fn support-fn]
          :as options} (finalize-options explicit-arguments)]
-    (println (:legend options))
     (maybe/intersection
       (maybe/union
         (body-fn options)

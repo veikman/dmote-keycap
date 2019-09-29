@@ -2,6 +2,7 @@
 
 (ns dmote-keycap.legend
   (:require [clojure.java.shell :refer [sh]]
+            [clojure.java.io :as io]
             [hiccup2.core :refer [html]]))
 
 ;;;;;;;;;;;;;;
@@ -27,19 +28,42 @@
        :y "1"}
       legend]]))
 
+(defn- path-filename [basename] (str basename "_path.svg"))
+
+(defn- output-filepath
+  "Produce a relative file path, from the current working directory, to the
+  standard scad-app SCAD output directory. This is intended to make the file
+  importable in OpenSCAD code by its filename alone."
+  [filename]
+  (str (io/file "output" "scad" filename)))
+
+(defn- convert-to-plain-svg
+  "Simplify text elements in an SVG file to paths.
+  This requires Inkscape and needs input and output file paths.
+  It makes the content more readable to OpenSCAD."
+  [in out]
+  (let [cmd ["inkscape" in "--export-plain-svg" out "--export-text-to-path"]]
+    (when-not (zero? (:exit (apply sh cmd)))
+      (throw (ex-info "File conversion with Inkscape failed" {:command cmd})))
+    out))
+
 
 ;;;;;;;;;;;;;;;
 ;; Interface ;;
 ;;;;;;;;;;;;;;;
 
-(defn svg-path-file
+(defn make-importable
+  "Author an SVG file from another SVG. Return the new filename."
+  [basename filepath-text]
+  (let [filename-out (path-filename basename)]
+    (convert-to-plain-svg filepath-text (output-filepath filename-out))
+    filename-out))
+
+(defn make-from-char
+  "Author an SVG file from a string, with an intermediate artefact."
   [basename legend]
-  (let [filename-in (str basename "_text.svg")
-        filename-out (str basename "_path.svg")
-        conversion ["inkscape"
-                    filename-in
-                    (str "--export-plain-svg=" filename-out)
-                    "--export-text-to-path"]]
-    (spit filename-in (text-svg legend))
-    (assert (zero? (:exit (apply sh conversion))))
+  (let [filepath-text (output-filepath (str basename "_text.svg"))
+        filename-out (path-filename basename)]
+    (spit filepath-text (text-svg legend))
+    (convert-to-plain-svg filepath-text (output-filepath filename-out))
     filename-out))

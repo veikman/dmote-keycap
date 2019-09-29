@@ -25,11 +25,12 @@
    [nil "--face-size N" "Smaller number gives more detail"
     :default 0.1, :parse-fn #(Float/parseFloat %),
     :validate [(partial spec/valid? ::app-core/minimum-face-size)]]
-   [nil "--switch-type TYPE" "One of “alps” (default) or “mx”"
-    :parse-fn keyword, :validate [(partial spec/valid? ::data/switch-type)]]
-   [nil "--style TYPE"
-    "Main body style; one of “minimal” (default) or “maquette”"
-    :parse-fn keyword, :validate [(partial spec/valid? ::data/style)]]
+   [nil "--switch-type TYPE" "One of “alps” or “mx”"
+    :default-desc "alps", :parse-fn keyword,
+    :validate [(partial spec/valid? ::data/switch-type)]]
+   [nil "--style TYPE" "Main body; “minimal” or “maquette”"
+    :default-desc "minimal", :parse-fn keyword,
+    :validate [(partial spec/valid? ::data/style)]]
    [nil "--top-size 'X Y Z'" "Size of keycap finger plate in mm"
     :parse-fn (fn [raw] (mapv nilable-number (split raw #"\s+")))
     :validate [(partial spec/valid? ::data/top-size)]]
@@ -45,22 +46,23 @@
    [nil "--error-stem-negative N" "Printer error in mm"
     :parse-fn #(Float/parseFloat %)]])
 
-(defn- assoc-legend
-  [face key]
-  (fn [coll _ value] (assoc-in coll [:legend face key] value)))
-
 (def legend-cli-options
   (apply concat
     (for [face [:top :north :east :south :west]]
-      (let [string (name face)]
-        [[nil
-          (format "--legend-%s-filepath PATH" string)
-          (format "Path to a 2D file for the %s face" string)
-          :assoc-fn (assoc-legend face :path)]
-         [nil
-          (format "--legend-%s-char CHAR" string)
-          (format "Text to render on the %s face" string)
-          :assoc-fn (assoc-legend face :char)]]))))
+      (let [string (name face)
+            as #(fn [coll _ val] (assoc-in coll [:legend :face face %] val))]
+        [[:long-opt (format "--legend-%s-unimportable" string)
+          :required "PATH"
+          :desc (format "Complex SVG file for the %s face" string)
+          :assoc-fn (as :unimportable)]
+         [:long-opt (format "--legend-%s-importable" string)
+          :required "PATH"
+          :desc (format "Simple 2D file for the %s face" string)
+          :assoc-fn (as :importable)]
+         [:long-opt (format "--legend-%s-char" string)
+          :required "CHAR"
+          :desc (format "Text to render on the %s face" string)
+          :assoc-fn (as :char)]]))))
 
 (defn -main
   "Basic command-line interface logic."
