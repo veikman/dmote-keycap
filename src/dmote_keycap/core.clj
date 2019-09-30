@@ -42,11 +42,17 @@
    [nil "--skirt-thickness N" "Thickness of walls descending around switch"
     :default (:skirt-thickness data/option-defaults)
     :parse-fn #(Float/parseFloat %)]
-   [nil "--nozzle-width N" "Printer nozzle (aperture) width in mm"
+   [nil "--nozzle-width N" "FDM printer nozzle (aperture) width in mm"
+    :default (:nozzle-width data/option-defaults)
+    :parse-fn #(Float/parseFloat %)]
+   [nil "--error-body-positive N" "Printer error in mm"
+    :default (:error-body-positive data/option-defaults)
     :parse-fn #(Float/parseFloat %)]
    [nil "--error-stem-positive N" "Printer error in mm"
+    :default (:error-stem-positive data/option-defaults)
     :parse-fn #(Float/parseFloat %)]
    [nil "--error-stem-negative N" "Printer error in mm"
+    :default (:error-stem-negative data/option-defaults)
     :parse-fn #(Float/parseFloat %)]])
 
 (def legend-cli-options

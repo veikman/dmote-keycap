@@ -4,8 +4,12 @@ This log follows the conventions of
 
 ## [Unreleased]
 ### Added
-- Added an output filename parameter to the CLI, for scripting.
-- Exposed the `bowl-radii` parameter through the CLI.
+- Added an output `filename` parameter to the CLI, for scripting.
+- Exposed the `bowl-radii` and `error-body-positive` parameters through the
+  CLI.
+
+### Fixed
+- More default values now appear in the CLI.
 
 ## [Version 0.2.0] - 2019-06-01
 ### Changed

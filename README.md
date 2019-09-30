@@ -75,6 +75,9 @@ a number of parameters, in a flat map, and returns a `scad-clj` specification:
   width of the nozzle because this improves print speed and quality.
 * `:error-stem-positive`, `:error-stem-negative`, `:error-body-positive`:
   Printer-dependent measurements of error for different parts of the cap.
+  A **breaking change** is planned for version 1.0.0: All of these error
+  values will default to zero to broaden support for different printing
+  technologies.
 
 Some of these parameters have global default values, while others have default
 values associated with particular styles, for ease of use. The long-term plan
