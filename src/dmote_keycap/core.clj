@@ -53,7 +53,7 @@
   (apply concat
     (for [face [:top :north :east :south :west]]
       (let [string (name face)
-            as #(fn [coll _ val] (assoc-in coll [:legend :face face %] val))]
+            as #(fn [coll _ val] (assoc-in coll [:legend :faces face %] val))]
         [[:long-opt (format "--legend-%s-unimportable" string)
           :required "PATH"
           :desc (format "Complex SVG file for the %s face" string)

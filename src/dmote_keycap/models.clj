@@ -226,14 +226,54 @@
                                           :z-thickness z})))
      negative]))
 
+(defn- engraved-legend
+  [filepath]
+  (model/extrude-linear {:height big}
+    (model/import filepath)))
+
+(defn- bowl?
+  "True if a bowl-shaped top has been requested."
+  [{:keys [bowl-radii]}]
+  (not (zero? (third bowl-radii))))
+
 (defn- bowl-model
   "A sphere for use as negative space."
-  [{:keys [top-size bowl-radii bowl-plate-offset]}]
-  (let [bowl-z (third bowl-radii)]
-    (when-not (zero? bowl-z)
-      (model/translate [0 0 (+ (third top-size) bowl-z bowl-plate-offset)]
-        (model/resize (map #(* 2 %) bowl-radii)  ; Bowl diameters.
-          (model/sphere 3))))))  ; Low detail for quick previews.
+  [{:keys [top-size bowl-radii bowl-plate-offset z-override]}]
+  (let [bowl-z (or z-override (third bowl-radii))]
+    (model/translate [0 0 (+ (third top-size) bowl-z bowl-plate-offset)]
+      (model/resize (map #(* 2 %) bowl-radii)  ; Bowl diameters.
+        (model/sphere 3)))))  ; Low detail for quick previews.
+
+(defn- bowl-with-legend
+  "Negative space with a legend protruding from a spheroid."
+  [{:keys [bowl-radii legend] :as options}]
+  (let [overrides {:bowl-radii (mapv #(+ (:depth legend) %) bowl-radii)
+                   :z-override (third bowl-radii)}]
+    (model/union
+      (bowl-model options)
+      (model/intersection
+        (bowl-model (merge options overrides))
+        (engraved-legend (get-in legend [:faces :top]))))))
+
+(defn- legend-without-bowl
+  "Negative space constituting the top-face legend without a curvature."
+  [{:keys [legend top-size]}]
+  (let [depth (:depth legend)
+        filepath (get-in legend [:faces :top])]
+    (model/intersection
+      (model/translate [0 0 (- (third top-size) (/ depth 2))]
+        (model/cube big big depth))
+      (engraved-legend filepath))))
+
+(defn- top-face
+  "Negative space shaping the topmost surface of a cap, whether flat or not."
+  [{:keys [legend] :as options}]
+  (let [bowl (bowl? options)
+        motif (get-in legend [:faces :top])]
+    (cond
+      (and bowl motif) (bowl-with-legend options)
+      bowl (bowl-model options)
+      motif (legend-without-bowl options))))
 
 (defn- minimal-body
   "A minimal (tight) keycap body with a skirt descending from a top plate.
@@ -246,7 +286,7 @@
     (model/difference
       (maybe/difference
         (util/loft positive)
-        (bowl-model options))
+        (top-face options))
       (switch-body options)
       (vaulted-ceiling options)
       (model/intersection  ; Make sure the inner negative cuts off at z = 0.
@@ -342,6 +382,11 @@
         (< skirt-length stem-z) (skirt-support options)
         (> skirt-length stem-z) (stem-support options)))))
 
+(defn- nested-defaults
+  "Merge default values into nested sections of the configuration."
+  [options]
+  (update options :legend merge (:legend data/option-defaults)))
+
 (defn- enrich-options
   "Take merged global-default and explicit user arguments. Merge these further
   with defaults that depend on other options."
@@ -380,19 +425,18 @@
   [basename face {:keys [unimportable importable char] :as properties}]
   (let [intname (format "%s_%s" basename (name face))]
     (cond
-      (some? importable)   importable
-      (some? unimportable) (legend/make-importable intname unimportable)
-      (some? char)         (legend/make-from-char intname char)
+      importable   importable
+      unimportable (legend/make-importable intname unimportable)
+      char         (legend/make-from-char intname char)
       :else (throw (ex-info "No source supplied for legend." properties)))))
 
 (defn- finalize-legend
   "Generate file paths for all configured faces with a legend."
   [{:keys [filename]} old]
-  (-> old
-      (assoc :face
-        (into {}
-          (for [[face properties] (:face old)]
-            [face (finalize-face-source filename face properties)])))))
+  (assoc old :faces
+    (into {}
+      (for [[face properties] (:faces old)]
+        [face (finalize-face-source filename face properties)]))))
 
 (defn- interpolate-options
   "Resolve ambiguities in user input."
@@ -406,6 +450,7 @@
   [explicit-arguments]
   (->> explicit-arguments
        (merge data/option-defaults)
+       nested-defaults
        enrich-options
        interpolate-options))
 
@@ -428,5 +473,5 @@
         (when supported
           (support-fn options)))
       (when sectioned
-        (model/translate [100 0 0]
-          (model/cube 200 200 200))))))
+        (model/translate [plenty 0 0]
+          (model/cube big big big))))))

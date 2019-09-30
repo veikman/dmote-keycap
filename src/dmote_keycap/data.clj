@@ -47,6 +47,7 @@
                       :slope 0.73
                       :bowl-plate-offset 0
                       :skirt-thickness 2.1
+                      :legend {:depth 0.2}
                       :nozzle-width 0.5
                       :horizontal-support-height 0.5
                       :error-body-positive -0.5

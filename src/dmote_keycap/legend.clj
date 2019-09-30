@@ -23,7 +23,7 @@
       :viewBox "0 0 1 1"
       :version "1.1"}
      [:text
-      {:style "font-size:5mm;font-family:'Bitstream Vera Sans Mono';text-anchor:middle;text-align:center;dominant-baseline:middle;"
+      {:style "font-size:2mm;font-family:'Bitstream Vera Sans Mono';text-anchor:middle;text-align:center;dominant-baseline:middle;"
        :x "0"
        :y "1"}
       legend]]))
