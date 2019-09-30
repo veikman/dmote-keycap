@@ -6,10 +6,10 @@ can print and use.
 
 [![Clojars Project](https://img.shields.io/clojars/v/dmote-keycap.svg)](https://clojars.org/dmote-keycap)
 
-Horizontal keycap size is measured in a traditional unit: The u, where 1 u is
-19.05 mm (0.75”) per key mount. A 1 u cap is smaller at about 18.25 mm to allow
-for space between caps on adjacent mounts. For the same reason, a 2 u cap is
-more than twice as a wide as a 1 u cap, and so on.
+Key size is measured in a traditional unit: The u, where 1 u is 19.05 mm
+(0.75”) per key mount. A 1 u cap is smaller at about 18.25 mm to allow for
+space between caps on adjacent mounts. For the same reason, a 2 u cap is more
+than twice as a wide as a 1 u cap, and so on.
 
 ## Features
 
@@ -84,7 +84,8 @@ is to model a variety of traditional “families” with just a few parameters.
 
 Use `lein run` with command-line arguments corresponding to the parameters
 listed above. Not all parameters are supported; try `lein run --help`.
-The CLI takes an additional parameter for resolution (i.e. level of detail).
+The CLI takes additional parameters for `face-size` (resolution) and
+output `filename` (for scripting whole sets of keys).
 
 The application will generate files of OpenSCAD code under `output/scad`
 and, optionally, STL files for slicing and 3D printing.
