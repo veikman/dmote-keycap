@@ -2,7 +2,7 @@
 
 (ns dmote-keycap.data
   (:require [clojure.spec.alpha :as spec]
-            [scad-tarmi.core :as tarmi]))
+            [scad-tarmi.core :refer [π] :as tarmi]))
 
 ;;;;;;;;;;;;;;;
 ;; Constants ;;
@@ -37,6 +37,13 @@
      :body {:top            {:size {:x 10.2,  :y 11,    :z 6.6}}
             :core           {:size {:x 14.7,  :y 14.7,  :z 1}}
             :base           {:size {:x 15.6,  :y 15.6,  :z 0.7}}}}})
+
+;; Face data concerns how legends are placed on the sides of keys.
+(def faces
+  {:north {:coord-mask [ 0  1], :z-angle π}
+   :east  {:coord-mask [ 1  0], :z-angle (/ π 2)}
+   :south {:coord-mask [ 0 -1], :z-angle 0}
+   :west  {:coord-mask [-1  0], :z-angle (* 3/2 π)}})
 
 ;; The keycap function exposed by dmote-keycap.models takes a number of options
 ;; whose global default values are exposed here.

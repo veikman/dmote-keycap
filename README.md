@@ -19,6 +19,8 @@ than twice as a wide as a 1 u cap, and so on.
   ergonomic advantages. Dust protection is better than a 0.75 u cap that does
   not extend down the sides of the switch.
 * A “maquette” style for previewing keyboard designs.
+* Legends: Arbitrary 2D designs can be “engraved” into any of the faces of a
+  non-maquette cap: The top and sides, in any combination.
 
 `dmote-keycap` does not provide models of switches and has no support for
 stabilizers.
@@ -52,7 +54,8 @@ a number of parameters, in a flat map, and returns a `scad-clj` specification:
   numbers in this 3-tuple can be omitted by replacing them with `nil`, in which
   case `:slope` (see below) will take precedence. All measurements in mm.
 * `:slope`: A ratio between the top and bottom widths of the keycap. This
-  setting is used only if `:top-size` is left incomplete.
+  setting is used to compute top size if `:top-size` is left incomplete, and
+  to position legends on the sides of the cap.
 * `:top-rotation`: A 3-tuple describing the angle of the finger contact
   surface, in radians. This would be `[0 0 0]` for a (row 3 or standard) DSA
   profile and would have a different non-zero first value for each row of an
@@ -67,6 +70,8 @@ a number of parameters, in a flat map, and returns a `scad-clj` specification:
 * `:skirt-length`: The length of material from the top of the stem
   down toward the switch mounting plate. By default, on a `minimal` cap, this
   is 1 mm less than the space available when the switch is pressed.
+* `:legend`: Sources of and related parameters for 2D designs. There is a
+  separate section about legends in this document.
 * `:sectioned`: If true, the model is cut in half for a sectioned view.
   This is useful in previews and development.
 * `:supported`: If true, support structures are added underneath the model.
@@ -92,6 +97,53 @@ output `filename` (for scripting whole sets of keys).
 
 The application will generate files of OpenSCAD code under `output/scad`
 and, optionally, STL files for slicing and 3D printing.
+
+## Legends
+
+`dmote-keycap` uses OpenSCAD’s `import` function, not the `text` function, to
+put markings on caps. This enables a wide variety of markings: Anything that
+can be expressed in SVG, DXF and other 2D image formats OpenSCAD can import.
+
+As of `dmote-keycap` v0.3.0, there is no support for raised (positive)
+markings or multiple materials, just engravings (negative space).
+
+To select a legend, when calling into the library, supply a map like this as
+part of the options to `keycap`:
+
+```clojure
+{:legend {:faces {:top {:char "F1"}}}}
+```
+
+The corresponding CLI parameter is `--legend-top-char F1`.
+
+In this example, `:char` supplies a text sequence for the F1 key, not a file
+path. You can use any text you like but formatting for such sequences is
+rudimentary in the current version of `dmote-keycap` and is likely to change
+in future versions.
+
+You will get more power by replacing the `:char` keyword with
+one of `:importable`, for a file OpenSCAD can read directly, or
+`:unimportable`, for an SVG file that must be simplified before OpenSCAD can
+read it.
+
+`dmote-keycap` uses [Inkscape](https://inkscape.org/) programmatically to
+simplify SVG, so you will need that installed for both `:char` and
+`:unimportable`.
+
+### Placement
+
+The `:top` keyword in the example above targets the top face, where the user’s
+finger touches the key. Other faces can be addressed with `:north`, `:east`
+and so on.
+
+When importing from SVG for the top face, `dmote-keycap` will match coordinates
+[0, 0] in the image to [0, 0] in OpenSCAD’s coordinate system, which is the
+middle of the face.
+
+Targeting is a bit more complicated for the sides:
+After being extruded to three dimensions, each image used to mark a side of
+the key is tilted using the `:slope` parameter and moved so that SVG’s [0, 0]
+ends up at the height of the top of the stem.
 
 ## Printing
 

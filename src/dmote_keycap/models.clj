@@ -3,7 +3,7 @@
 (ns dmote-keycap.models
   (:require [clojure.spec.alpha :as spec]
             [scad-clj.model :as model]
-            [scad-tarmi.core :refer [abs] :as tarmi]
+            [scad-tarmi.core :refer [abs π] :as tarmi]
             [scad-tarmi.dfm :refer [error-fn]]
             [scad-tarmi.maybe :as maybe]
             [scad-tarmi.util :as util]
@@ -101,9 +101,11 @@
          (model/offset radius))))
 
 (defn- rounded-square
-  [{:keys [footprint radius skirt-thickness] :or {radius 1.8}}]
-  {:pre [(spec/valid? ::tarmi/point-2d footprint)]}
-  (inset-corner (map #(+ % skirt-thickness) footprint) radius))
+  [{:keys [footprint radius xy-offset] :or {radius 1.8, xy-offset 0}}]
+  {:pre [(spec/valid? ::tarmi/point-2d footprint)
+         (number? radius)
+         (number? xy-offset)]}
+  (inset-corner (map #(+ % xy-offset) footprint) radius))
 
 (defn- rounded-block
   [{:keys [z-offset z-thickness]
@@ -195,12 +197,17 @@
           (model/translate [0 0 overshoot] outer-profile)
           inner-profile)))))
 
-(defn- rounded-frames
-  "Two vectors of rounded blocks, positive and negative.
-  The inner sequence uses a horizontal (skirt) thickness of zero."
-  [sequence]
-  [(map rounded-block sequence)
-   (map #(rounded-block (assoc % :skirt-thickness 0)) sequence)])
+(defn- rounded-pillar
+  "A sequence of rounded blocks. Passed overrides update each item of the
+  source sequences, e.g. for adjusting its width."
+  [overrides sequence]
+  (map (fn [item] (rounded-block (merge item overrides))) sequence))
+
+(defn- rounded-layers
+  "Multiple sequences of rounded blocks at different thicknesses.
+  Return a vector for indexing."
+  [thicknesses sequence]
+  (mapv #(rounded-pillar {:xy-offset %} sequence) thicknesses))
 
 (defn- tight-shell-sequence
   [{:keys [switch-type] :as options}]
@@ -215,21 +222,32 @@
       (reverse (sort (keys rectangles-by-z))))))
 
 (defn- minimal-shell-sequences
-  "Positive and negative stages of a minimal keycap shell.
-  The positive sequences is extended away from the switch by the top plate."
-  [{:keys [top-size bowl-radii] :as options}]
-  (let [[x y top-z] top-size
-        z (+ top-z (third bowl-radii))
-        [positive negative] (rounded-frames (tight-shell-sequence options))]
-    [(cons positive
-           (rounded-block (merge options {:footprint [x y]
-                                          :z-thickness z})))
-     negative]))
+  "The layers of a minimal keycap shell.
+  In order: An outer layer, an intermediate layer at engraving depth, and an
+  inner layer that hugs the switch. The outer and intermediate layers are
+  extended away from the switch by the top plate."
+  [{:keys [top-size bowl-radii skirt-thickness legend] :as options}]
+  (let [engraving-depth (:depth legend)
+        engraving-thickness (max (- skirt-thickness engraving-depth) 0)
+        [x y top-z] top-size
+        outer-top {:footprint [x y], :z-thickness (+ top-z (third bowl-radii))}
+        inner-top (assoc outer-top :xy-offset (- engraving-depth))
+        raw (rounded-layers [skirt-thickness engraving-thickness 0]
+                            (tight-shell-sequence options))]
+    (-> raw
+        (update 0 #(cons % (rounded-block (merge options outer-top))))
+        (update 1 #(cons % (rounded-block (merge options inner-top)))))))
 
 (defn- engraved-legend
+  "An extrusion from a 2D legend image into a 3D negative."
   [filepath]
-  (model/extrude-linear {:height big}
+  (model/extrude-linear {:height (data/key-length 1)}  ; Rough.
     (model/import filepath)))
+
+(defn- engraved-sides?
+  "True if any legends have been requested for the sides."
+  [options]
+  (not (empty? (dissoc (get-in options [:legend :faces]) :top))))
 
 (defn- bowl?
   "True if a bowl-shaped top has been requested."
@@ -275,18 +293,45 @@
       bowl (bowl-model options)
       motif (legend-without-bowl options))))
 
+(defn- side-face
+  "A model of the legend on one side of a cap.
+  The 3D image is tilted for a rough match against the slope of the key.
+  This function centers the image roughly at z = 0, without adaptation to
+  short skirts or tall tops. Rotation of the image is also not supported
+  from parameters: All such modifications currently need to happen in the 2D
+  image itself."
+  [{:keys [legend skirt-length slope unit-size]} face]
+  (let [{:keys [coord-mask z-angle]} (face data/faces)
+        masked-size (mapv * coord-mask unit-size)
+        real-size (mapv #(/ (data/key-length %) 2) masked-size)
+        unit-length (abs (first (remove zero? masked-size)))
+        slope-tilt (- (Math/atan (/ (* slope unit-length) skirt-length)))]
+    (->> (get-in legend [:faces face])
+         (engraved-legend)
+         (model/rotate [slope-tilt 0 0])
+         (model/rotate [(/ π 2) 0 z-angle])
+         (model/translate (conj real-size 0)))))
+
+(defn- side-faces
+  "Negative space shaping the sides of a cap for engraved legends."
+  [{:keys [legend] :as options}]
+  (apply maybe/union
+    (map (partial side-face options) (keys (dissoc (:faces legend) :top)))))
+
 (defn- minimal-body
   "A minimal (tight) keycap body with a skirt descending from a top plate.
-  The top plate rises at the edges to form a bowl. The ‘top-size’ argument
-  describes the plate, including the final thickness of the plate at its
-  center. The ‘bowl-radii’ argument describes the sphere used as a negative to
-  carve out the bowl."
+  The ‘top-size’ argument describes the plate, including the final thickness
+  of the plate at its center."
   [{:keys [skirt-length shell-sequence-fn] :as options}]
-  (let [[positive negative] (shell-sequence-fn options)]
+  (let [[positive intermediate negative] (shell-sequence-fn options)]
     (model/difference
       (maybe/difference
         (util/loft positive)
-        (top-face options))
+        (top-face options)
+        (when (engraved-sides? options)
+          (model/difference
+            (side-faces options)
+            (util/loft intermediate))))
       (switch-body options)
       (vaulted-ceiling options)
       (model/intersection  ; Make sure the inner negative cuts off at z = 0.

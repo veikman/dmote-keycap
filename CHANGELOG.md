@@ -4,6 +4,7 @@ This log follows the conventions of
 
 ## [Unreleased]
 ### Added
+- Added perfunctory support for legends.
 - Added an output `filename` parameter to the CLI, for scripting.
 - Exposed the `bowl-radii` and `error-body-positive` parameters through the
   CLI.
