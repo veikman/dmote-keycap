@@ -73,6 +73,14 @@
           :desc (format "Text to render on the %s face" string)
           :assoc-fn (as :char)]]))))
 
+(defn- build!
+  "Define a scad-app asset and call scad-app to write to file."
+  [options]
+  (build-all [{:name (:filename options)
+               :model-main (models/keycap options)
+               :minimum-face-size (:face-size options)}]
+             options))
+
 (defn -main
   "Basic command-line interface logic."
   [& raw]
@@ -86,9 +94,4 @@
      (get-in args [:options :help]) (help-text)
      (get-in args [:options :version]) (version)
      (:errors args) (error)
-     :else
-       (let [options (:options args)]
-         (build-all [{:name (:filename options)
-                      :model-main (models/keycap options)
-                      :minimum-face-size (:face-size options)}]
-                    options)))))
+     :else (build! (:options args)))))
