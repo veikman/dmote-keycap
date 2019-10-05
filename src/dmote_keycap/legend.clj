@@ -1,7 +1,8 @@
 ;;; 2D vector graphics for markings on keycaps.
 
 (ns dmote-keycap.legend
-  (:require [clojure.java.shell :refer [sh]]
+  (:require [clojure.string :refer [join]]
+            [clojure.java.shell :refer [sh]]
             [clojure.java.io :as io]
             [hiccup2.core :refer [html]]))
 
@@ -9,12 +10,17 @@
 ;; Internal ;;
 ;;;;;;;;;;;;;;
 
+(defn- to-css
+  "Present a Clojure map to a CSS-like style specification."
+  [mapping]
+  (join ";" (for [[key value] mapping] (str (name key) ":" value))))
+
 (defn- text-svg
   "A string representing an SVG image with a text element.
   The nominal size of this document, and positions within it,
   are based on the assumption that OpenSCAD will display elements
   from the SVG file even if they fall outside the viewbox."
-  [legend]
+  [legend style]
   (html
     [:svg
      {:xmlns "http://www.w3.org/2000/svg"
@@ -23,7 +29,7 @@
       :viewBox "0 0 1 1"
       :version "1.1"}
      [:text
-      {:style "font-size:2mm;font-family:'Bitstream Vera Sans Mono';text-anchor:middle;text-align:center;dominant-baseline:middle;"
+      {:style (to-css style)
        :x "0"
        :y "1"}
       legend]]))
@@ -63,7 +69,12 @@
   "Author an SVG file from a string, with an intermediate artefact."
   [basename legend]
   (let [filepath-text (output-filepath (str basename "_text.svg"))
-        filename-out (path-filename basename)]
-    (spit filepath-text (text-svg legend))
+        filename-out (path-filename basename)
+        style {:font-size "1mm"
+               :font-family "'Bitstream Vera Sans Mono'"
+               :text-anchor "middle"
+               :text-align "center"
+               :dominant-baseline "middle"}]
+    (spit filepath-text (text-svg legend style))
     (convert-to-plain-svg filepath-text (output-filepath filename-out))
     filename-out))
