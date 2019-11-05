@@ -7,13 +7,16 @@
             [scad-tarmi.dfm :refer [error-fn]]
             [scad-tarmi.maybe :as maybe]
             [scad-tarmi.util :as util]
+            [dmote-keycap.schema :as schema]
             [dmote-keycap.data :as data]
+            [dmote-keycap.measure :as measure]
             [dmote-keycap.legend :as legend]))
 
 ;;;;;;;;;;;;;;
 ;; Internal ;;
 ;;;;;;;;;;;;;;
 
+;; Semi-arbitrary internal constants.
 (def wafer 0.01)
 (def plenty 100)
 (def big (* 2 plenty))
@@ -40,7 +43,7 @@
   interior is taller than the body of its switch above the mounting plate."
   [{:keys [switch-type skirt-length]}]
   (- (min (max (stem-length switch-type) skirt-length)
-          (data/switch-height switch-type))))
+          (measure/switch-height switch-type))))
 
 (defn- maquette-body
   "The shape of one keycap, greatly simplified.
@@ -56,7 +59,7 @@
       (maybe/rotate top-rotation
         (apply model/cube top-size)))
     (maybe/translate [0 0 (- skirt-length)]
-      (apply model/cube (conj (mapv data/key-length unit-size) wafer)))))
+      (apply model/cube (conj (mapv measure/key-length unit-size) wafer)))))
 
 (defn- switch-level-section
   "Find a vector of vertical sections of a switch."
@@ -77,7 +80,7 @@
     (fn [coll part]
       (let [z (get-in data/switches [switch-type :body part :size :z])]
         (update coll z switch-level-section switch-type z)))
-    {0 [(data/switch-footprint switch-type)]}
+    {0 [(measure/switch-footprint switch-type)]}
     (data/switch-parts switch-type)))
 
 (defn- rectangular-sections
@@ -119,9 +122,10 @@
 (defn- switch-body-cube
   [{:keys [switch-type error-body-positive]}
    part-name]
-  (let [{:keys [x y z]} (get-in data/switches [switch-type :body part-name :size])
+  (let [{:keys [x y z]} (get-in data/switches
+                          [switch-type :body part-name :size])
         compensator (error-fn error-body-positive)]
-    (model/translate [0 0 (- (/ z 2) (data/switch-height switch-type))]
+    (model/translate [0 0 (- (/ z 2) (measure/switch-height switch-type))]
       (model/cube (compensator x) (compensator y) z))))
 
 (defn- stem-body-cuboid
@@ -217,7 +221,7 @@
         (conj coll
           (merge options
                  {:footprint (get rectangles-by-z z)
-                  :z-offset (- z (data/switch-height switch-type))})))
+                  :z-offset (- z (measure/switch-height switch-type))})))
       []
       (reverse (sort (keys rectangles-by-z))))))
 
@@ -241,7 +245,7 @@
 (defn- engraved-legend
   "An extrusion from a 2D legend image into a 3D negative."
   [filepath]
-  (model/extrude-linear {:height (data/key-length 1)}  ; Rough.
+  (model/extrude-linear {:height (measure/key-length 1)}  ; Rough.
     (model/import filepath)))
 
 (defn- engraved-sides?
@@ -303,7 +307,7 @@
   [{:keys [legend skirt-length slope unit-size]} face]
   (let [{:keys [coord-mask z-angle]} (face data/faces)
         masked-size (mapv * coord-mask unit-size)
-        real-size (mapv #(/ (data/key-length %) 2) masked-size)
+        real-size (mapv #(/ (measure/key-length %) 2) masked-size)
         unit-length (abs (first (remove zero? masked-size)))
         slope-tilt (- (Math/atan (/ (* slope unit-length) skirt-length)))]
     (->> (get-in legend [:faces face])
@@ -376,7 +380,7 @@
            shell-sequence-fn skirt-perimeter-fn]
     :as options}]
   (let [[stem-x stem-y] (stem-footprint switch-type 0)
-        [skirt-x skirt-y] (mapv data/key-length unit-size)
+        [skirt-x skirt-y] (mapv measure/key-length unit-size)
         positive (first (shell-sequence-fn options))
         outline (skirt-perimeter-fn options)]
     (model/intersection
@@ -439,7 +443,7 @@
   (merge {:top-size [nil nil 1]
           :top-rotation [0 0 0]
           :bowl-radii [0 0 0]
-          :skirt-length (data/default-skirt-length switch-type)
+          :skirt-length (measure/default-skirt-length switch-type)
           :stem-fn stem-model
           :support-fn support-model}
          (case style
@@ -462,7 +466,7 @@
   (if (every? some? old)
     old
     (case style
-      :maquette (conj (mapv #(* slope (data/key-length %)) unit-size)
+      :maquette (conj (mapv #(* slope (measure/key-length %)) unit-size)
                       (third old))
       :minimal (mapv #(if (some? %1) %1 9) old))))
 
@@ -508,7 +512,7 @@
   "A model of one keycap. Resolution is left at OpenSCAD defaults throughout.
   For a guide to the parameters, see README.md."
   [explicit-arguments]
-  {:pre [(spec/valid? ::data/keycap-parameters explicit-arguments)]}
+  {:pre [(spec/valid? ::schema/keycap-parameters explicit-arguments)]}
   (let [{:keys [supported sectioned body-fn stem-fn support-fn]
          :as options} (finalize-options explicit-arguments)]
     (maybe/intersection

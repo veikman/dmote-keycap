@@ -6,6 +6,7 @@
             [clojure.tools.cli :refer [parse-opts]]
             [environ.core :refer [env]]
             [scad-app.core :refer [build-all] :as app-core]
+            [dmote-keycap.schema :as schema]
             [dmote-keycap.data :as data]
             [dmote-keycap.models :as models])
   (:gen-class :main true))
@@ -27,7 +28,7 @@
     :validate [(partial spec/valid? ::app-core/minimum-face-size)]]
    [nil "--switch-type TYPE" "One of “alps” or “mx”"
     :default-desc "alps", :parse-fn keyword,
-    :validate [(partial spec/valid? ::data/switch-type)]]
+    :validate [(partial spec/valid? ::schema/switch-type)]]
    [nil "--style TYPE" "Main body; “minimal” or “maquette”"
     :default-desc "minimal", :parse-fn keyword,
     :validate [(partial spec/valid? ::data/style)]]

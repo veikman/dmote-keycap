@@ -3,11 +3,19 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+### Changed
+- Broke the `data` module into three: Added a `measure` module for measurement
+  functions and a `schema` module for Clojure spec and deserialization, leaving
+  the rest in place.
+
 ### Added
-- Added perfunctory support for legends.
+- Added perfunctory support for legends. API stability not guaranteed.
 - Added an output `filename` parameter to the CLI, for scripting.
 - Exposed the `bowl-radii` and `error-body-positive` parameters through the
   CLI.
+
+### Developer
+- Added parameter parsers for use with serialized inputs in other applications.
 
 ### Fixed
 - More default values now appear in the CLI.

@@ -1,8 +1,7 @@
-;;; Constants and very basic functions concerning keycaps.
+;;; Constants used for constructing keycaps.
 
 (ns dmote-keycap.data
-  (:require [clojure.spec.alpha :as spec]
-            [scad-tarmi.core :refer [π] :as tarmi]))
+  (:require [scad-tarmi.core :refer [π] :as tarmi]))
 
 ;;;;;;;;;;;;;;;
 ;; Constants ;;
@@ -62,116 +61,11 @@
                       :error-stem-negative 0})
 
 
-;;;;;;;;;;;;
-;; Schema ;;
-;;;;;;;;;;;;
-
-(spec/def ::style #{:maquette :minimal})
-(spec/def ::switch-type (set (keys switches)))
-(spec/def ::unit-size ::tarmi/point-2d)
-(spec/def ::top-size
-  (spec/tuple (spec/nilable number?) (spec/nilable number?) number?))
-(spec/def ::top-rotation ::tarmi/point-3d)
-(spec/def ::bowl-radii ::tarmi/point-3d)
-(spec/def ::bowl-plate-offset number?)
-(spec/def ::skirt-thickness number?)
-(spec/def ::skirt-length (spec/and number? #(>= % 0)))
-(spec/def ::slope (spec/and number? #(>= % 0)))
-(spec/def ::nozzle-width (spec/and number? #(> % 0)))
-(spec/def ::horizontal-support-height (spec/and number? #(>= % 0)))
-(spec/def ::error-stem-positive number?)
-(spec/def ::error-stem-negative number?)
-(spec/def ::error-body-positive number?)
-(spec/def ::sectioned boolean?)
-(spec/def ::supported boolean?)
-
-;; A composite spec for all valid parameters going into the keycap model.
-(spec/def ::keycap-parameters
-  (spec/keys :opt-un [::style ::switch-type ::unit-size
-                      ::top-size ::top-rotation
-                      ::bowl-radii ::bowl-plate-offset
-                      ::skirt-thickness ::skirt-length ::slope
-                      ::nozzle-width ::horizontal-support-height
-                      ::error-stem-positive ::error-stem-negative
-                      ::error-body-positive ::sectioned ::supported]))
-
-;;;;;;;;;;;;;;;
-;; Functions ;;
-;;;;;;;;;;;;;;;
-
-(declare switch-dimension)  ; Internal.
-
-(defn key-length [units] (- (* units mount-1u) (* 2 key-margin)))
+;;;;;;;;;;;;;;;;;;;;;;;;
+;; Accessor functions ;;
+;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn switch-parts
   "The keyword names of the parts of a switch body."
   [switch-type]
   (keys (get-in switches [switch-type :body])))
-
-(defn switch-height
-  "The total height of a switch’s body over the mounting plate."
-  [switch-type]
-  (switch-dimension switch-type :z))
-
-(defn default-skirt-length
-  "The default height of a keycap over the mounting plate is 1 mm less than the
-  height of the switch. This is a rough estimate based on frobnicating OEM
-  caps."
-  [switch-type]
-  (dec (switch-height switch-type)))
-
-(defn switch-footprint
-  "The xy footprint of a switch’s body on the mounting plate. This is not to be
-  confused with notches extending from the body to rest on top of the plate."
-  [switch-type]
-  [(switch-dimension switch-type :x)
-   (switch-dimension switch-type :y)])
-
-(defn skirt-footprint
-  "The maximum horizontal size of a keycap.
-  This measurement should describe the keycap at its widest point, coinciding
-  with the lower edge of the skirt. The function is exposed to allow for
-  clearing negative space around the keycap in a keyboard model."
-  [options]
-  {:pre [(spec/valid? ::keycap-parameters options)]
-   :post [(spec/valid? ::tarmi/point-2d %)]}
-  (let [options-final (merge option-defaults options)
-        {:keys [style switch-type unit-size skirt-thickness]} options-final]
-    (if (= style :minimal)
-      (mapv #(+ % skirt-thickness) (switch-footprint switch-type))
-      (mapv key-length unit-size))))
-
-(defn plate-to-stem-end
-  "The distance from the switch mount plate to the end of the switch stem,
-  in the resting (open) state of the switch.
-  This is exposed because dmote-keycap models place z 0 at the end of the
-  stem, not on the mounting plate."
-  [switch-type]
-  (+ (switch-height switch-type)
-     (get-in switches [switch-type :travel])))
-
-(defn pressed-clearance
-  "The height of the skirt of a keycap above the mounting plate, depressed."
-  [switch-type skirt-length]
-  {:pre [(spec/valid? ::switch-type switch-type)
-         (spec/valid? number? skirt-length)]}
-  (- (switch-height switch-type) skirt-length))
-
-(defn resting-clearance
-  "The height of the skirt of a keycap above the mounting plate, at rest."
-  [switch-type skirt-length]
-  (+ (pressed-clearance switch-type skirt-length)
-     (get-in switches [switch-type :travel])))
-
-
-;;;;;;;;;;;;;;
-;; Internal ;;
-;;;;;;;;;;;;;;
-
-(defn- switch-dimension
-  "A switch’s body over the mounting plate."
-  [switch-type dimension]
-  {:pre [(spec/valid? ::switch-type switch-type)]
-   :post [(number? %)]}
-  (apply max (map #(get-in switches [switch-type :body % :size dimension])
-                  (switch-parts switch-type))))
