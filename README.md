@@ -33,11 +33,13 @@ mechanical keyboards.
 
 ### As a library
 
-The `dmote-keycap.data` namespace exposes various raw data and simple
-mathematical functions to describe keycaps.
+The `dmote-keycap.data` namespace exposes various raw data.
+
+The `dmote-keycap.measure` namespace exposes functions for calculating
+how much space a keycap model would need. Useful in keyboard design.
 
 The `dmote-keycap.models` namespace exposes one function: `keycap`. It takes
-a number of parameters, in a flat map, and returns a `scad-clj` specification:
+a number of parameters and returns a `scad-clj` specification:
 
 * `:style`: One of `:minimal` (described above) or `:maquette` (a crude
   preview).
@@ -128,7 +130,11 @@ read it.
 
 `dmote-keycap` uses [Inkscape](https://inkscape.org/) programmatically to
 simplify SVG, so you will need that installed for both `:char` and
-`:unimportable`.
+`:unimportable`. If you are calling `keycap` from an application that does
+not use `scad-app`’s default output structure, you will also need to supply
+a function as a the top-level `:importable-filepath-fn` parameter. This
+function must take a string filename and return a path for placing the file
+where OpenSCAD will be able to import it.
 
 ### Placement
 

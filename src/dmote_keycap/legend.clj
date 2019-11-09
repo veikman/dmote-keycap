@@ -3,7 +3,6 @@
 (ns dmote-keycap.legend
   (:require [clojure.string :refer [join]]
             [clojure.java.shell :refer [sh]]
-            [clojure.java.io :as io]
             [hiccup2.core :refer [html]]))
 
 ;;;;;;;;;;;;;;
@@ -36,13 +35,6 @@
 
 (defn- path-filename [basename] (str basename "_path.svg"))
 
-(defn- output-filepath
-  "Produce a relative file path, from the current working directory, to the
-  standard scad-app SCAD output directory. This is intended to make the file
-  importable in OpenSCAD code by its filename alone."
-  [filename]
-  (str (io/file "output" "scad" filename)))
-
 (defn- convert-to-plain-svg
   "Simplify text elements in an SVG file to paths.
   This requires Inkscape and needs input and output file paths.
@@ -60,15 +52,15 @@
 
 (defn make-importable
   "Author an SVG file from another SVG. Return the new filename."
-  [basename filepath-text]
+  [filepath-fn basename filepath-text]
   (let [filename-out (path-filename basename)]
-    (convert-to-plain-svg filepath-text (output-filepath filename-out))
+    (convert-to-plain-svg filepath-text (filepath-fn filename-out))
     filename-out))
 
 (defn make-from-char
   "Author an SVG file from a string, with an intermediate artefact."
-  [basename legend]
-  (let [filepath-text (output-filepath (str basename "_text.svg"))
+  [filepath-fn basename legend]
+  (let [filepath-text (filepath-fn (str basename "_text.svg"))
         filename-out (path-filename basename)
         style {:font-size "1mm"
                :font-family "'Bitstream Vera Sans Mono'"
@@ -76,5 +68,5 @@
                :text-align "center"
                :dominant-baseline "middle"}]
     (spit filepath-text (text-svg legend style))
-    (convert-to-plain-svg filepath-text (output-filepath filename-out))
+    (convert-to-plain-svg filepath-text (filepath-fn filename-out))
     filename-out))

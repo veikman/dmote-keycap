@@ -1,6 +1,6 @@
-(defproject dmote-keycap "0.3.0-SNAPSHOT"
+(defproject dmote-keycap "0.3.0"
   :description "Printable keycap models for mechanical keyboards"
-  :url "http://viktor.eikman.se/article/the-dmote/"
+  :url "https://viktor.eikman.se/article/the-dmote/"
   :license {:name "EPL-2.0 OR GPL-3.0-or-later"
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :dependencies [[org.clojure/clojure "1.10.0"]

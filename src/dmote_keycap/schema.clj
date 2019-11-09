@@ -29,6 +29,8 @@
 ;; Crude parsers for configuration deserialization in applications.
 ;; Notice these are not used in core.clj, which needs heavier-duty parsers
 ;; for working with strings from a CLI.
+;; Notice also that functions passable as arguments are omitted because they
+;; would not normally be recoverable from serialized data.
 (def option-parsers {:filename str
                      :style keyword
                      :switch-type keyword
@@ -71,6 +73,8 @@
 ;; Spec registration ;;
 ;;;;;;;;;;;;;;;;;;;;;;;
 
+(spec/def ::importable-filepath-fn fn?)
+
 (spec/def ::style #{:maquette :minimal})
 (spec/def ::switch-type (set (keys switches)))
 (spec/def ::unit-size ::tarmi/point-2d)
@@ -103,7 +107,8 @@
 
 ;; A composite spec for all valid parameters going into the keycap model.
 (spec/def ::keycap-parameters
-  (spec/keys :opt-un [::style ::switch-type ::unit-size
+  (spec/keys :opt-un [::importable-filepath-fn
+                      ::style ::switch-type ::unit-size
                       ::top-size ::top-rotation
                       ::bowl-radii ::bowl-plate-offset
                       ::skirt-thickness ::skirt-length ::slope

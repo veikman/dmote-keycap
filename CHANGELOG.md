@@ -3,19 +3,23 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+Nothing yet.
+
+## [Version 0.3.0] - 2019-11-09
 ### Changed
 - Broke the `data` module into three: Added a `measure` module for measurement
-  functions and a `schema` module for Clojure spec and deserialization, leaving
-  the rest in place.
+  functions and a `schema` module for validation, leaving the rest in place.
 
 ### Added
 - Added perfunctory support for legends. API stability not guaranteed.
 - Added an output `filename` parameter to the CLI, for scripting.
 - Exposed the `bowl-radii` and `error-body-positive` parameters through the
   CLI.
+- Added an option parser map, for deserialization in the DMOTE application.
 
 ### Developer
 - Added parameter parsers for use with serialized inputs in other applications.
+- Added trivial unit tests.
 
 ### Fixed
 - More default values now appear in the CLI.
@@ -42,6 +46,7 @@ This log follows the conventions of
 ### Added
 - Minimal and maquette styles.
 
-[Unreleased]: https://github.com/veikman/dmote-keycap/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/veikman/dmote-keycap/compare/v0.3.0...HEAD
+[Version 0.3.0]: https://github.com/veikman/dmote-keycap/compare/v0.2.0...v0.3.0
 [Version 0.2.0]: https://github.com/veikman/dmote-keycap/compare/v0.1.1...v0.2.0
 [Version 0.1.1]: https://github.com/veikman/dmote-keycap/compare/v0.1.0...v0.1.1

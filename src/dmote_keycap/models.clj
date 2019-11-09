@@ -2,6 +2,7 @@
 
 (ns dmote-keycap.models
   (:require [clojure.spec.alpha :as spec]
+            [clojure.java.io :as io]
             [scad-clj.model :as model]
             [scad-tarmi.core :refer [abs π] :as tarmi]
             [scad-tarmi.dfm :refer [error-fn]]
@@ -436,6 +437,13 @@
   [options]
   (update options :legend merge (:legend data/option-defaults)))
 
+(defn- to-filepath
+  "Produce a relative file path, from the current working directory to a
+  place where OpenSCAD will find the file by its name alone. In this default
+  version, use the standard scad-app SCAD output directory."
+  [filename]
+  (str (io/file "output" "scad" filename)))
+
 (defn- enrich-options
   "Take merged global-default and explicit user arguments. Merge these further
   with defaults that depend on other options."
@@ -445,6 +453,7 @@
           :bowl-radii [0 0 0]
           :skirt-length (measure/default-skirt-length switch-type)
           :stem-fn stem-model
+          :importable-filepath-fn to-filepath
           :support-fn support-model}
          (case style
            :maquette {:body-fn maquette-body
@@ -471,21 +480,22 @@
       :minimal (mapv #(if (some? %1) %1 9) old))))
 
 (defn- finalize-face-source
-  [basename face {:keys [unimportable importable char] :as properties}]
+  [path-fn basename face {:keys [unimportable importable char] :as properties}]
   (let [intname (format "%s_%s" basename (name face))]
     (cond
       importable   importable
-      unimportable (legend/make-importable intname unimportable)
-      char         (legend/make-from-char intname char)
+      unimportable (legend/make-importable path-fn intname unimportable)
+      char         (legend/make-from-char path-fn intname char)
       :else (throw (ex-info "No source supplied for legend." properties)))))
 
 (defn- finalize-legend
   "Generate file paths for all configured faces with a legend."
-  [{:keys [filename]} old]
+  [{:keys [filename importable-filepath-fn]} old]
   (assoc old :faces
     (into {}
       (for [[face properties] (:faces old)]
-        [face (finalize-face-source filename face properties)]))))
+        [face (finalize-face-source
+                importable-filepath-fn filename face properties)]))))
 
 (defn- interpolate-options
   "Resolve ambiguities in user input."
