@@ -116,3 +116,10 @@
                       ::nozzle-width ::horizontal-support-height
                       ::error-stem-positive ::error-stem-negative
                       ::error-body-positive ::sectioned ::supported]))
+
+;; Composite specs for batch mode.
+(spec/def ::batch-entry
+  (spec/or :short-form string?
+           :long-form ::keycap-parameters))
+(spec/def ::batch-file
+  (spec/map-of ::keycap-parameters (spec/coll-of ::batch-entry)))

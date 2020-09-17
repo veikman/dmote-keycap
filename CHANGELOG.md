@@ -3,7 +3,8 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
-Nothing yet.
+### Added
+- A batch mode, where the CLI takes an EDN file describing several caps.
 
 ## [Version 0.3.0] - 2019-11-09
 ### Changed

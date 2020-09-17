@@ -2,14 +2,22 @@
 
 (ns dmote-keycap.core
   (:require [clojure.spec.alpha :as spec]
-            [clojure.string :refer [split]]
+            [clojure.string :refer [join split]]
+            [clojure.edn :as edn]
             [clojure.tools.cli :refer [parse-opts]]
             [environ.core :refer [env]]
             [scad-app.core :refer [build-all] :as app-core]
             [dmote-keycap.schema :as schema]
             [dmote-keycap.data :as data]
-            [dmote-keycap.models :as models])
+            [dmote-keycap.models :as models]
+            [dmote-keycap.batch :refer [batch-assets]])
   (:gen-class :main true))
+
+(defn stderr
+  "Print to STDERR where applicable."
+  [message]
+  (binding [*out* *err*]
+    (println message)))
 
 (defn- nilable-number [raw] (when-not (= raw "nil") (Float/parseFloat raw)))
 
@@ -19,6 +27,7 @@
    ["-h" "--help" "Print this message and exit"]
    ["-r" "--render" "Render SCAD to STL"]
    [nil "--rendering-program PATH" "Path to OpenSCAD" :default "openscad"]
+   [nil "--batch PATH" "Input filepath for batch mode"]
    [nil "--filename NAME" "Output filename; no suffix"
     :default (:filename data/option-defaults)]
    [nil "--supported" "Include print supports underneath models"]
@@ -74,6 +83,15 @@
           :desc (format "Text to render on the %s face" string)
           :assoc-fn (as :char)]]))))
 
+(defn- read-edn
+  [{:keys [batch]}]
+  (try
+    (edn/read-string (slurp batch))
+    (catch java.io.IOException e
+      (stderr (format "File not available: “%s”." (.getMessage e))))
+    (catch java.lang.RuntimeException e
+      (stderr (format "File not valid EDN: “%s”." batch (.getMessage e))))))
+
 (defn- build!
   "Define a scad-app asset and call scad-app to write to file."
   [options]
@@ -82,17 +100,32 @@
                :minimum-face-size (:face-size options)}]
              options))
 
+(defn- batch!
+  "Build scad-app assets from an EDN file."
+  [options]
+  (if-let [data (read-edn options)]
+    (if (spec/valid? ::schema/batch-file data)
+      (build-all (batch-assets options data))
+      (do
+        (binding [*out* *err*]
+          (println "Invalid data structure in EDN file. Details follow.")
+          (spec/explain ::schema/batch-file data)
+          (flush))
+        (System/exit 65)))
+    (System/exit 64)))
+
 (defn -main
   "Basic command-line interface logic."
   [& raw]
-  (let [args (parse-opts raw (concat static-cli-options legend-cli-options))
+  (let [args (parse-opts raw (concat static-cli-options legend-cli-options)
+                         :in-order true)
         help-text (fn [] (println "dmote-keycap options:")
                          (println (:summary args)))
         version (fn [] (println "dmote-keycap version"
-                         (env :dmote-keycap-version)))
-        error (fn [] (run! println (:errors args)) (System/exit 1))]
+                         (env :dmote-keycap-version)))]
    (cond
      (get-in args [:options :help]) (help-text)
      (get-in args [:options :version]) (version)
-     (:errors args) (error)
+     (:errors args) (fn [] (run! stderr (:errors args)) (System/exit 1))
+     (get-in args [:options :batch]) (batch! (:options args))
      :else (build! (:options args)))))
