@@ -9,17 +9,23 @@
 ;; Internal ;;
 ;;;;;;;;;;;;;;
 
-(defn- to-css
-  "Present a Clojure map to a CSS-like style specification."
+(defn- format-css
+  "Present a Clojure map as a CSS-like style specification."
   [mapping]
-  (join ";" (for [[key value] mapping] (str (name key) ":" value))))
+  (join ";" (for [[k v] mapping] (str (name k) ":" v))))
+
+(defn- format-options
+  [[k v]]
+  (if (map? v)
+    [k (format-css v)]
+    [k (str v)]))
 
 (defn- text-svg
   "A string representing an SVG image with a text element.
   The nominal size of this document, and positions within it,
   are based on the assumption that OpenSCAD will display elements
   from the SVG file even if they fall outside the viewbox."
-  [legend style]
+  [text-content text-options]
   (html
     [:svg
      {:xmlns "http://www.w3.org/2000/svg"
@@ -28,10 +34,8 @@
       :viewBox "0 0 1 1"
       :version "1.1"}
      [:text
-      {:style (to-css style)
-       :x "0"
-       :y "1"}
-      legend]]))
+      (into {} (map format-options text-options))
+      text-content]]))
 
 (defn- path-filename [basename] (str basename "_path.svg"))
 
@@ -59,14 +63,9 @@
 
 (defn make-from-char
   "Author an SVG file from a string, with an intermediate artefact."
-  [filepath-fn basename legend]
+  [filepath-fn basename text-content text-options]
   (let [filepath-text (filepath-fn (str basename "_text.svg"))
-        filename-out (path-filename basename)
-        style {:font-size "1mm"
-               :font-family "'Bitstream Vera Sans Mono'"
-               :text-anchor "middle"
-               :text-align "center"
-               :dominant-baseline "middle"}]
-    (spit filepath-text (text-svg legend style))
+        filename-out (path-filename basename)]
+    (spit filepath-text (text-svg text-content text-options))
     (convert-to-plain-svg filepath-text (filepath-fn filename-out))
     filename-out))

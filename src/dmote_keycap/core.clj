@@ -6,7 +6,7 @@
             [clojure.edn :as edn]
             [clojure.tools.cli :refer [parse-opts]]
             [environ.core :refer [env]]
-            [scad-app.core :refer [build-all] :as app-core]
+            [scad-app.core :refer [filter-by-name build-all] :as app-core]
             [dmote-keycap.schema :as schema]
             [dmote-keycap.data :as data]
             [dmote-keycap.models :as models]
@@ -28,6 +28,9 @@
    ["-r" "--render" "Render SCAD to STL"]
    [nil "--rendering-program PATH" "Path to OpenSCAD" :default "openscad"]
    [nil "--batch PATH" "Input filepath for batch mode"]
+   ["-w" "--whitelist RE"
+    "Limit batch output to files whose names match the regular expression RE"
+    :default #"" :parse-fn re-pattern]
    [nil "--filename NAME" "Output filename; no suffix"
     :default (:filename data/option-defaults)]
    [nil "--supported" "Include print supports underneath models"]
@@ -93,7 +96,7 @@
       (stderr (format "File not valid EDN: “%s”." batch (.getMessage e))))))
 
 (defn- build!
-  "Define a scad-app asset and call scad-app to write to file."
+  "Define one scad-app asset and call scad-app to write to file."
   [options]
   (build-all [{:name (:filename options)
                :model-main (models/keycap options)
@@ -102,10 +105,10 @@
 
 (defn- batch!
   "Build scad-app assets from an EDN file."
-  [options]
+  [{:keys [whitelist] :as options}]
   (if-let [data (read-edn options)]
     (if (spec/valid? ::schema/batch-file data)
-      (build-all (batch-assets options data))
+      (build-all (filter-by-name whitelist (batch-assets options data)))
       (do
         (binding [*out* *err*]
           (println "Invalid data structure in EDN file. Details follow.")

@@ -38,6 +38,7 @@
             :base           {:size {:x 15.6,  :y 15.6,  :z 0.7}}}}})
 
 ;; Face data concerns how legends are placed on the sides of keys.
+(def face-keys [:top :north :east :south :west])
 (def faces
   {:north {:coord-mask [ 0  1], :z-angle π}
    :east  {:coord-mask [ 1  0], :z-angle (/ π 2)}
@@ -46,19 +47,33 @@
 
 ;; The keycap function exposed by dmote-keycap.models takes a number of options
 ;; whose global default values are exposed here.
-(def option-defaults {:filename "cap"
-                      :style :minimal
-                      :switch-type :alps
-                      :unit-size [1 1]
-                      :slope 0.73
-                      :bowl-plate-offset 0
-                      :skirt-thickness 2.1
-                      :legend {:depth 0.4}  ; Suitable for SLA engraving.
-                      :nozzle-width 0.5
-                      :horizontal-support-height 0.5
-                      :error-body-positive -0.5
-                      :error-stem-positive 0
-                      :error-stem-negative 0})
+;; Together with the default 1 y offset, the 1x1 scale of generated SVG
+;; and the dominant baseline set here, generated legends should be
+;; vertically centered in relation to the font.
+(def text-style-defaults {:font-size "1mm"
+                          :font-family "DejaVu Sans Mono"
+                          :text-anchor "middle"
+                          :text-align "center"
+                          :dominant-baseline "middle"})
+(def option-defaults
+  {:filename "cap"
+   :style :minimal
+   :switch-type :alps
+   :unit-size [1 1]
+   :slope 0.73
+   :bowl-plate-offset 0
+   :skirt-thickness 2.1
+   :legend {:depth 0.4  ; Suitable for SLA engraving.
+            :faces (into {}
+                     (for [f face-keys]
+                       [f {:text-options {:style text-style-defaults
+                                          :x "0"
+                                          :y "1"}}]))}
+   :nozzle-width 0.5
+   :horizontal-support-height 0.5
+   :error-body-positive -0.5
+   :error-stem-positive 0
+   :error-stem-negative 0})
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;

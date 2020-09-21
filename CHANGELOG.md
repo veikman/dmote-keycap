@@ -3,8 +3,17 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+### Changed
+- The default typeface for legends is now DejaVu Sans Mono. This should
+  present excellent backwards compatibility with the previous default,
+  Bitstream Vera Sans Mono, and broader Unicode support.
+
 ### Added
 - A batch mode, where the CLI takes an EDN file describing several caps.
+- CSS and other legend styling properties are now exposed for overrides.
+- Support for arbitrary SVG transforms of generatedlegends.
+- Colourization of legends in OpenSCAD previews.
+- A `whitelist` CLI parameter for the batch mode.
 
 ## [Version 0.3.0] - 2019-11-09
 ### Changed

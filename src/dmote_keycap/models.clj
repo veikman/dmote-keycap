@@ -11,7 +11,8 @@
             [dmote-keycap.schema :as schema]
             [dmote-keycap.data :as data]
             [dmote-keycap.measure :as measure]
-            [dmote-keycap.legend :as legend]))
+            [dmote-keycap.legend :as legend]
+            [dmote-keycap.misc :refer [deep-merge]]))
 
 ;;;;;;;;;;;;;;
 ;; Internal ;;
@@ -21,6 +22,7 @@
 (def wafer 0.01)
 (def plenty 100)
 (def big (* 2 plenty))
+(def color-legend [0.7 0.7 0.9])
 
 (defn- third [coll] (nth coll 2))
 
@@ -246,13 +248,9 @@
 (defn- engraved-legend
   "An extrusion from a 2D legend image into a 3D negative."
   [filepath]
-  (model/extrude-linear {:height (measure/key-length 1)}  ; Rough.
+  (model/extrude-linear {:height (measure/key-length 1)  ; Rough.
+                         :convexity 6}
     (model/import filepath)))
-
-(defn- engraved-sides?
-  "True if any legends have been requested for the sides."
-  [options]
-  (not (empty? (dissoc (get-in options [:legend :faces]) :top))))
 
 (defn- bowl?
   "True if a bowl-shaped top has been requested."
@@ -274,25 +272,32 @@
                    :z-override (third bowl-radii)}]
     (model/union
       (bowl-model options)
-      (model/intersection
-        (bowl-model (merge options overrides))
-        (engraved-legend (get-in legend [:faces :top]))))))
+      (model/color color-legend
+       (model/intersection
+         (bowl-model (merge options overrides))
+         (engraved-legend (get-in legend [:faces :top])))))))
 
 (defn- legend-without-bowl
   "Negative space constituting the top-face legend without a curvature."
   [{:keys [legend top-size]}]
   (let [depth (:depth legend)
         filepath (get-in legend [:faces :top])]
-    (model/intersection
-      (model/translate [0 0 (- (third top-size) (/ depth 2))]
-        (model/cube big big depth))
-      (engraved-legend filepath))))
+   (model/translate [0 0 wafer]  ; Cleaner OpenSCAD preview.
+     (model/color color-legend
+       (model/intersection
+         (model/translate [0 0 (- (third top-size) (/ depth 2))]
+           (model/cube big big depth))
+         (engraved-legend filepath))))))
+
+(defn- has-finalized-legend?
+  [options face]
+  (get-in options [:legend :faces face]))
 
 (defn- top-face
   "Negative space shaping the topmost surface of a cap, whether flat or not."
-  [{:keys [legend] :as options}]
+  [options]
   (let [bowl (bowl? options)
-        motif (get-in legend [:faces :top])]
+        motif (has-finalized-legend? options :top)]
     (cond
       (and bowl motif) (bowl-with-legend options)
       bowl (bowl-model options)
@@ -305,17 +310,18 @@
   short skirts or tall tops. Rotation of the image is also not supported
   from parameters: All such modifications currently need to happen in the 2D
   image itself."
-  [{:keys [legend skirt-length slope unit-size]} face]
-  (let [{:keys [coord-mask z-angle]} (face data/faces)
-        masked-size (mapv * coord-mask unit-size)
-        real-size (mapv #(/ (measure/key-length %) 2) masked-size)
-        unit-length (abs (first (remove zero? masked-size)))
-        slope-tilt (- (Math/atan (/ (* slope unit-length) skirt-length)))]
-    (->> (get-in legend [:faces face])
-         (engraved-legend)
-         (model/rotate [slope-tilt 0 0])
-         (model/rotate [(/ π 2) 0 z-angle])
-         (model/translate (conj real-size 0)))))
+  [{:keys [legend skirt-length slope unit-size] :as options} face]
+  (when (has-finalized-legend? options face)
+    (let [{:keys [coord-mask z-angle]} (face data/faces)
+          masked-size (mapv * coord-mask unit-size)
+          real-size (mapv #(/ (measure/key-length %) 2) masked-size)
+          unit-length (abs (first (remove zero? masked-size)))
+          slope-tilt (- (Math/atan (/ (* slope unit-length) skirt-length)))]
+      (->> (get-in legend [:faces face])
+        (engraved-legend)
+        (model/rotate [slope-tilt 0 0])
+        (model/rotate [(/ π 2) 0 z-angle])
+        (model/translate (conj real-size 0))))))
 
 (defn- side-faces
   "Negative space shaping the sides of a cap for engraved legends."
@@ -328,14 +334,16 @@
   The ‘top-size’ argument describes the plate, including the final thickness
   of the plate at its center."
   [{:keys [skirt-length shell-sequence-fn] :as options}]
-  (let [[positive intermediate negative] (shell-sequence-fn options)]
+  (let [[positive intermediate negative] (shell-sequence-fn options)
+        side-legends (side-faces options)]
     (model/difference
       (maybe/difference
         (util/loft positive)
         (top-face options)
-        (when (engraved-sides? options)
+        (when side-legends
           (model/difference
-            (side-faces options)
+            (model/color color-legend
+              side-legends)
             (util/loft intermediate))))
       (switch-body options)
       (vaulted-ceiling options)
@@ -432,11 +440,6 @@
         (< skirt-length stem-z) (skirt-support options)
         (> skirt-length stem-z) (stem-support options)))))
 
-(defn- nested-defaults
-  "Merge default values into nested sections of the configuration."
-  [options]
-  (update options :legend merge (:legend data/option-defaults)))
-
 (defn- to-filepath
   "Produce a relative file path, from the current working directory to a
   place where OpenSCAD will find the file by its name alone. In this default
@@ -480,13 +483,13 @@
       :minimal (mapv #(if (some? %1) %1 9) old))))
 
 (defn- finalize-face-source
-  [path-fn basename face {:keys [unimportable importable char] :as properties}]
+  [path-fn basename face
+   {:keys [unimportable importable char text-options]}]
   (let [intname (format "%s_%s" basename (name face))]
     (cond
       importable   importable
       unimportable (legend/make-importable path-fn intname unimportable)
-      char         (legend/make-from-char path-fn intname char)
-      :else (throw (ex-info "No source supplied for legend." properties)))))
+      char         (legend/make-from-char path-fn intname char text-options))))
 
 (defn- finalize-legend
   "Generate file paths for all configured faces with a legend."
@@ -494,8 +497,9 @@
   (assoc old :faces
     (into {}
       (for [[face properties] (:faces old)]
-        [face (finalize-face-source
-                importable-filepath-fn filename face properties)]))))
+        (if-let [path (finalize-face-source
+                        importable-filepath-fn filename face properties)]
+          [face path])))))
 
 (defn- interpolate-options
   "Resolve ambiguities in user input."
@@ -508,8 +512,7 @@
   "Reconcile explicit user arguments with defaults at various levels."
   [explicit-arguments]
   (->> explicit-arguments
-       (merge data/option-defaults)
-       nested-defaults
+       (deep-merge data/option-defaults)
        enrich-options
        interpolate-options))
 

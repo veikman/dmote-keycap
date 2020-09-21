@@ -48,7 +48,9 @@
                                          (map-like
                                            {:unimportable str
                                             :importable str
-                                            :char str}))})
+                                            :char str
+                                            :style (map-of keyword
+                                                              identity)}))})
                      :nozzle-width num
                      :horizontal-support-height num
                      :error-body-positive num
@@ -92,8 +94,9 @@
 (spec/def ::unimportable (spec/and string? file?))
 (spec/def ::importable (spec/and string? (complement empty?)))
 (spec/def ::char (spec/and string? (complement empty?)))
-(spec/def ::face-data (spec/keys :req-un
-                        [(or ::unimportable ::importable ::char)]))
+(spec/def ::style map?)
+(spec/def ::face-data (spec/keys :opt-un
+                        [::unimportable ::importable ::char ::style]))
 (spec/def ::faces (spec/map-of ::face-id ::face-data))
 (spec/def ::legend (spec/keys :opt-un [::depth ::faces]))
 
