@@ -3,6 +3,7 @@
 (ns dmote-keycap.batch
   (:require [clojure.spec.alpha :as spec]
             [clojure.string :refer [join split]]
+            [me.raynes.fs :as fs]
             [dmote-keycap.data :refer [face-keys]]
             [dmote-keycap.misc :refer [deep-merge]]
             [dmote-keycap.models :as models]
@@ -41,6 +42,7 @@
       (map second)
       (mapcat (juxt :char :importable :unimportable))
       (remove nil?)
+      (map #(fs/base-name % true))
       (join "-"))))
 
 (defn- name-fn
