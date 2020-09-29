@@ -48,9 +48,10 @@
 (defn- name-fn
   "Return a function to gives each asset a unique name."
   [n-places]
-  (fn [index {:keys [filename] :as options}]
-    (format (str "%s-%0" n-places "d-%s")
-            filename index (name-from-faces options))))
+  (fn [index {:keys [filename legend] :as options}]
+    (let [suffix (:filename-suffix legend)]
+      (format (str "%s-%0" n-places "d-%s")
+              filename index (or suffix (name-from-faces options))))))
 
 (defn- define-asset
   "Define one scad-app asset.
