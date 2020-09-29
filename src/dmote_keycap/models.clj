@@ -341,10 +341,10 @@
         (util/loft positive)
         (top-face options)
         (when side-legends
-          (model/difference
-            (model/color color-legend
-              side-legends)
-            (util/loft intermediate))))
+          (model/color color-legend
+            (model/difference
+              side-legends
+              (util/loft intermediate)))))
       (switch-body options)
       (vaulted-ceiling options)
       (model/intersection  ; Make sure the inner negative cuts off at z = 0.
