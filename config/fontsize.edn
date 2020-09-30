@@ -1,0 +1,17 @@
+;; A sample set of keycaps demonstrating legend font sizes.
+
+;; Not for printing.
+
+;; Notice that the default-face-path parameter is abused here to change only
+;; font size, not the content of each legend. The legend “My”, used throughout,
+;; is intended only to show the vertical span of the selected font.
+
+{{:top-size [10 10 3]
+  :legend {:faces {:top {:char "My"}}}
+  :default-face-path [:legend :faces :top :text-options :style :font-size]}
+ ["1.0mm"
+  "1.4mm"
+  "1.8mm"
+  "2.2mm"
+  "2.6mm"
+  "3.0mm"]}

@@ -14,6 +14,9 @@ This log follows the conventions of
 - Support for arbitrary SVG transforms of generatedlegends.
 - Colourization of legends in OpenSCAD previews.
 - A `whitelist` CLI parameter for the batch mode.
+- Sample configuration files for batches, principally a complete set for the
+  Concertina.
+- Sample SVG files for advanced legends.
 
 ## [Version 0.3.0] - 2019-11-09
 ### Changed
