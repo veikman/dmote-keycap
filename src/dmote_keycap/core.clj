@@ -92,8 +92,8 @@
     (edn/read-string (slurp batch))
     (catch java.io.IOException e
       (stderr (format "File not available: “%s”." (.getMessage e))))
-    (catch java.lang.RuntimeException e
-      (stderr (format "File not valid EDN: “%s”." batch (.getMessage e))))))
+    (catch java.lang.RuntimeException _
+      (stderr (format "File not valid EDN: “%s”." batch)))))
 
 (defn- build!
   "Define one scad-app asset and call scad-app to write to file."
@@ -108,7 +108,7 @@
   [{:keys [whitelist] :as options}]
   (if-let [data (read-edn options)]
     (if (spec/valid? ::schema/batch-file data)
-      (build-all (filter-by-name whitelist (batch-assets options data)))
+      (build-all (filter-by-name whitelist (batch-assets options data)) options)
       (do
         (binding [*out* *err*]
           (println "Invalid data structure in EDN file. Details follow.")
