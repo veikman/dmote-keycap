@@ -73,19 +73,30 @@
                    :west {:text-options {:style {:font-size "1.8mm"} :y 2}}}}}
  [;; Left-hand side, main key cluster.
   ;; Bottom column (index 5), near to far.
-  {:legend {:filename-suffix "delete" :faces {:top {:char "⌦"}}}}
-  {:legend {:filename-suffix "backspace" :faces {:top {:char "⌫"}}}}
+  {:legend {:filename-suffix "delete-insert"
+            :faces {:top {:char "⌦" :text-options {:y 1.6}}
+                    :west {:char "⎀"}}}}
+  {:legend {:filename-suffix "backspace"
+            :faces {:top {:char "⌫" :text-options {:y 1.6}}}}}
   {:top-size [10 10 3.6]
    :legend {:filename-suffix "tab-F12"
             :faces {:top {:char "↹"} :north {:char "F12"}}}}
   ;; Left-hand-side navigation area.
   {:legend {:filename-suffix "page_up" :faces {:top {:char "⤒"}}}}
-  {:legend {:filename-suffix "page_down" :faces {:top {:char "⤓"}}}}
-  {:legend {:filename-suffix "home" :faces {:top {:char "⇤"}}}}
-  {:legend {:filename-suffix "end" :faces {:top {:char "⇥"}}}}
+  {:legend {:filename-suffix "page_down"
+            :faces {:top {:char "⤓"}
+                    :south {:unimportable "resources/legend/nontext/nav_castle.svg"}}}}
+  {:legend {:filename-suffix "home"
+            :faces {:top {:char "⇤"}
+                    :south {:unimportable "resources/legend/nontext/mouse_button1.svg"}}}}
+  {:legend {:filename-suffix "end"
+            :faces {:top {:char "⇥"}
+                    :south {:unimportable "resources/legend/nontext/mouse_button2.svg"}}}}
   ;; Right-hand-side navigation area.
   {:legend {:filename-suffix "up" :faces {:top {:char "↑"}}}}
-  {:legend {:filename-suffix "down" :faces {:top {:char "↓"}}}}
+  {:legend {:filename-suffix "down"
+            :faces {:top {:char "↓"}
+                    :south {:unimportable "resources/legend/nontext/mouse_motion.svg"}}}}
   {:legend {:filename-suffix "left" :faces {:top {:char "←"}}}}
   {:legend {:filename-suffix "right" :faces {:top {:char "→"}}}}
   ;; Left-hand thumb cluster, starting with the first column on the left (index 3), near to far.
@@ -110,23 +121,25 @@
                                            :transform "rotate(-30, 0, 0)"
                                            :x -1
                                            :y 3}}}}}
-  {:legend {:filename-suffix "mute_hibernate"
+  {:legend {:filename-suffix "mute-acceleration0"
             :faces {:top {:unimportable "resources/legend/nontext/mute.svg"}
-                    :north {:char "❄" :text-options {:style {:font-size "2.4mm"} :y 2}}}}}
+                    :north {:unimportable "resources/legend/nontext/mouse_acceleration0.svg"}}}}
   {:legend {:filename-suffix "escape"
             :faces {:top {:char "⎋"
                           :text-options {:style {:font-size "3.2mm"}}}}}}
   {:legend {:filename-suffix "pause"
             :faces {:top {:char "⏯" :text-options {:style {:font-size "1.8mm"}}}}}}
-  {:legend {:filename-suffix "volume_down"
-            :faces {:top {:char "🕩" :text-options {:style {:font-size "1.8mm"} :y 2}}}}}
+  {:legend {:filename-suffix "volume_down-acceleration1"
+            :faces {:top {:char "🕩" :text-options {:style {:font-size "1.8mm"} :y 2}}
+                    :north {:unimportable "resources/legend/nontext/mouse_acceleration1.svg"}}}}
   {:legend {:filename-suffix "right_alt" :faces {:top {:char "⎇" :text-options {:transform "scale(-1,1)"}}}}}
   {:legend {:filename-suffix "numeric_layer"  ; For shifting layers in QMK firmware.
             :faces {:top {:char "ℕ"  ; Blackboard bold N.
                           :text-options {:style {:font-family "Liberation Serif"}
                                          :y 2}}}}}  ; Center.
-  {:legend {:filename-suffix "volume_up"
-            :faces {:top {:char "🕪" :text-options {:style {:font-size "2.0mm"} :y 2}}}}}
+  {:legend {:filename-suffix "volume_up-acceleration2"
+            :faces {:top {:char "🕪" :text-options {:style {:font-size "2.0mm"} :y 2}}
+                    :north {:unimportable "resources/legend/nontext/mouse_acceleration2.svg"}}}}
   {:legend {:filename-suffix "right_ctrl"
             :faces {:top {:char "⎈"} :east {:char ")"}}}}
   {:legend {:filename-suffix "right_shift"
