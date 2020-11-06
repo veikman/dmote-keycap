@@ -57,7 +57,9 @@
   "O"
   {:legend {:faces {:top {:unimportable "resources/legend/2linetext/semicolon_with_colon.svg"}
                     :north {:char "F10"}}}}
-  {:legend {:faces {:top {:unimportable "resources/legend/2linetext/grave_accent_mark_with_tilde.svg"}}}}
+  {:legend {:filename-suffix "grave-reset"
+            :faces {:top {:unimportable "resources/legend/2linetext/grave_accent_mark_with_tilde.svg"}
+                    :south {:char "↻" :text-options {:style {:font-size "2.0mm"}}}}}}
   {:legend {:faces {:top {:unimportable "resources/legend/2linetext/undirected_single_and_double_quote.svg"}}}}
   {:legend {:faces {:top {:unimportable "resources/legend/2linetext/backslash_with_vertical_bar.svg"}
                     :north {:char "F11"}}}}]
@@ -116,11 +118,7 @@
   ;; Right-hand thumb cluster, first column on the left (index 0), near to far.
   {:legend {:filename-suffix "directed_right-sleep"
             :faces {:top {:unimportable "resources/legend/2linetext/directed_right_single_and_double_quote.svg"}
-                    :south {:char "☾"
-                            :text-options {:style {:font-size "2.4mm"}
-                                           :transform "rotate(-30, 0, 0)"
-                                           :x -1
-                                           :y 3}}}}}
+                    :south {:char "⏾" :text-options {:style {:font-size "2.0mm"} :x 0.5 :y 2}}}}}
   {:legend {:filename-suffix "mute-acceleration0"
             :faces {:top {:unimportable "resources/legend/nontext/mute.svg"}
                     :north {:unimportable "resources/legend/nontext/mouse_acceleration0.svg"}}}}
