@@ -1,0 +1,19 @@
+;; A sample set of keycaps with varied DFM settings.
+
+;; This is meant for a short run of sample prints, to trim in apppropriate DFM
+;; settings for a larger run on a particular combination of printer, slicer,
+;; part orientation, resin, and switch.
+
+{{:top-size [10 10 0.5]
+  :skirt-thickness 1
+  :legend {:faces {:top {:text-options {:style {:font-size "2mm"}}}
+                   :south {:text-options {:style {:font-size "1mm"} :y 5}}
+                   :east {:text-options {:style {:font-size "1mm"} :y 5}}}}}
+ [{:legend {:filename-suffix "A_bp05_sp00" :faces {:top {:char "A"} :south {:char "-0.5"} :east {:char "0.0"}}} :error-body-positive -0.5 :error-stem-positive 0.0}
+  {:legend {:filename-suffix "B_bp05_sp01" :faces {:top {:char "B"} :south {:char "-0.5"} :east {:char "0.1"}}} :error-body-positive -0.5 :error-stem-positive 0.1}
+  {:legend {:filename-suffix "C_bp05_sp02" :faces {:top {:char "C"} :south {:char "-0.5"} :east {:char "0.2"}}} :error-body-positive -0.5 :error-stem-positive 0.2}
+  {:legend {:filename-suffix "D_bp05_sp03" :faces {:top {:char "D"} :south {:char "-0.5"} :east {:char "0.3"}}} :error-body-positive -0.5 :error-stem-positive 0.3}
+  {:legend {:filename-suffix "E_bp06_sp00" :faces {:top {:char "E"} :south {:char "-0.6"} :east {:char "0.0"}}} :error-body-positive -0.6 :error-stem-positive 0.0}
+  {:legend {:filename-suffix "F_bp07_sp00" :faces {:top {:char "F"} :south {:char "-0.7"} :east {:char "0.0"}}} :error-body-positive -0.7 :error-stem-positive 0.0}
+  {:legend {:filename-suffix "G_bp06_sp01" :faces {:top {:char "G"} :south {:char "-0.6"} :east {:char "0.1"}}} :error-body-positive -0.6 :error-stem-positive 0.1}
+  {:legend {:filename-suffix "H_bp07_sp02" :faces {:top {:char "H"} :south {:char "-0.7"} :east {:char "0.2"}}} :error-body-positive -0.7 :error-stem-positive 0.2}]}
