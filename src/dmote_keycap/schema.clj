@@ -94,9 +94,9 @@
 (spec/def ::unimportable (spec/and string? file?))
 (spec/def ::importable (spec/and string? (complement empty?)))
 (spec/def ::char (spec/and string? (complement empty?)))
-(spec/def ::style map?)
+(spec/def :legend/style map?)
 (spec/def ::face-data (spec/keys :opt-un
-                        [::unimportable ::importable ::char ::style]))
+                        [::unimportable ::importable ::char :legend/style]))
 (spec/def ::faces (spec/map-of ::face-id ::face-data))
 (spec/def ::legend (spec/keys :opt-un [::depth ::faces]))
 
@@ -108,17 +108,28 @@
 (spec/def ::sectioned boolean?)
 (spec/def ::supported boolean?)
 
-;; A composite spec for all valid parameters going into the keycap model.
-(spec/def ::keycap-parameters
+;; A composite spec for most of the above, omitting only switch type.
+;; This spec is designed for use by applications that support more types of
+;; switches than this library, where the additional types are irrelevant to
+;; keycaps. For example, the additional types could be used to provide models
+;; of the switches themselves, or mounting plates for them, and would then be
+;; translated to some keycap-relevant type that falls under the
+;; ::keycap-parameters spec below, before calling into this library’s model
+;; functions.
+(spec/def ::base-parameters
   (spec/keys :opt-un [::importable-filepath-fn
-                      ::style ::switch-type ::unit-size
-                      ::top-size ::top-rotation
+                      ::style ::unit-size ::top-size ::top-rotation
                       ::bowl-radii ::bowl-plate-offset
                       ::skirt-thickness ::skirt-length ::slope
                       ::legend
                       ::nozzle-width ::horizontal-support-height
                       ::error-stem-positive ::error-stem-negative
                       ::error-body-positive ::sectioned ::supported]))
+
+;; A composite spec for all valid parameters going into the keycap model.
+(spec/def ::keycap-parameters
+  (spec/and ::base-parameters
+            (spec/keys :opt-un [::switch-type])))
 
 ;; Composite specs for batch mode.
 (spec/def ::batch-entry

@@ -13,17 +13,37 @@ than twice as a wide as a 1 u cap, and so on.
 
 ## Features
 
-* Supports both ALPS- and MX-style switches.
-* A “minimal” style that hugs the body of the switch. This style enables
+* Support for various types of switches. Details in the next section.
+* A “minimal” keycap style that hugs the body of the switch. This style enables
   keyboard designs more dense than the traditional 1 u, which can have
   ergonomic advantages. Dust protection is better than a 0.75 u cap that does
   not extend down the sides of the switch.
-* A “maquette” style for previewing keyboard designs.
+* A “maquette” keycap style for previewing keyboard designs.
 * Legends: Arbitrary 2D designs can be “engraved” into any of the faces of a
   non-maquette cap: The top and sides, in any combination.
 
-`dmote-keycap` does not provide models of switches and has no support for
-stabilizers.
+`dmote-keycap` has no support for stabilizers.
+
+### Switch types
+
+`dmote-keycap` does not provide models of electromechanical switches, but it
+does contain some data on common types of switches, for shaping keycaps to fit.
+The following keywords are recognized for the switch type parameter mentioned
+further down:
+
+* `:alps`: ALPS-like designs, including Matias.
+* `:mx`: Cherry MX and designs with very similar upper bodies.
+
+The `mx` category covers, for example, Gateron’s KS-3 series and Kailh’s PG1511
+series among other MX clones, though `dmote-keycap` does not have full support
+for short-travel (metal-themed) or BOX-type PG1511 switches; the latter will not
+fit.
+
+Minor differences in the lower body of two types of switches, such as plate
+mount versus PCB mount, and lateral recesses on some MX-like switches but not
+on others, are not modelled by this library because they are irrelevant to
+keycaps. Version 0.7.0 of the DMOTE application introduced some support for
+additional switch types that are relevant to the mounting plate.
 
 ## Usage
 
@@ -41,10 +61,8 @@ how much space a keycap model would need. Useful in keyboard design.
 The `dmote-keycap.models` namespace exposes one function: `keycap`. It takes
 a number of parameters and returns a `scad-clj` specification:
 
-* `:style`: One of `:minimal` (described above) or `:maquette` (a crude
-  preview).
-* `:switch-type`: One of `:alps` (ALPS style, including Matias) or
-  `:mx` (Cherry MX style).
+* `:style`: One of `:minimal` or `:maquette` (see above).
+* `:switch-type`: See above.
 * `:unit-size`: A 2-tuple of horizontal size measured in u, hence non-linear.
   On a traditional ISO keyboard, the first value in this tuple (the width)
   varies from 1 for most keys to about 6 for a space bar. The second value
@@ -173,7 +191,7 @@ support material, this may ultimately be a better option.
 
 ## License
 
-Copyright © 2019 Viktor Eikman
+Copyright © 2019–2020 Viktor Eikman
 
 This software is distributed under the [Eclipse Public License](LICENSE-EPL)
 (EPL) v2.0 or any later version thereof. This software may also be made

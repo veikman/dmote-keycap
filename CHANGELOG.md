@@ -11,12 +11,14 @@ This log follows the conventions of
 ### Added
 - A batch mode, where the CLI takes an EDN file describing several caps.
 - CSS and other legend styling properties are now exposed for overrides.
-- Support for arbitrary SVG transforms of generatedlegends.
+- Support for arbitrary SVG transforms of generated legends.
 - Colourization of legends in OpenSCAD previews.
 - A `whitelist` CLI parameter for the batch mode.
 - Sample configuration files for batches, principally a complete set for the
   Concertina.
 - Sample SVG files for advanced legends.
+- A basic keycap parameter schema for applications that support a superset of
+  this library’s switch types.
 
 ## [Version 0.3.0] - 2019-11-09
 ### Changed
