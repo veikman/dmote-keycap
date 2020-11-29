@@ -26,7 +26,7 @@
             :slider-housing {:size {:x 13.35, :y 5.95,  :z 5.15}}
             :snap           {:size {:x 12,    :y 13.03, :z 4.75}}}}
    :mx
-    {:travel 3.6
+    {:travel 4
      :stem {:shell          {:size {:x 7,     :y 5.25,  :z 3.6}
                              :positive true}
             :cross-x        {:size {:x 4,     :y 1.25,  :z 3.6}
