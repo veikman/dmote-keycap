@@ -13,7 +13,7 @@ than twice as a wide as a 1 u cap, and so on.
 
 ## Features
 
-* Support for various types of switches. Details in the next section.
+* Support for various types of switches. Details below.
 * A “minimal” keycap style that hugs the body of the switch. This style enables
   keyboard designs more dense than the traditional 1 u, which can have
   ergonomic advantages. Dust protection is better than a 0.75 u cap that does
@@ -22,28 +22,8 @@ than twice as a wide as a 1 u cap, and so on.
 * Legends: Arbitrary 2D designs can be “engraved” into any of the faces of a
   non-maquette cap: The top and sides, in any combination.
 
-`dmote-keycap` has no support for stabilizers.
-
-### Switch types
-
-`dmote-keycap` does not provide models of electromechanical switches, but it
-does contain some data on common types of switches, for shaping keycaps to fit.
-The following keywords are recognized for the switch type parameter mentioned
-further down:
-
-* `:alps`: ALPS-like designs, including Matias.
-* `:mx`: Cherry MX and designs with very similar upper bodies.
-
-The `mx` category covers, for example, Gateron’s KS-3 series and Kailh’s PG1511
-series among other MX clones, though `dmote-keycap` does not have full support
-for short-travel (metal-themed) or BOX-type PG1511 switches; the latter will not
-fit.
-
-Minor differences in the lower body of two types of switches, such as plate
-mount versus PCB mount, and lateral recesses on some MX-like switches but not
-on others, are not modelled by this library because they are irrelevant to
-keycaps. Version 0.7.0 of the DMOTE application introduced some support for
-additional switch types that are relevant to the mounting plate.
+`dmote-keycap` has no support for stabilizers, raised legends, or multiple
+materials (printing to simulate “double shot” injection moulding).
 
 ## Usage
 
@@ -62,7 +42,7 @@ The `dmote-keycap.models` namespace exposes one function: `keycap`. It takes
 a number of parameters and returns a `scad-clj` specification:
 
 * `:style`: One of `:minimal` or `:maquette` (see above).
-* `:switch-type`: See above.
+* `:switch-type`: See below.
 * `:unit-size`: A 2-tuple of horizontal size measured in u, hence non-linear.
   On a traditional ISO keyboard, the first value in this tuple (the width)
   varies from 1 for most keys to about 6 for a space bar. The second value
@@ -111,21 +91,50 @@ is to model a variety of traditional “families” with just a few parameters.
 ### As a command-line application
 
 Use `lein run` with command-line arguments corresponding to the parameters
-listed above. Not all parameters are supported; try `lein run --help`.
-The CLI takes additional parameters for `face-size` (resolution) and
-output `filename` (for scripting whole sets of keys).
-
+listed above. Not all parameters are supported; try `lein run -- --help`.
 The application will generate files of OpenSCAD code under `output/scad`
 and, optionally, STL files for slicing and 3D printing.
+
+The CLI supports some additional parameter that are not interpreted by the
+`keycap` function inside the library. Here are some highlights:
+
+* `--batch`: An operating mode for multiple keys; more below.
+* `--face-size`: Rendering resolution.
+* `--filename`: For your own CLI-based scripting needs.
+* `--render`: Render results to STL.
+
+The batch mode takes an EDN file specifying arbitrarily large sets of keys with
+arbitrary shared and unique properties. The EDN must contain a vector of maps,
+keyed by maps of properties, with vectors of individual switches as their
+values. Clojure’s EDN format was chosen for this partly because YAML does not
+allow maps as map keys. Examples of the format are available under `config`.
+
+## Switch types
+
+`dmote-keycap` does not provide models of electromechanical switches, but it
+does contain some data on common types of switches, for shaping keycaps to fit.
+The following keywords are recognized for the switch type parameter mentioned
+above:
+
+* `:alps`: ALPS-like designs, including Matias.
+* `:mx`: Cherry MX and designs with very similar upper bodies.
+
+The `mx` category covers, for example, Gateron’s KS-3 series and some of
+Kailh’s PG1511 series among other MX clones. However, the PG1511 series
+includes some models with shorter travel, and some types of stems (e.g. BOX)
+that will not fit.
+
+Minor differences in the lower body of two types of switches, such as plate
+mount versus PCB mount, and lateral recesses on some MX-like switches but not
+on others, are not modelled by this library because they are irrelevant to
+keycaps. Version 0.7.0 of the DMOTE application introduced some support for
+additional switch types that are relevant to the mounting plate.
 
 ## Legends
 
 `dmote-keycap` uses OpenSCAD’s `import` function, not the `text` function, to
 put markings on caps. This enables a wide variety of markings: Anything that
 can be expressed in SVG, DXF and other 2D image formats OpenSCAD can import.
-
-As of `dmote-keycap` v0.3.0, there is no support for raised (positive)
-markings or multiple materials, just engravings (negative space).
 
 To select a legend, when calling into the library, supply a map like this as
 part of the options to `keycap`:
