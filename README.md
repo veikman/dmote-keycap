@@ -103,11 +103,7 @@ The CLI supports some additional parameter that are not interpreted by the
 * `--filename`: For your own CLI-based scripting needs.
 * `--render`: Render results to STL.
 
-The batch mode takes an EDN file specifying arbitrarily large sets of keys with
-arbitrary shared and unique properties. The EDN must contain a vector of maps,
-keyed by maps of properties, with vectors of individual switches as their
-values. Clojure’s EDN format was chosen for this partly because YAML does not
-allow maps as map keys. Examples of the format are available under `config`.
+The batch mode flag takes an EDN file path.
 
 ## Switch types
 
@@ -177,6 +173,24 @@ Targeting is a bit more complicated for the sides:
 After being extruded to three dimensions, each image used to mark a side of
 the key is tilted using the `:slope` parameter and moved so that SVG’s [0, 0]
 ends up at the height of the top of the stem.
+
+## Batch mode format
+
+Batch mode allows for rendering arbitrarily large sets of keys with arbitrary
+shared and unique properties. Settings for a batch of keys are to be specified
+in EDN format, a data serialization format chosen partly because, unlike e.g.
+YAML, it allows maps as map keys. Overrides can be passed on the command line.
+
+The EDN file for a batch must contain a vector of maps, keyed by maps of
+properties, with vectors of individual switches as their values. Each
+individual switch must be represented either by a map of properties or by a
+shorthand format interpreted according to the parent map.
+
+Valid examples of the expected format are available under `config`.
+Here is a complete usage example calling one of those, for FDM printing with a
+0.5 mm nozzle, which is recommended:
+
+`lein run -- --batch config/concertina/64key/alps/colemak.edn --skirt-thickness 2.4 --error-body-positive -0.7 --error-stem-positive 0.1 --supported  --render`
 
 ## Printing
 
