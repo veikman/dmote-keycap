@@ -14,6 +14,8 @@
             [dmote-keycap.batch :refer [batch-assets]])
   (:gen-class :main true))
 
+(def compass [:north :east :south :west])
+
 (defn stderr
   "Print to STDERR where applicable."
   [message]
@@ -72,7 +74,7 @@
 
 (def legend-cli-options
   (apply concat
-    (for [face [:top :north :east :south :west]]
+    (for [face (concat [:top] compass)]
       (let [string (name face)
             as #(fn [coll _ val] (assoc-in coll [:legend :faces face %] val))]
         [[:long-opt (format "--legend-%s-unimportable" string)
@@ -105,6 +107,12 @@
     (when (= suffix "png") (swap! tracker assoc-in [head (first tail)] path))
     path))
 
+(defn- specify-image
+  [name eye size]
+  {:name name
+   :camera {:eye eye, :center [0 0 0]}
+   :size [size, size]})
+
 (defn- finalize-asset
   "Finish an asset before handing it to scad-app.
   Conditionally add requests for 2D images and ensure they are tracked."
@@ -112,8 +120,12 @@
   (cond-> asset
     true (assoc :filepath-fn (partial track-image-filepath tracker))
     montage (assoc :images
-                   [{:name "top" :camera {:eye [0 0 40] :center [0 0 0]}}
-                    {:name "north" :camera {:eye [0 50 0] :center [0 0 0]}}])))
+                   (concat
+                     [(specify-image "top"   [0 0 40]  400)
+                      (specify-image "north" [0 50 0]  200)
+                      (specify-image "east"  [50 0 0]  200)
+                      (specify-image "south" [0 -50 0] 200)
+                      (specify-image "west"  [-50 0 0] 200)]))))
 
 (defn- montage!
   "Compose a 2D montage of the assets."

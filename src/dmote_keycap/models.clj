@@ -22,7 +22,7 @@
 (def wafer 0.01)
 (def plenty 100)
 (def big (* 2 plenty))
-(def color-legend [0.7 0.7 0.9])
+(def color-legend [0.2 0.3 0.4])
 
 (defn- third [coll] (nth coll 2))
 
