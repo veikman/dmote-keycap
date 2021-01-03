@@ -6,7 +6,8 @@
             [clojure.edn :as edn]
             [clojure.tools.cli :refer [parse-opts]]
             [environ.core :refer [env]]
-            [scad-app.core :refer [filter-by-name build-all] :as app-core]
+            [scad-app.core :as app-core]
+            [scad-app.misc :refer [compose-filepath]]
             [dmote-keycap.schema :as schema]
             [dmote-keycap.data :as data]
             [dmote-keycap.models :as models]
@@ -27,6 +28,7 @@
    ["-h" "--help" "Print this message and exit"]
    ["-r" "--render" "Render SCAD to STL"]
    [nil "--rendering-program PATH" "Path to OpenSCAD" :default "openscad"]
+   ["-m" "--montage" "When rendering to STL, also produce a 2D montage"]
    [nil "--batch PATH" "Input filepath for batch mode"]
    ["-w" "--whitelist RE"
     "Limit batch output to files whose names match the regular expression RE"
@@ -95,20 +97,53 @@
     (catch java.lang.RuntimeException _
       (stderr (format "File not valid EDN: “%s”." batch)))))
 
+(defn- track-image-filepath
+  "Compose a filepath with tracking for images.
+  Store the final path in passed “tracker” atom mapping."
+  [tracker head suffix {:keys [tail] :as options}]
+  (let [path (compose-filepath head suffix options)]
+    (when (= suffix "png") (swap! tracker assoc-in [head (first tail)] path))
+    path))
+
+(defn- finalize-asset
+  "Finish an asset before handing it to scad-app.
+  Conditionally add requests for 2D images and ensure they are tracked."
+  [{:keys [montage]} tracker asset]
+  (cond-> asset
+    true (assoc :filepath-fn (partial track-image-filepath tracker))
+    montage (assoc :images
+                   [{:name "top" :camera {:eye [0 0 40] :center [0 0 0]}}
+                    {:name "north" :camera {:eye [0 50 0] :center [0 0 0]}}])))
+
+(defn- montage!
+  "Compose a 2D montage of the assets."
+  [options tracker])
+  ;; FIXME: Implement.
+
+(defn- build-all!
+  "Call scad-app to write to file."
+  [assets {:keys [montage] :as options}]
+  (let [tracker (atom {})
+        all (map (partial finalize-asset options tracker) assets)]
+    (app-core/build-all all options)
+    (when montage (montage! options tracker))))
+
 (defn- build!
-  "Define one scad-app asset and call scad-app to write to file."
+  "Define one scad-app asset and write to file."
   [options]
-  (build-all [{:name (:filename options)
-               :model-main (models/keycap options)
-               :minimum-face-size (:face-size options)}]
-             options))
+  (build-all! [{:name (:filename options)
+                :model-main (models/keycap options)
+                :minimum-face-size (:face-size options)}]
+              options))
 
 (defn- batch!
   "Build scad-app assets from an EDN file."
   [{:keys [whitelist] :as options}]
   (if-let [data (read-edn options)]
     (if (spec/valid? ::schema/batch-file data)
-      (build-all (filter-by-name whitelist (batch-assets options data)) options)
+      (build-all! (app-core/filter-by-name whitelist
+                                           (batch-assets options data))
+                  options)
       (do
         (binding [*out* *err*]
           (println "Invalid data structure in EDN file. Details follow.")
