@@ -3,6 +3,9 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+### Added
+- 2D montages for inspecting whole batches of caps.
+
 ### Fixed
 - Corrected nominal travel distance on Cherry MX from 3.6 mm to 4.0 mm.
   4.0 mm is also more common on MX clones.

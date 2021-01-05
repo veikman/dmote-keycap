@@ -101,9 +101,14 @@ The CLI supports some additional parameter that are not interpreted by the
 * `--batch`: An operating mode for multiple keys; more below.
 * `--face-size`: Rendering resolution.
 * `--filename`: For your own CLI-based scripting needs.
-* `--render`: Render results to STL.
+* `--render`: Render results to STL under `output/stl`.
+* `--montage`: With `--render`, render to PNG  under `output/png`.
 
 The batch mode flag takes an EDN file path.
+
+Montages include one of all sides of all keys in a `--batch`.
+
+Rendering requires OpenSCAD. Montages also require ImageMagick.
 
 ## Switch types
 
@@ -191,6 +196,9 @@ Here is a complete usage example calling one of those, for FDM printing with a
 0.5 mm nozzle, which is recommended:
 
 `lein run -- --batch config/concertina/64key/alps/colemak.edn --skirt-thickness 2.4 --error-body-positive -0.7 --error-stem-positive 0.1 --supported  --render`
+
+For large batches with complex legends, add `--montage` for an easier means of
+inspecting the typesetting.
 
 ## Printing
 
