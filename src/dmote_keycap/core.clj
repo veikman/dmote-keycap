@@ -2,23 +2,17 @@
 
 (ns dmote-keycap.core
   (:require [clojure.edn :as edn]
-            [clojure.java.io :as io]
-            [clojure.java.shell :refer [sh]]
             [clojure.spec.alpha :as spec]
             [clojure.string :refer [join split]]
             [clojure.tools.cli :refer [parse-opts]]
             [environ.core :refer [env]]
             [scad-app.core :as app-core]
-            [scad-app.misc :refer [compose-filepath]]
             [dmote-keycap.schema :as schema]
             [dmote-keycap.data :as data]
             [dmote-keycap.models :as models]
+            [dmote-keycap.montage :refer [expand-asset montage!]]
             [dmote-keycap.batch :refer [batch-assets]])
   (:gen-class :main true))
-
-(def compass [:north :east :south :west])
-(def dir-tmp (io/file "output" "png" "intermediate"))
-(def dir-montage (io/file "output" "png" "montage"))
 
 (defn stderr
   "Print to STDERR where applicable."
@@ -78,7 +72,7 @@
 
 (def legend-cli-options
   (apply concat
-    (for [face (concat [:top] compass)]
+    (for [face (concat [:top :north :east :south :west])]
       (let [string (name face)
             as #(fn [coll _ val] (assoc-in coll [:legend :faces face %] val))]
         [[:long-opt (format "--legend-%s-unimportable" string)
@@ -103,86 +97,11 @@
     (catch java.lang.RuntimeException _
       (stderr (format "File not valid EDN: “%s”." batch)))))
 
-(defn- track-image-filepath
-  "Compose a filepath with tracking for images.
-  Store the final path in passed “tracker” atom mapping."
-  [tracker head suffix {:keys [tail] :as options}]
-  (let [path (compose-filepath head suffix options)]
-    (when (= suffix "png") (swap! tracker assoc-in [head (first tail)] path))
-    path))
-
-(defn- specify-image
-  [key eye size]
-  {:name (name key)
-   :camera {:eye eye, :center [0 0 0]}
-   :size [size, size]})
-
-(defn- finalize-asset
-  "Finish an asset before handing it to scad-app.
-  Conditionally add requests for 2D images and ensure they are tracked."
-  [{:keys [montage]} tracker asset]
-  (cond-> asset
-    true (assoc :filepath-fn (partial track-image-filepath tracker))
-    montage (assoc :images
-                   (concat
-                     [(specify-image :top   [0 0 40]  250)
-                      (specify-image :north [0 50 0]  250)
-                      (specify-image :east  [50 0 0]  250)
-                      (specify-image :south [0 -50 0] 250)
-                      (specify-image :west  [-50 0 0] 250)]))))
-
-(defn- asset-montage-path
-  [asset-name]
-  (str (io/file dir-montage (str asset-name ".png"))))
-
-(defn- partial-montage-seq
-  "Prepare intermediate resources, comprising one asset, for a 2D montage.
-  First, make the default OpenSCAD background colour transparent.
-  Then, arrange the sides of the key around the image of its top, through
-  a series of rotations and a pair of carefully centred montages starting with
-  the north-south axis to establish the height of the composite image."
-  [asset-name sides]
-  (let [input (fn [k] (->> k name (get sides) str))
-        tmp (fn [k] (str (io/file dir-tmp (str (name k) ".png"))))
-        alpha (fn [k] ["-transparent" "#ffffe5" (input k) (tmp k)])]
-    [(concat ["convert" "-rotate" "90"] (alpha :west))
-     (concat ["convert" "-rotate" "270"] (alpha :east))
-     (concat ["convert" "-rotate" "180"] (alpha :north))
-     (concat ["convert"] (alpha :south))
-     (concat ["convert"] (alpha :top))
-     ["montage" (tmp :north) (tmp :top) (tmp :south) "-geometry" "+0+0" "-tile" "1x" (tmp :axis)]
-     ["montage" (tmp :west) (tmp :axis) (tmp :east) "-geometry" "1x1+0+0<" "-tile" "x1"
-      (asset-montage-path asset-name)]]))
-
-(defn- final-montage-element
-  [asset-name]
-  ["-label" asset-name (asset-montage-path asset-name)])
-
-(defn- imagemagick
-  [cmd]
-  (when-not (zero? (:exit (apply sh cmd)))
-    (println "Montage failed: Unable to run" cmd)
-    (System/exit 66)))
-
-(defn- montage!
-  "Compose a 2D montage of images specified in each asset rendered previously."
-  [options tracker]
-  (.mkdir dir-tmp)
-  (.mkdir dir-montage)
-  (doseq [old (.listFiles dir-montage)]
-    (io/delete-file old))
-  (doseq [[asset-name sides] @tracker]
-    (doseq [cmd (partial-montage-seq asset-name sides)]
-      (imagemagick cmd)))
-  (imagemagick (concat ["montage" "-geometry" "250x250+0+0"]
-                       (mapcat final-montage-element (sort (keys @tracker)))
-                       [(str (io/file dir-montage "montage.png"))])))
-
 (defn- build-all!
   "Call scad-app to write to file."
   [assets {:keys [montage] :as options}]
   (let [tracker (atom {})
-        all (map (partial finalize-asset options tracker) assets)]
+        all (map (partial expand-asset options tracker) assets)]
     (app-core/build-all all options)
     (when montage (montage! options tracker))))
 
