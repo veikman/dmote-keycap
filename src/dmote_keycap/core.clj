@@ -131,6 +131,10 @@
                       (specify-image :south [0 -50 0] 250)
                       (specify-image :west  [-50 0 0] 250)]))))
 
+(defn- asset-montage-path
+  [asset-name]
+  (str (io/file dir-montage (str asset-name ".png"))))
+
 (defn- partial-montage-seq
   "Prepare intermediate resources, comprising one asset, for a 2D montage.
   First, make the default OpenSCAD background colour transparent.
@@ -148,7 +152,17 @@
      (concat ["convert"] (alpha :top))
      ["montage" (tmp :north) (tmp :top) (tmp :south) "-geometry" "+0+0" "-tile" "1x" (tmp :axis)]
      ["montage" (tmp :west) (tmp :axis) (tmp :east) "-geometry" "1x1+0+0<" "-tile" "x1"
-      (str (io/file dir-montage (str asset-name ".png")))]]))
+      (asset-montage-path asset-name)]]))
+
+(defn- final-montage-element
+  [asset-name]
+  ["-label" asset-name (asset-montage-path asset-name)])
+
+(defn- imagemagick
+  [cmd]
+  (when-not (zero? (:exit (apply sh cmd)))
+    (println "Montage failed: Unable to run" cmd)
+    (System/exit 66)))
 
 (defn- montage!
   "Compose a 2D montage of images specified in each asset rendered previously."
@@ -159,8 +173,10 @@
     (io/delete-file old))
   (doseq [[asset-name sides] @tracker]
     (doseq [cmd (partial-montage-seq asset-name sides)]
-      (when-not (zero? (:exit (apply sh cmd)))
-        (println "Montage failed: Unable to run" cmd)))))
+      (imagemagick cmd)))
+  (imagemagick (concat ["montage" "-geometry" "250x250+0+0"]
+                       (mapcat final-montage-element (sort (keys @tracker)))
+                       [(str (io/file dir-montage "montage.png"))])))
 
 (defn- build-all!
   "Call scad-app to write to file."
