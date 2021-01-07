@@ -43,14 +43,14 @@
       (mapcat (juxt :char :importable :unimportable))
       (remove nil?)
       (map #(fs/base-name % true))
-      (join "-"))))
+      (join "_"))))
 
 (defn- name-fn
   "Return a function to gives each asset a unique name."
   [n-places]
   (fn [index {:keys [filename legend] :as options}]
     (let [suffix (:filename-suffix legend)]
-      (format (str "%s-%0" n-places "d-%s")
+      (format (str "%s-%0" n-places "d_%s")
               filename index (or suffix (name-from-faces options))))))
 
 (defn- define-asset

@@ -3,12 +3,17 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+### Changed
+- Started joining the names of sides with underscores instead of hyphens,
+  because it makes more sense to hyphenate within the names of sides.
+
 ### Added
 - 2D montages for inspecting whole batches of caps.
 
 ### Fixed
 - Corrected nominal travel distance on Cherry MX from 3.6 mm to 4.0 mm.
   4.0 mm is also more common on MX clones.
+- Improved designs for Concertina.
 
 ## [Version 0.4.0] - 2020-11-29
 ### Changed
