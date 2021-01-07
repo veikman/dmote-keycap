@@ -57,7 +57,7 @@
   "O"
   {:legend {:faces {:top {:unimportable "resources/legend/2linetext/semicolon_with_colon.svg"}
                     :north {:char "F10"}}}}
-  {:legend {:filename-suffix "grave-reset"
+  {:legend {:filename-suffix "grave_reset"
             :faces {:top {:unimportable "resources/legend/2linetext/grave_accent_mark_with_tilde.svg"}
                     :south {:char "↻" :text-options {:style {:font-size "2.0mm"}}}}}}
   {:legend {:faces {:top {:unimportable "resources/legend/2linetext/undirected_single_and_double_quote.svg"}}}}
@@ -68,25 +68,31 @@
  {:top-size [10 10 2.6]
   :skirt-thickness 2.4
   :legend {:faces {:top {:text-options {:style {:font-size "2.8mm"}}}
-                   :north {:text-options {:style {:font-size "1.4mm"
+                   :north {:text-options {:style {:font-size "1.8mm"
                                                   :dominant-baseline "baseline"}
                                           :transform "rotate(180, 0, 0)"}}
                    :east {:text-options {:style {:font-size "1.8mm"} :y 2}}
+                   :south {:text-options {:style {:font-size "1.8mm"} :y 2}}
                    :west {:text-options {:style {:font-size "1.8mm"} :y 2}}}}}
  [;; Left-hand side, main key cluster.
   ;; Bottom column (index 5), near to far.
-  {:legend {:filename-suffix "delete-insert"
-            :faces {:top {:char "⌦" :text-options {:y 1.6}}
+  {:legend {:filename-suffix "delete_insert"
+            :faces {:top {:char "⌦" :text-options {:style {:font-size "3.4mm"} :y 1.6}}
                     :west {:char "⎀"}}}}
   {:legend {:filename-suffix "backspace"
-            :faces {:top {:char "⌫" :text-options {:y 1.6}}}}}
+            :faces {:top {:char "⌫" :text-options {:style {:font-size "3.4mm"} :y 1.6}}}}}
   {:top-size [10 10 3.6]
-   :legend {:filename-suffix "tab-F12"
-            :faces {:top {:char "↹"} :north {:char "F12"}}}}
+   :legend {:filename-suffix "tab_F12"
+            :faces {:top {:char "↹"}
+                    :north {:char "F12"  ; Imitate other function keys.
+                            :text-options {:style {:font-size "1.4mm"
+                                                   :dominant-baseline "baseline"}
+                                           :transform "rotate(180, 0, 0)"}}}}}
   ;; Left-hand-side navigation area.
-  {:legend {:filename-suffix "page_up" :faces {:top {:char "⤒"}}}}
-  {:legend {:filename-suffix "page_down"
-            :faces {:top {:char "⤓"}
+  {:legend {:filename-suffix "page-up"
+            :faces {:top {:char "⤒" :text-options {:y 2}}}}}
+  {:legend {:filename-suffix "page-down"
+            :faces {:top {:char "⤓" :text-options {:y 2}}
                     :south {:unimportable "resources/legend/nontext/nav_castle.svg"}}}}
   {:legend {:filename-suffix "home"
             :faces {:top {:char "⇤"}
@@ -102,24 +108,30 @@
   {:legend {:filename-suffix "left" :faces {:top {:char "←"}}}}
   {:legend {:filename-suffix "right" :faces {:top {:char "→"}}}}
   ;; Left-hand thumb cluster, starting with the first column on the left (index 3), near to far.
-  {:legend {:filename-suffix "left_ctrl" :faces {:top {:char "⎈"} :west {:char "("}}}}
-  {:legend {:filename-suffix "left_shift" :faces {:top {:char "⇧"} :west {:char "["}}}}
-  {:legend {:filename-suffix "left_alt" :faces {:top {:char "⎇"}}}}
+  {:legend {:filename-suffix "left-ctrl"
+            :faces {:top {:char "⎈" :text-options {:style {:font-size "3.4mm"} :y 1}}
+                    :south {:char "["}}}}
+  {:legend {:filename-suffix "left-shift"
+            :faces {:top {:char "⇧" :text-options {:style {:font-size "3.4mm"} :y 1}}
+                    :north {:char "("}}}}
+  {:legend {:filename-suffix "left-alt"
+            :faces {:top {:char "⎇"} :south {:char "{"}}}}
   {:legend {:filename-suffix "super" :faces {:top {:unimportable "resources/legend/nontext/penguin.svg"}}}}
-  {:legend {:faces {:top {:unimportable "resources/legend/2linetext/hyphen_with_underscore.svg"}}}}
+  {:legend {:faces {:top {:unimportable "resources/legend/2linetext/hyphen_with_emdash.svg"}}}}
   {:legend {:filename-suffix "space"
             :faces {:top {:char "␣" :text-options {:style {:font-size "1.8mm"}}}}}}
-  {:legend {:filename-suffix "charset-layout"
+  {:legend {:filename-suffix "charset_layout"
             :faces {:top {:unimportable "resources/legend/nontext/charset_roman-japanese_qwerty-colemak.svg"}}}}
   {:legend {:faces {:top {:unimportable "resources/legend/2linetext/equals_with_plus.svg"}}}}
-  {:legend {:filename-suffix "directed_left"
+  {:legend {:filename-suffix "directed-left"
             :faces {:top {:unimportable "resources/legend/2linetext/directed_left_single_and_double_quote.svg"}}}}
-  {:legend {:filename-suffix "enter" :faces {:top {:char "⏎"}}}}
+  {:legend {:filename-suffix "enter"
+            :faces {:top {:char "⏎" :text-options {:style {:font-size "3.4mm"} :y 1}}}}}
   ;; Right-hand thumb cluster, first column on the left (index 0), near to far.
-  {:legend {:filename-suffix "directed_right-sleep"
+  {:legend {:filename-suffix "directed-right_sleep"
             :faces {:top {:unimportable "resources/legend/2linetext/directed_right_single_and_double_quote.svg"}
                     :south {:char "⏾" :text-options {:style {:font-size "2.0mm"} :x 0.5 :y 2}}}}}
-  {:legend {:filename-suffix "mute-acceleration0"
+  {:legend {:filename-suffix "mute_acceleration0"
             :faces {:top {:unimportable "resources/legend/nontext/mute.svg"}
                     :north {:unimportable "resources/legend/nontext/mouse_acceleration0.svg"}}}}
   {:legend {:filename-suffix "escape"
@@ -127,18 +139,21 @@
                           :text-options {:style {:font-size "3.2mm"}}}}}}
   {:legend {:filename-suffix "pause"
             :faces {:top {:char "⏯" :text-options {:style {:font-size "1.8mm"}}}}}}
-  {:legend {:filename-suffix "volume_down-acceleration1"
+  {:legend {:filename-suffix "volume-down_acceleration1"
             :faces {:top {:char "🕩" :text-options {:style {:font-size "1.8mm"} :y 2}}
                     :north {:unimportable "resources/legend/nontext/mouse_acceleration1.svg"}}}}
-  {:legend {:filename-suffix "right_alt" :faces {:top {:char "⎇" :text-options {:transform "scale(-1,1)"}}}}}
-  {:legend {:filename-suffix "numeric_layer"  ; For shifting layers in QMK firmware.
+  {:legend {:filename-suffix "right-alt"
+            :faces {:top {:char "⎇" :text-options {:transform "scale(-1,1)"}} :south {:char "}"}}}}
+  {:legend {:filename-suffix "numeric-layer"  ; For shifting layers in QMK firmware.
             :faces {:top {:char "ℕ"  ; Blackboard bold N.
                           :text-options {:style {:font-family "Liberation Serif"}
                                          :y 2}}}}}  ; Center.
-  {:legend {:filename-suffix "volume_up-acceleration2"
+  {:legend {:filename-suffix "volume-up_acceleration2"
             :faces {:top {:char "🕪" :text-options {:style {:font-size "2.0mm"} :y 2}}
                     :north {:unimportable "resources/legend/nontext/mouse_acceleration2.svg"}}}}
-  {:legend {:filename-suffix "right_ctrl"
-            :faces {:top {:char "⎈"} :east {:char ")"}}}}
-  {:legend {:filename-suffix "right_shift"
-            :faces {:top {:char "⇧"} :east {:char "]"}}}}]}
+  {:legend {:filename-suffix "right-ctrl"
+            :faces {:top {:char "⎈" :text-options {:style {:font-size "3.4mm"} :y 1}}
+                    :south {:char "]"}}}}
+  {:legend {:filename-suffix "right-shift"
+            :faces {:top {:char "⇧" :text-options {:style {:font-size "3.4mm"} :y 1}}
+                    :north {:char ")"}}}}]}
