@@ -70,17 +70,18 @@
   :legend {:faces {:top {:text-options {:style {:font-size "2.8mm"}}}
                    :north {:text-options {:style {:font-size "1.8mm"
                                                   :dominant-baseline "baseline"}
-                                          :transform "rotate(180, 0, 0)"}}
+                                          :transform "rotate(180, 0, 0)"
+                                          :y 0.5}}
                    :east {:text-options {:style {:font-size "1.8mm"} :y 2}}
                    :south {:text-options {:style {:font-size "1.8mm"} :y 2}}
                    :west {:text-options {:style {:font-size "1.8mm"} :y 2}}}}}
  [;; Left-hand side, main key cluster.
   ;; Bottom column (index 5), near to far.
   {:legend {:filename-suffix "delete_insert"
-            :faces {:top {:char "⌦" :text-options {:style {:font-size "3.4mm"} :y 1.6}}
-                    :west {:char "⎀"}}}}
+            :faces {:top {:char "⌦" :text-options {:style {:font-size "3.2mm"} :y 1.6}}
+                    :west {:char "⎀" :text-options {:style {:font-size "2.0mm"}}}}}}
   {:legend {:filename-suffix "backspace"
-            :faces {:top {:char "⌫" :text-options {:style {:font-size "3.4mm"} :y 1.6}}}}}
+            :faces {:top {:char "⌫" :text-options {:style {:font-size "3.2mm"} :y 1.6}}}}}
   {:top-size [10 10 3.6]
    :legend {:filename-suffix "tab_F12"
             :faces {:top {:char "↹"}
