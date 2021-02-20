@@ -22,34 +22,28 @@
   ;; Fourth column from the bottom (index 2).
   "C"
   "S"
-  {:top-size [10 10 3.6]
-   :legend {:faces {:top {:char "F"} :north {:char "F3"}}}}
+  {:legend {:faces {:top {:char "F"} :north {:char "F3"}}}}
   ;; Fifth column from the bottom (index 1).
   "V"
   "T"
-  {:top-size [10 10 3.6]
-   :legend {:faces {:top {:char "P"} :north {:char "F4"}}}}
+  {:legend {:faces {:top {:char "P"} :north {:char "F4"}}}}
   ;; Topmost column (index 0).
   "B"
   "D"
-  {:top-size [10 10 3.6]
-   :legend {:faces {:top {:char "G"} :north {:char "F5"}}}}
+  {:legend {:faces {:top {:char "G"} :north {:char "F5"}}}}
   ;; Right-hand side, main key cluster. Topmost column (index 0).
   "K"
   "H"
-  {:top-size [10 10 3.6]
-   :legend {:faces {:top {:char "J"} :north {:char "F6"}}}}
+  {:legend {:faces {:top {:char "J"} :north {:char "F6"}}}}
   ;; Second column from the top (index 1) and so on, going down.
   ;; The last columns are dominated by text-based SVG glyphs for two separate
   ;; characters on the top face, with and without Shift.
   "M"
   "N"
-  {:top-size [10 10 3.6]
-   :legend {:faces {:top {:char "L"} :north {:char "F7"}}}}
+  {:legend {:faces {:top {:char "L"} :north {:char "F7"}}}}
   {:legend {:faces {:top {:unimportable "resources/legend/2linetext/comma_with_lesser_than.svg"}}}}
   "E"
-  {:top-size [10 10 3.6]
-   :legend {:faces {:top {:char "U"} :north {:char "F8"}}}}
+  {:legend {:faces {:top {:char "U"} :north {:char "F8"}}}}
   {:legend {:faces {:top {:unimportable "resources/legend/2linetext/period_with_greater_than.svg"}}}}
   "I"
   {:legend {:faces {:top {:char "Y"} :north {:char "F9"}}}}
@@ -82,8 +76,7 @@
                     :west {:char "⎀" :text-options {:style {:font-size "2.0mm"}}}}}}
   {:legend {:filename-suffix "backspace"
             :faces {:top {:char "⌫" :text-options {:style {:font-size "3.2mm"} :y 1.6}}}}}
-  {:top-size [10 10 3.6]
-   :legend {:filename-suffix "tab_F12"
+  {:legend {:filename-suffix "tab_F12"
             :faces {:top {:char "↹"}
                     :north {:char "F12"  ; Imitate other function keys.
                             :text-options {:style {:font-size "1.4mm"
