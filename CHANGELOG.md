@@ -9,6 +9,7 @@ This log follows the conventions of
 
 ### Added
 - 2D montages for inspecting whole batches of caps.
+- Exposed the `horizontal-support-height` parameter through the CLI.
 
 ### Fixed
 - Corrected nominal travel distance on Cherry MX from 3.6 mm to 4.0 mm.

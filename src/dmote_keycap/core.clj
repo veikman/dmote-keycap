@@ -60,6 +60,9 @@
    [nil "--nozzle-width N" "FDM printer nozzle (aperture) width in mm"
     :default (:nozzle-width data/option-defaults)
     :parse-fn #(Float/parseFloat %)]
+   [nil "--horizontal-support-height N" "Height of support with --supported"
+    :default (:horizontal-support-height data/option-defaults)
+    :parse-fn #(Float/parseFloat %)]
    [nil "--error-body-positive N" "Printer error in mm"
     :default (:error-body-positive data/option-defaults)
     :parse-fn #(Float/parseFloat %)]
