@@ -10,11 +10,12 @@ This log follows the conventions of
 ### Added
 - 2D montages for inspecting whole batches of caps.
 - Exposed the `horizontal-support-height` parameter through the CLI.
+- A brief troubleshooting guide.
 
 ### Fixed
 - Corrected nominal travel distance on Cherry MX from 3.6 mm to 4.0 mm.
   4.0 mm is also more common on MX clones.
-- Improved designs for Concertina.
+- Improved designs for Concertina v0.7.0.
 
 ## [Version 0.4.0] - 2020-11-29
 ### Changed

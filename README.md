@@ -78,6 +78,9 @@ a number of parameters and returns a `scad-clj` specification:
 * `:nozzle-width`: The width of the printer nozzle that will be used to print
   the cap. This parameter is only used to build supports, which will have the
   width of the nozzle because this improves print speed and quality.
+* `:horizontal-support-height`: The height of support structures added by
+  `:supported`, where this are not already determined by the parts they
+  support.
 * `:error-stem-positive`, `:error-stem-negative`, `:error-body-positive`:
   Printer-dependent measurements of error for different parts of the cap.
   A **breaking change** is planned for version 1.0.0: All of these error
@@ -104,9 +107,9 @@ The CLI supports some additional parameter that are not interpreted by the
 * `--render`: Render results to STL under `output/stl`.
 * `--montage`: With `--render`, render to PNG  under `output/png`.
 
-The batch mode flag takes an EDN file path.
+The batch mode flag takes an EDN file path. Example available below.
 
-Montages include one of all sides of all keys in a `--batch`.
+Montages include a view of all sides of all keys in a `--batch`.
 
 Rendering requires OpenSCAD. Montages also require ImageMagick.
 
@@ -123,7 +126,7 @@ above:
 The `mx` category covers, for example, Gateron’s KS-3 series and some of
 Kailh’s PG1511 series among other MX clones. However, the PG1511 series
 includes some models with shorter travel, and some types of stems (e.g. BOX)
-that will not fit.
+that will not fit with `dmote-keycap`.
 
 Minor differences in the lower body of two types of switches, such as plate
 mount versus PCB mount, and lateral recesses on some MX-like switches but not
@@ -191,14 +194,16 @@ properties, with vectors of individual switches as their values. Each
 individual switch must be represented either by a map of properties or by a
 shorthand format interpreted according to the parent map.
 
-Valid examples of the expected format are available under `config`.
-Here is a complete usage example calling one of those, for FDM printing with a
-0.5 mm nozzle, which is recommended:
+Valid examples of the expected format are available under `config`. Here is a
+usage example calling one of those without any further customization
+through the CLI:
 
-`lein run -- --batch config/concertina/64key/alps/colemak.edn --skirt-thickness 2.4 --error-body-positive -0.7 --error-stem-positive 0.1 --supported  --render`
+`lein run -- --batch config/concertina/64key/alps/colemak.edn --render`
+
+OpenSCAD and Inkscape are required to run this example.
 
 For large batches with complex legends, add `--montage` for an easier means of
-inspecting the typesetting.
+inspecting the typesetting, using ImageMagick.
 
 ## Printing
 
@@ -209,20 +214,88 @@ for building supports in slicing software.
 With single-head FDM printing in a material like PLA, a relatively simple way
 to get a good result is to print each key in an upright position, with
 `supported`. In general, a `minimal`-style cap with a tall top plate (hence
-a vaulted ceiling) should not need further support.
+a vaulted ceiling) should need no further support and no brim.
 
 Consider the main alternative: Printing each key upside down. This will often
-give you a cleaner stem and skirt, but with an uneven face (i.e. non-nil
-`bowl-radii`), cleaning up the print will be difficult. In particular, even
-with fairly dense supports added by a slicer, you will probably find tiny
-cavities behind the face, to such a depth that a really good surface finish is
-hard to achieve even with a suitable rotary tool. Still, if you intend to
-paint your prints anyway, or if you have a dual-head printer with a soluble
-support material, this may ultimately be a better option.
+give you a cleaner stem and skirt, but if the face of the key is not even (i.e.
+`bowl-radii` is not nil), cleaning up the print will be more difficult. In
+particular, even with fairly dense supports added by a slicer, you will
+probably find tiny cavities behind the face, to such a depth that a really good
+surface finish is hard to achieve even with a suitable rotary tool. Still, if
+you intend to paint your prints anyway, or if you have a dual-head printer with
+a soluble support material, printing upside down may ultimately be a better
+option.
+
+### Troubleshooting
+
+Recommended solutions to common problems.
+
+#### When the printed stem is too thick for the stem of the switch
+
+First, for FDM printing, try reducing extrusion width in your slicer. In
+PrusaSlicer v2.3.0, for example, go into “Print settings” → “Advanced” →
+“Extrusion width” and reduce e.g. “Perimeters” to a value closer to, but not
+smaller than, the actual width of your nozzle. By default, slicers for FDM tend
+to overextrude filament to reduce gaps and compensate for thermal contraction.
+
+For SLA printing, the main factor seems to be orientation. Try rotating the cap
+and adding supports in your slicer to drain excess resin away from the tip of
+the stem on the cap.
+
+If that does not work, try running `dmote-keycap` with error compensation.
+
+* For an `:alps` stem that is too thick, run with `--error-stem-positive 0.1`
+  or more.
+* For an `:mx` stem that does not fit over the cross of the stem, run with
+  `--error-stem-negative -0.1` or less.
+
+#### When the printed cap is too narrow for the body of the switch
+
+First, see the advice on extrusion width and orientation above. If that does
+not help, try running with `--error-body-positive -0.7` and extra
+`--skirt-thickness` (e.g.  2.5) to compensate for the walls getting thinner
+with error compensation. Notice that extra skirt thickness can cause very
+tightly placed neighbouring keys to collide.
+
+#### When the printer nozzle dislocates the stem while printing
+
+First, use standard techniques for print bed adhesion with your printer and
+filament. For FDM this means e.g. tape, glue stick, alcohol, bed heating,
+precise z-offset tuning, extra first-layer height and extrusion width etc.
+
+If that does not help, and/or if the caps you are printing do not have the
+skirt and stem going to the exact same level, run with `--supported`.
+
+If that still does not solve the problem, try nozzle lifting in your slicer. In
+PrusaSlicer v2.3.0, for example, go into “Printer settings” → “Extruder 1” →
+“Retraction” and set “Lift Z” to a positive value so that the printer lifts
+before moving between stem and body, reducing shear. If the setting is at zero,
+try 0.3 mm.
+
+If you’re still seeing the occasional bent stem, run with
+`--horizontal-support-height 2` or more. This makes taller buttresses that
+stabilize the stem by connecting it more strongly to the skirt. You will need
+to snip these off with flush cutters, which gets harder the more you increase
+the value.
+
+#### When legends are hard to read
+
+Nozzle size in FDM printing is a fundamental limitation to horizontal
+resolution. You can work around this a little bit by tweaking slicer settings.
+In particular:
+
+* Use ironing to smooth out each layer of the top face before adding the next.
+* Use variable layer height. Reduce the very top layers to the minimum your
+  hardware can handle.
+* Extrusion width and retraction; see above.
+
+When you know what you can achieve this way, design your legends for your
+hardware. Make your figures thick enough that they survive slicing and printing
+with the amount of manual cleanup you want to do.
 
 ## License
 
-Copyright © 2019–2020 Viktor Eikman
+Copyright © 2019–2021 Viktor Eikman
 
 This software is distributed under the [Eclipse Public License](LICENSE-EPL)
 (EPL) v2.0 or any later version thereof. This software may also be made
