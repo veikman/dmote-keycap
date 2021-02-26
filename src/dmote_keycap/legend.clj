@@ -41,12 +41,15 @@
 
 (defn- convert-to-plain-svg
   "Simplify text elements in an SVG file to paths.
-  This requires Inkscape and needs input and output file paths.
+  This requires Inkscape 1 and needs input and output file paths.
   It makes the content more readable to OpenSCAD."
   [in out]
-  (let [cmd ["inkscape" in "--export-plain-svg" out "--export-text-to-path"]]
-    (when-not (zero? (:exit (apply sh cmd)))
-      (throw (ex-info "File conversion with Inkscape failed" {:command cmd})))
+  (let [cmd ["inkscape" in "--export-plain-svg" "--export-text-to-path"
+             "--export-filename" out]
+        status (:exit (apply sh cmd))]
+    (when-not (zero? status)
+      (throw (ex-info "File conversion with Inkscape failed"
+                      {:command cmd, :exit-status status})))
     out))
 
 

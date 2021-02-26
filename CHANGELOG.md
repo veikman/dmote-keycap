@@ -4,6 +4,7 @@ This log follows the conventions of
 
 ## [Unreleased]
 ### Changed
+- Changed the target version of Inkscape for SVG exports, from 0 to 1.
 - Started joining the names of sides with underscores instead of hyphens,
   because it makes more sense to hyphenate within the names of sides.
 
