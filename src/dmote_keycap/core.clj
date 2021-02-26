@@ -7,6 +7,7 @@
             [clojure.tools.cli :refer [parse-opts]]
             [environ.core :refer [env]]
             [scad-app.core :as app-core]
+            [scad-app.schema :as app-schema]
             [dmote-keycap.schema :as schema]
             [dmote-keycap.data :as data]
             [dmote-keycap.models :as models]
@@ -37,9 +38,9 @@
     :default (:filename data/option-defaults)]
    [nil "--supported" "Include print supports underneath models"]
    [nil "--sectioned" "Show models in section (cut in half)"]
-   [nil "--face-size N" "Smaller number gives more detail"
+   [nil "--facet-size N" "Smaller number gives more detail"
     :default 0.1, :parse-fn #(Float/parseFloat %),
-    :validate [(partial spec/valid? ::app-core/minimum-face-size)]]
+    :validate [(partial spec/valid? ::app-schema/minimum-facet-size)]]
    [nil "--switch-type TYPE" "One of “alps” or “mx”"
     :default-desc "alps", :parse-fn keyword,
     :validate [(partial spec/valid? ::schema/switch-type)]]
@@ -113,7 +114,7 @@
   [options]
   (build-all! [{:name (:filename options)
                 :model-main (models/keycap options)
-                :minimum-face-size (:face-size options)}]
+                :minimum-facet-size (:facet-size options)}]
               options))
 
 (defn- batch!
@@ -140,10 +141,11 @@
         help-text (fn [] (println "dmote-keycap options:")
                          (println (:summary args)))
         version (fn [] (println "dmote-keycap version"
-                         (env :dmote-keycap-version)))]
+                         (env :dmote-keycap-version)))
+        error (fn [] (run! println (:errors args)) (System/exit 1))]
    (cond
      (get-in args [:options :help]) (help-text)
      (get-in args [:options :version]) (version)
-     (:errors args) (fn [] (run! stderr (:errors args)) (System/exit 1))
+     (some? (:errors args)) (error)
      (get-in args [:options :batch]) (batch! (:options args))
      :else (build! (:options args)))))

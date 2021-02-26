@@ -4,9 +4,11 @@ This log follows the conventions of
 
 ## [Unreleased]
 ### Changed
-- Changed the target version of Inkscape for SVG exports, from 0 to 1.
+- Changed the target version of Inkscape for SVG exports, from v0 to v1.
 - Started joining the names of sides with underscores instead of hyphens,
   because it makes more sense to hyphenate within the names of sides.
+- One minor change to the CLI matching `scad-app` v1:
+  `--face-size` has been replaced with `--facet-size`.
 
 ### Added
 - 2D montages for inspecting whole batches of caps.
@@ -17,6 +19,7 @@ This log follows the conventions of
 - Corrected nominal travel distance on Cherry MX from 3.6 mm to 4.0 mm.
   4.0 mm is also more common on MX clones.
 - Improved designs for Concertina v0.7.0.
+- Improved feedback on incorrect CLI arguments.
 
 ## [Version 0.4.0] - 2020-11-29
 ### Changed

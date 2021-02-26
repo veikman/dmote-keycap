@@ -8,7 +8,7 @@
                  [environ "1.1.0"]
                  [hiccup "2.0.0-alpha2"]
                  [me.raynes/fs "1.4.6"]
-                 [scad-app "0.4.0-SNAPSHOT"]
+                 [scad-app "1.0.0"]
                  [scad-clj "0.5.3"]
                  [scad-tarmi "0.4.0"]]
   :plugins [[lein-environ "1.1.0"]]
