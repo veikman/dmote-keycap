@@ -3,6 +3,9 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+Nothing yet.
+
+## [Version 0.5.0] - 2020-04-10
 ### Changed
 - Changed the target version of Inkscape for SVG exports, from v0 to v1.
 - Started joining the names of sides with underscores instead of hyphens,
@@ -80,7 +83,8 @@ This log follows the conventions of
 ### Added
 - Minimal and maquette styles.
 
-[Unreleased]: https://github.com/veikman/dmote-keycap/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/veikman/dmote-keycap/compare/v0.5.0...HEAD
+[Version 0.5.0]: https://github.com/veikman/dmote-keycap/compare/v0.4.0...v0.5.0
 [Version 0.4.0]: https://github.com/veikman/dmote-keycap/compare/v0.3.0...v0.4.0
 [Version 0.3.0]: https://github.com/veikman/dmote-keycap/compare/v0.2.0...v0.3.0
 [Version 0.2.0]: https://github.com/veikman/dmote-keycap/compare/v0.1.1...v0.2.0
