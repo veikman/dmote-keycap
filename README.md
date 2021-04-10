@@ -6,16 +6,13 @@ can print and use.
 
 [![Clojars Project](https://img.shields.io/clojars/v/dmote-keycap.svg)](https://clojars.org/dmote-keycap)
 
-Key size is measured in a traditional unit: The u, where 1 u is 19.05 mm
-(0.75”) per key mount. A 1 u cap is smaller at about 18.25 mm to allow for
-space between caps on adjacent mounts. For the same reason, a 2 u cap is more
-than twice as a wide as a 1 u cap, and so on.
+[![Image of a Concertina thumb-key cluster using designs bundled with dmote-keycap](https://viktor.eikman.se/image/concertina-2-left-thumb-cluster/display)](https://viktor.eikman.se/image/concertina-2-left-thumb-cluster/)
 
 ## Features
 
 * Support for various types of switches. Details below.
 * A “minimal” keycap style that hugs the body of the switch. This style enables
-  keyboard designs more dense than the traditional 1 u, which can have
+  keyboard designs more dense than the traditional 1 u,* which can have
   ergonomic advantages. Dust protection is better than a 0.75 u cap that does
   not extend down the sides of the switch.
 * A “maquette” keycap style for previewing keyboard designs.
@@ -24,6 +21,11 @@ than twice as a wide as a 1 u cap, and so on.
 
 `dmote-keycap` has no support for stabilizers, raised legends, or multiple
 materials (printing to simulate “double shot” injection moulding).
+
+*Footnote: Key size is measured in a traditional unit. 1 u is 19.05 mm (0.75”)
+per key mount. A 1 u cap is smaller at about 18.25 mm to allow for space
+between caps on adjacent mounts. For the same reason, a 2 u cap is more than
+twice as a wide as a 1 u cap, and so on.
 
 ## Usage
 
