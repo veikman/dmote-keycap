@@ -12,9 +12,9 @@ can print and use.
 
 * Support for various types of switches. Details below.
 * A “minimal” keycap style that hugs the body of the switch. This style enables
-  keyboard designs more dense than the traditional 1 u,* which can have
-  ergonomic advantages. Dust protection is better than a 0.75 u cap that does
-  not extend down the sides of the switch.
+  keyboard designs more dense than the traditional 1 u (see below), which can
+  have ergonomic advantages. Dust protection is better than a 0.75 u cap that
+  does not extend down the sides of the switch.
 * A “maquette” keycap style for previewing keyboard designs.
 * Legends: Arbitrary 2D designs can be “engraved” into any of the faces of a
   non-maquette cap: The top and sides, in any combination.
@@ -22,10 +22,10 @@ can print and use.
 `dmote-keycap` has no support for stabilizers, raised legends, or multiple
 materials (printing to simulate “double shot” injection moulding).
 
-*Footnote: Key size is measured in a traditional unit. 1 u is 19.05 mm (0.75”)
+Key size is measured in a traditional unit. 1 u is 19.05 mm (0.75”)
 per key mount. A 1 u cap is smaller at about 18.25 mm to allow for space
 between caps on adjacent mounts. For the same reason, a 2 u cap is more than
-twice as a wide as a 1 u cap, and so on.
+twice as wide as a 1 u cap, and so on.
 
 ## Usage
 
