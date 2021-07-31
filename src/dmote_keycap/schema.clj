@@ -83,7 +83,7 @@
 (spec/def ::top-size
   (spec/tuple (spec/nilable number?) (spec/nilable number?) number?))
 (spec/def ::top-rotation ::tarmi/point-3d)
-(spec/def ::bowl-radii ::tarmi/point-3d)
+(spec/def ::bowl-radii (spec/nilable ::tarmi/point-3d))
 (spec/def ::bowl-plate-offset number?)
 (spec/def ::skirt-thickness number?)
 (spec/def ::skirt-length (spec/and number? #(>= % 0)))

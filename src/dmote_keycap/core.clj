@@ -22,6 +22,7 @@
     (println message)))
 
 (defn- nilable-number [raw] (when-not (= raw "nil") (Float/parseFloat raw)))
+(defn- nilable-vector [raw] (if (= raw [nil nil nil]) nil raw))
 
 (def static-cli-options
   "Define command-line interface flags."
@@ -51,7 +52,7 @@
     :parse-fn (fn [raw] (mapv nilable-number (split raw #"\s+")))
     :validate [(partial spec/valid? ::schema/top-size)]]
    [nil "--bowl-radii 'X Y Z'" "Radii of a spheroid that rounds out the top"
-    :parse-fn (fn [raw] (mapv nilable-number (split raw #"\s+")))
+    :parse-fn (fn [raw] (nilable-vector (mapv nilable-number (split raw #"\s+"))))
     :validate [(partial spec/valid? ::schema/bowl-radii)]]
    [nil "--skirt-length N" "Height of keycap up to top of switch stem"
     :parse-fn #(Float/parseFloat %)]

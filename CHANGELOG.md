@@ -6,7 +6,8 @@ This log follows the conventions of
 Nothing yet.
 
 ### Fixed
-- Bad references to data module for CLI parameter schema.
+- Flat tops.
+    - Failure to parse CLI argument for all-nil bowl radii.
 
 ## [Version 0.5.0] - 2020-04-10
 ### Changed
