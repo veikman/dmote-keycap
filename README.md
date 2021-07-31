@@ -62,9 +62,9 @@ a number of parameters and returns a `scad-clj` specification:
   surface, in radians. This would be `[0 0 0]` for a (row 3 or standard) DSA
   profile and would have a different non-zero first value for each row of an
   OEM profile.
-* `:bowl-radii`: A 3-tuple describing the radii of a spheroid used as
+* `:bowl-radii`: A 3-tuple describing the radii in mm of a spheroid used as
   negative space to carve a bowl out of the top of a non-maquette keycap.
-  If this option is set to `nil`, no bowl is used.
+  If this option is set to `nil` (CLI: `'nil nil nil'`), the top is left flat.
 * `:bowl-plate-offset`: An optional modification of the vertical distance in
   mm between the bowl and the top of the keycap.
 * `:skirt-thickness`: The horizontal thickness of material in the outer walls
@@ -220,7 +220,7 @@ a vaulted ceiling) should need no further support and no brim.
 
 Consider the main alternative: Printing each key upside down. This will often
 give you a cleaner stem and skirt, but if the face of the key is not even (i.e.
-`bowl-radii` is not nil), cleaning up the print will be more difficult. In
+`bowl-radii` is not `nil`), cleaning up the print will be more difficult. In
 particular, even with fairly dense supports added by a slicer, you will
 probably find tiny cavities behind the face, to such a depth that a really good
 surface finish is hard to achieve even with a suitable rotary tool. Still, if
