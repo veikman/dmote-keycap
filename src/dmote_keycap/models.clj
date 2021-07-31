@@ -228,6 +228,11 @@
       []
       (reverse (sort (keys rectangles-by-z))))))
 
+(defn- bowl?
+  "True if a bowl-shaped top has been requested."
+  [{:keys [bowl-radii]}]
+  (some? bowl-radii))
+
 (defn- minimal-shell-sequences
   "The layers of a minimal keycap shell.
   In order: An outer layer, an intermediate layer at engraving depth, and an
@@ -237,7 +242,8 @@
   (let [engraving-depth (:depth legend)
         engraving-thickness (max (- skirt-thickness engraving-depth) 0)
         [x y top-z] top-size
-        outer-top {:footprint [x y], :z-thickness (+ top-z (third bowl-radii))}
+        outer-top {:footprint [x y]
+                   :z-thickness (+ top-z (if (bowl? options) (third bowl-radii) 0))}
         inner-top (assoc outer-top :xy-offset (- engraving-depth))
         raw (rounded-layers [skirt-thickness engraving-thickness 0]
                             (tight-shell-sequence options))]
@@ -251,11 +257,6 @@
   (model/extrude-linear {:height (measure/key-length 1)  ; Rough.
                          :convexity 6}
     (model/import filepath)))
-
-(defn- bowl?
-  "True if a bowl-shaped top has been requested."
-  [{:keys [bowl-radii]}]
-  (not (zero? (third bowl-radii))))
 
 (defn- bowl-model
   "A sphere for use as negative space."
