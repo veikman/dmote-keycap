@@ -8,6 +8,8 @@ Nothing yet.
 ### Fixed
 - Flat tops.
     - Failure to parse CLI argument for all-nil bowl radii.
+    - Regression in actually modeling flat-topped keys given the right
+      parameters.
 
 ## [Version 0.5.0] - 2020-04-10
 ### Changed
