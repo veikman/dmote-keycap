@@ -46,13 +46,13 @@
     :validate [(partial spec/valid? ::schema/switch-type)]]
    [nil "--style TYPE" "Main body; “minimal” or “maquette”"
     :default-desc "minimal", :parse-fn keyword,
-    :validate [(partial spec/valid? ::data/style)]]
+    :validate [(partial spec/valid? ::schema/style)]]
    [nil "--top-size 'X Y Z'" "Size of keycap finger plate in mm"
     :parse-fn (fn [raw] (mapv nilable-number (split raw #"\s+")))
-    :validate [(partial spec/valid? ::data/top-size)]]
+    :validate [(partial spec/valid? ::schema/top-size)]]
    [nil "--bowl-radii 'X Y Z'" "Radii of a spheroid that rounds out the top"
     :parse-fn (fn [raw] (mapv nilable-number (split raw #"\s+")))
-    :validate [(partial spec/valid? ::data/bowl-radii)]]
+    :validate [(partial spec/valid? ::schema/bowl-radii)]]
    [nil "--skirt-length N" "Height of keycap up to top of switch stem"
     :parse-fn #(Float/parseFloat %)]
    [nil "--skirt-thickness N" "Thickness of walls descending around switch"

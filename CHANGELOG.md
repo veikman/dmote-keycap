@@ -5,6 +5,9 @@ This log follows the conventions of
 ## [Unreleased]
 Nothing yet.
 
+### Fixed
+- Bad references to data module for CLI parameter schema.
+
 ## [Version 0.5.0] - 2020-04-10
 ### Changed
 - Changed the target version of Inkscape for SVG exports, from v0 to v1.
