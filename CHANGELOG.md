@@ -5,6 +5,7 @@ This log follows the conventions of
 ## [Unreleased]
 Nothing yet.
 
+## [Version 0.5.1] - 2020-07-31
 ### Fixed
 - Flat tops.
     - Failure to parse CLI argument for all-nil bowl radii.
@@ -89,7 +90,8 @@ Nothing yet.
 ### Added
 - Minimal and maquette styles.
 
-[Unreleased]: https://github.com/veikman/dmote-keycap/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/veikman/dmote-keycap/compare/v0.5.1...HEAD
+[Version 0.5.1]: https://github.com/veikman/dmote-keycap/compare/v0.5.0...v0.5.1
 [Version 0.5.0]: https://github.com/veikman/dmote-keycap/compare/v0.4.0...v0.5.0
 [Version 0.4.0]: https://github.com/veikman/dmote-keycap/compare/v0.3.0...v0.4.0
 [Version 0.3.0]: https://github.com/veikman/dmote-keycap/compare/v0.2.0...v0.3.0
