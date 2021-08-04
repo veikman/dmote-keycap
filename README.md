@@ -100,7 +100,7 @@ listed above. Not all parameters are supported; try `lein run -- --help`.
 The application will generate files of OpenSCAD code under `output/scad`
 and, optionally, STL files for slicing and 3D printing.
 
-The CLI supports some additional parameter that are not interpreted by the
+The CLI supports some additional parameters that are not interpreted by the
 `keycap` function inside the library. Here are some highlights:
 
 * `--batch`: An operating mode for multiple keys; more below.
