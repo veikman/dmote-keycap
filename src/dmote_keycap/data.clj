@@ -55,6 +55,8 @@
                           :text-anchor "middle"
                           :text-align "center"
                           :dominant-baseline "middle"})
+(def style-defaults {:minimal {:top-size [9 9 1]
+                               :bowl-radii [15 10 2]}})
 (def option-defaults
   {:filename "cap"
    :style :minimal

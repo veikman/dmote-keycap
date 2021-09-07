@@ -8,11 +8,12 @@
             [environ.core :refer [env]]
             [scad-app.core :as app-core]
             [scad-app.schema :as app-schema]
-            [dmote-keycap.schema :as schema]
+            [dmote-keycap.batch :refer [batch-assets]]
             [dmote-keycap.data :as data]
             [dmote-keycap.models :as models]
             [dmote-keycap.montage :refer [expand-asset montage!]]
-            [dmote-keycap.batch :refer [batch-assets]])
+            [dmote-keycap.sand :as sand]
+            [dmote-keycap.schema :as schema])
   (:gen-class :main true))
 
 (defn stderr
@@ -32,6 +33,13 @@
    [nil "--rendering-program PATH" "Path to OpenSCAD" :default "openscad"]
    ["-m" "--montage" "When rendering to STL, also produce a 2D montage"]
    [nil "--batch PATH" "Input filepath for batch mode"]
+   [nil "--jig-mode" "Produce a sanding jig instead of a keycap"]
+   [nil "--jig-lanes N" "Number of strips of sandpaper on jig"
+    :default 1, :parse-fn #(Integer/parseInt %), :validate [#(> % 0)]]
+   [nil "--jig-angle N" "Slope of plinths on jig, in radians"
+    :default 0.2, :parse-fn #(Float/parseFloat %), :validate [#(>= % 0)]]
+   [nil "--paper-width N" "Width of each strip of sandpaper on jig, in mm"
+    :default 25, :parse-fn #(Float/parseFloat %), :validate [#(> % 0)]]
    ["-w" "--whitelist RE"
     "Limit batch output to files whose names match the regular expression RE"
     :default #"" :parse-fn re-pattern]
@@ -134,6 +142,14 @@
         (System/exit 65)))
     (System/exit 64)))
 
+(defn- jig!
+  "Define one scad-app asset for a jig, and write to file."
+  [options]
+  (app-core/build-all [{:name "cap-sanding-jig"
+                        :model-main (sand/jig options)
+                        :minimum-facet-size (:facet-size options)}]
+                      options))
+
 (defn -main
   "Basic command-line interface logic."
   [& raw]
@@ -149,4 +165,5 @@
      (get-in args [:options :version]) (version)
      (some? (:errors args)) (error)
      (get-in args [:options :batch]) (batch! (:options args))
+     (get-in args [:options :jig-mode]) (jig! (:options args))
      :else (build! (:options args)))))

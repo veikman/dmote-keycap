@@ -459,13 +459,14 @@
           :stem-fn stem-model
           :importable-filepath-fn to-filepath
           :support-fn support-model}
+         ;; Add any constants specific to the style.
+         (data/style-defaults :style {})
+         ;; Add logic specific to the style.
          (case style
            :maquette {:body-fn maquette-body
                       :stem-fn (constantly nil)
                       :support-fn (constantly nil)}
-           :minimal {:top-size [9 9 1]
-                     :bowl-radii [15 10 2]
-                     :body-fn minimal-body
+           :minimal {:body-fn minimal-body
                      :shell-sequence-fn minimal-shell-sequences
                      :skirt-perimeter-fn minimal-skirt-perimeter})
          explicit))
