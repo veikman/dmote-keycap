@@ -45,6 +45,8 @@ not waste good soldering tips on plastic; prefer tips that are already old and
 oxidized. Apply to narrow stems to strengthen layer adhesion or fine-tune
 dimensions. Apply to legends to clean up smudged contours.
 
+For help sanding keycaps to the desired finish, use the [jig mode](jig.md).
+
 ### Troubleshooting
 
 Recommended solutions to common problems.
