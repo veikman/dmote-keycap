@@ -4,83 +4,123 @@ Some [parameters](param.md) are intended to aid manufacturability. This
 includes the `supported` parameter, which is intended to reduce the need for
 building supports in slicing software.
 
+### Orientation
+
 With single-head FDM printing in a material like PLA, a relatively simple way
 to get a good result is to print each key in an upright position, with
 `supported`. In general, a `minimal`-style cap with a tall top plate (hence
 a vaulted ceiling) should need no further support and no brim.
 
-Consider the main alternative: Printing each key upside down. This will often
-give you a cleaner stem and skirt, but if the face of the key is not even (i.e.
-`bowl-radii` is not `nil`), cleaning up the print will be more difficult. In
-particular, even with fairly dense supports added by a slicer, you will
-probably find tiny cavities behind the face, to such a depth that a really good
-surface finish is hard to achieve even with a suitable rotary tool. Still, if
-you intend to paint your prints anyway, or if you have a dual-head printer with
-a soluble support material, printing upside down may ultimately be a better
-option.
+Consider the main alternative for FDM: Printing each key upside down. This will
+often give you a cleaner stem and skirt, but if the face of the key is not even
+(i.e. `bowl-radii` is not `nil`), cleaning up the print will be more
+difficult. In particular, even with fairly dense supports added by a slicer,
+you will probably find tiny cavities behind the face, to such a depth that a
+really good surface finish is hard to achieve even with a suitable rotary tool.
+Still, if you intend to paint your prints anyway, or if you have a dual-head
+printer with a soluble support material, printing upside down may ultimately be
+a better option.
+
+For SLA printing, try rotating the cap and adding supports in your slicer to
+drain excess resin away from the tip of the stem on the cap.
+
+### General printer settings
+
+For FDM printing, try reducing extrusion width in your slicer. In
+PrusaSlicer v2.3.0, for example, go into “Print settings” → “Advanced” →
+“Extrusion width” and reduce e.g. “Perimeters” to a value very close to, but
+not smaller than, the actual width of your nozzle. By default, slicers for FDM
+tend to overextrude filament to reduce gaps and compensate for thermal
+contraction, which doesn’t work for small objects like keycaps.
+
+### Cleanup
+
+If you’re using `supported` and printing in an upright position, you will need
+to remove the supports. The recommended way to do this is with a pair of flush
+cutters, working gradually through a series of small snips.
+
+Minor details of a bad FDM print can be improved with a soldering iron set to
+low heat. For PLA, try 150 °C (300 °F). Work in a well-ventilated area and do
+not waste good soldering tips on plastic; prefer tips that are already old and
+oxidized. Apply to narrow stems to strengthen layer adhesion or fine-tune
+dimensions. Apply to legends to clean up smudged contours.
 
 ### Troubleshooting
 
 Recommended solutions to common problems.
 
-#### When the printed stem is too thick for the stem of the switch
+#### The stem is too thick
 
-First, for FDM printing, try reducing extrusion width in your slicer. In
-PrusaSlicer v2.3.0, for example, go into “Print settings” → “Advanced” →
-“Extrusion width” and reduce e.g. “Perimeters” to a value closer to, but not
-smaller than, the actual width of your nozzle. By default, slicers for FDM tend
-to overextrude filament to reduce gaps and compensate for thermal contraction.
-
-For SLA printing, the main factor seems to be orientation. Try rotating the cap
-and adding supports in your slicer to drain excess resin away from the tip of
-the stem on the cap.
-
-If that does not work, try running `dmote-keycap` with error compensation.
+Check general printer settings and try running `dmote-keycap` with error
+compensation.
 
 * For an `:alps` stem that is too thick, run with `--error-stem-positive 0.1`
   or more.
 * For an `:mx` stem that does not fit over the cross of the stem, run with
   `--error-stem-negative -0.1` or less.
 
-#### When the printed cap is too narrow for the body of the switch
+#### The cap is too narrow when printed
 
-First, see the advice on extrusion width and orientation above. If that does
-not help, try running with `--error-body-positive -0.7` and extra
-`--skirt-thickness` (e.g.  2.5) to compensate for the walls getting thinner
-with error compensation. Notice that extra skirt thickness can cause very
-tightly placed neighbouring keys to collide.
+Check general printer settings and make sure your prints are properly cleaned.
+If the first layer of the skirt has an inward lip to it, that means your nozzle
+was too close to the print bed; trim that lip with a hobby knife.
 
-#### When the printer nozzle dislocates the stem while printing
+Try running `dmote-keycap` with a large error setting, e.g.
+`--error-body-positive -0.8`. Such a setting will make the walls thin.
+Compensate with a non-default `--skirt-thickness` setting, e.g. 2.5.
 
-First, use standard techniques for print bed adhesion with your printer and
-filament. For FDM this means e.g. tape, glue stick, alcohol, bed heating,
-precise z-offset tuning, extra first-layer height and extrusion width etc.
+Notice that extra skirt thickness, in turn, can cause very tightly placed
+neighbouring keys to collide.
 
-If that does not help, and/or if the caps you are printing do not have the
-skirt and stem going to the exact same level, run with `--supported`.
+#### The cap shrinks after printing
+
+If exposed to sunlight, even through a window, PLA can get hot enough for
+annealing to occur. This can warp a keycap, making it too thin in one
+dimension. Observe advice above for narrow caps, or print in a material that
+will not warp where you intend to use it.
+
+#### The cap comes loose while printing
+
+Use standard techniques for print bed adhesion with your printer and filament.
+For FDM this means e.g. tape, glue stick, alcohol, bed heating, precise
+z-offset tuning, extra first-layer height and extrusion width, brim etc.
+
+If that does not help, or if the caps you are printing do not have the skirt
+and stem going to the exact same level, run with `--supported` or have your
+slicer generate supports.
 
 If that still does not solve the problem, try nozzle lifting in your slicer. In
 PrusaSlicer v2.3.0, for example, go into “Printer settings” → “Extruder 1” →
 “Retraction” and set “Lift Z” to a positive value so that the printer lifts
 before moving between stem and body, reducing shear. If the setting is at zero,
-try 0.3 mm.
+try 0.2 mm.
 
-If you’re still seeing the occasional bent stem, run with
-`--horizontal-support-height 2` or more. This makes taller buttresses that
-stabilize the stem by connecting it more strongly to the skirt. You will need
-to snip these off with flush cutters, which gets harder the more you increase
-the value.
+#### The stem bends while printing
 
-#### When legends are hard to read
+Use standard techniques for print bed adhesion, and run with `--supported`.
+
+Also try `--horizontal-support-height 2` or more. This makes taller buttresses
+that stabilize the stem by connecting it more strongly to the skirt. You will
+need to snip these off with flush cutters, which gets harder the more you
+increase the value.
+
+#### The top of the cap is bumpy
+
+Check general printer settings. In particular, reduce infill extrusion width
+closer to the width of your nozzle.
+
+Use ironing in your slicer to smooth out each layer of the top face before
+adding the next.
+
+#### Legends are hard to read
 
 Nozzle size in FDM printing is a fundamental limitation to horizontal
 resolution. You can work around this a little bit by tweaking slicer settings.
 In particular:
 
-* Use ironing to smooth out each layer of the top face before adding the next.
+* Use reduced extrusion width and ironing.
 * Use variable layer height. Reduce the very top layers to the minimum your
   hardware can handle.
-* Extrusion width and retraction; see above.
 
 When you know what you can achieve this way, design your legends for your
 hardware. Make your figures thick enough that they survive slicing and printing
