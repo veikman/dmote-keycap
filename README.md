@@ -30,7 +30,7 @@ materials (printing to simulate “double shot” injection moulding).
 To run the utility and generate a printable model, enter `lein run` at your
 command line, in this folder.
 
-The CLI uility uses what the library exposes as `dmote-kgeycap.models/keycap`.
+The CLI utility uses what the library exposes as `dmote-kgeycap.models/keycap`.
 That function takes a number of parameters and returns a `scad-clj`
 specification. Most of them are mirrored in the CLI. Parameters in both
 contexts are documented [here](doc/param.md).
