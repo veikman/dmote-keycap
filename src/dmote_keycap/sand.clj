@@ -81,7 +81,8 @@
               (model/cut
                 (model/hull
                   (plinth options)
-                  (model/translate [(* (dec jig-lanes) pitch) 0 0] (plinth options))))
+                  (model/translate [(* (dec jig-lanes) pitch) 0 0]
+                    (plinth options))))
               ;; Extra material outside the array, for corner screws.
               (base-edge pitch screw-offset)
               (model/translate [(* jig-lanes pitch) 0]
@@ -92,6 +93,8 @@
         (for [x (range (inc jig-lanes))
               y [screw-offset (- screw-offset)]]
           (model/translate [(* (- x 0.5) pitch) y 0]
-            (loft [(model/translate [0 0 (- base-height)] (model/cylinder 1.6 1))
-                   (model/translate [0 0 (/ base-height -2)] (model/cylinder 2 1))
+            (loft [(model/translate [0 0 (- base-height)]
+                     (model/cylinder 1.7 1))
+                   (model/translate [0 0 -1.5]
+                     (model/cylinder 2 (/ base-height 2)))
                    (model/cylinder 3.7 1)])))))))
