@@ -3,6 +3,8 @@
 The CLI utility’s `--jig-mode` [parameter](param.md) causes the utility to
 output a model of a tool, instead of the default model of a keycap.
 
+[![Image of a set of jigs](https://viktor.eikman.se/image/keycap-jigs-mounted-on-board/display)](https://viktor.eikman.se/image/keycap-jigs-mounted-on-board/)
+
 This tool is intended for use in the manual finishing of printed keycaps.
 Specifically, controlled by the standard `--bowl-radii` parameter to the CLI
 utility, the jig includes a pad with the same curvature as the bowl that tops
@@ -27,6 +29,9 @@ The following parameters to the CLI utility affect only its jig mode:
   number in your `bowl-radii` and to the actual width of any sandpaper strips
   you already have lying around. Minor differences won’t matter.
 
+The jigs shown in the image above were made with `lein run --jig-mode
+--jig-lanes 3 --paper-width 22`.
+
 ### Printing
 
 Sanding blocks are commonly made of cork or rubber to help make a smooth
@@ -41,7 +46,4 @@ By mounting a printed jig on a spare piece of wooden board and wrapping a strip
 of sandpaper around it, you complete the jig. You then take a printed cap and
 rub it on the curved pad.
 
-Wet sanding is key. Dip each keycap in shallow water as you work. For an
-FDM-printed PLA keycap, try starting with 60–80 grit and work your way up to at
-least 800. For a black keycap or any material that requires a smooth finish to
-look and feel good, proceed to 1200–2000 grit.
+More detailed instructions are available in [this illustrated build guide](https://viktor.eikman.se/article/keycap-jig-build-guide/).
