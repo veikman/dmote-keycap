@@ -7,6 +7,10 @@ This log follows the conventions of
 - A new operating mode, `--jig-mode`. This makes a model of a jig for sanding
   down the top bowls of printed keycaps to the desired finish.
 
+## Fixed
+- Intermediate directories are now automatically created as needed for a
+  montage and for generated SVG files (`:char` legends).
+
 ## [Version 0.5.1] - 2020-07-31
 ### Fixed
 - Flat tops.

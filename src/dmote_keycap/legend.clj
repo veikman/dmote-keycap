@@ -2,6 +2,7 @@
 
 (ns dmote-keycap.legend
   (:require [clojure.string :refer [join]]
+            [clojure.java.io :as io]
             [clojure.java.shell :refer [sh]]
             [hiccup2.core :refer [html]]))
 
@@ -65,10 +66,13 @@
     filename-out))
 
 (defn make-from-char
-  "Author an SVG file from a string, with an intermediate artefact."
+  "Author an SVG file from a string, with an intermediate artefact.
+  Create directories to hold the file. Return only its name as a string."
   [filepath-fn basename text-content text-options]
   (let [filepath-text (filepath-fn (str basename "_text.svg"))
-        filename-out (path-filename basename)]
+        filename-out (path-filename basename)
+        filepath-out (filepath-fn filename-out)]
+    (->> filepath-out io/file .getParentFile .mkdirs)
     (spit filepath-text (text-svg text-content text-options))
-    (convert-to-plain-svg filepath-text (filepath-fn filename-out))
+    (convert-to-plain-svg filepath-text filepath-out)
     filename-out))

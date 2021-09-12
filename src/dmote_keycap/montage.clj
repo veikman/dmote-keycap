@@ -74,8 +74,8 @@
   them to have been specified on the passed tracker, a map of asset names to
   maps of side kes to Java file objects, all in an atom."
   [options tracker]
-  (.mkdir dir-tmp)
-  (.mkdir dir-montage)
+  (.mkdirs dir-tmp)
+  (.mkdirs dir-montage)
   (doseq [old (.listFiles dir-montage)]
     (io/delete-file old))
   (doseq [[asset-name sides] @tracker]
