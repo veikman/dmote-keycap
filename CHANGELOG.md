@@ -3,6 +3,9 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+Nothing yet.
+
+## [Version 0.6.0] - 2021-09-12
 ## Added
 - A new operating mode, `--jig-mode`. This makes a model of a jig for sanding
   down the top bowls of printed keycaps to the desired finish.
@@ -96,7 +99,8 @@ This log follows the conventions of
 ### Added
 - Minimal and maquette styles.
 
-[Unreleased]: https://github.com/veikman/dmote-keycap/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/veikman/dmote-keycap/compare/v0.6.0...HEAD
+[Version 0.6.0]: https://github.com/veikman/dmote-keycap/compare/v0.5.1...v0.6.0
 [Version 0.5.1]: https://github.com/veikman/dmote-keycap/compare/v0.5.0...v0.5.1
 [Version 0.5.0]: https://github.com/veikman/dmote-keycap/compare/v0.4.0...v0.5.0
 [Version 0.4.0]: https://github.com/veikman/dmote-keycap/compare/v0.3.0...v0.4.0
