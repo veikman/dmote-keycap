@@ -5,6 +5,9 @@ This log follows the conventions of
 ## [Unreleased]
 Nothing yet.
 
+## Fixed
+- Incorrect default `bowl-radii` for keycaps.
+
 ## [Version 0.6.0] - 2021-09-12
 ## Added
 - A new operating mode, `--jig-mode`. This makes a model of a jig for sanding

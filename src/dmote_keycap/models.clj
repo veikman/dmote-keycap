@@ -231,7 +231,7 @@
 (defn- bowl?
   "True if a bowl-shaped top has been requested."
   [{:keys [bowl-radii]}]
-  (some? bowl-radii))
+  (and (some? bowl-radii) (every? some? bowl-radii)))
 
 (defn- minimal-shell-sequences
   "The layers of a minimal keycap shell.
@@ -454,13 +454,13 @@
   [{:keys [switch-type style] :as explicit}]
   (merge {:top-size [nil nil 1]
           :top-rotation [0 0 0]
-          :bowl-radii [0 0 0]
+          :bowl-radii [nil nil nil]
           :skirt-length (measure/default-skirt-length switch-type)
           :stem-fn stem-model
           :importable-filepath-fn to-filepath
           :support-fn support-model}
          ;; Add any constants specific to the style.
-         (data/style-defaults :style {})
+         (data/style-defaults style {})
          ;; Add logic specific to the style.
          (case style
            :maquette {:body-fn maquette-body
