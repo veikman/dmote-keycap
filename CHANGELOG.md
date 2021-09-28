@@ -5,6 +5,10 @@ This log follows the conventions of
 ## [Unreleased]
 Nothing yet.
 
+## Changed
+- Engraved legends on the sides of keycaps cut more deeply:
+  Closer to the depth of legends on the tops of keycaps.
+
 ## Fixed
 - Incorrect default `bowl-radii` for keycaps.
 

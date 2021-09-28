@@ -111,7 +111,7 @@
   {:pre [(spec/valid? ::tarmi/point-2d footprint)
          (number? radius)
          (number? xy-offset)]}
-  (inset-corner (map #(+ % xy-offset) footprint) radius))
+  (inset-corner (map #(+ % (* 2 xy-offset)) footprint) radius))
 
 (defn- rounded-block
   [{:keys [z-offset z-thickness]
