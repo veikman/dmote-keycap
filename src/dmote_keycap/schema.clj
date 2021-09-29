@@ -54,8 +54,10 @@
                      :nozzle-width num
                      :horizontal-support-height num
                      :error-body-positive num
-                     :error-stem-positive num
+                     :error-side-negative num
                      :error-stem-negative num
+                     :error-stem-positive num
+                     :error-top-negative num
                      :sectioned boolean
                      :supported boolean})
 
@@ -103,9 +105,11 @@
 
 (spec/def ::nozzle-width (spec/and number? #(> % 0)))
 (spec/def ::horizontal-support-height (spec/and number? #(>= % 0)))
-(spec/def ::error-stem-positive number?)
-(spec/def ::error-stem-negative number?)
 (spec/def ::error-body-positive number?)
+(spec/def ::error-side-negative number?)
+(spec/def ::error-stem-negative number?)
+(spec/def ::error-stem-positive number?)
+(spec/def ::error-top-negative number?)
 (spec/def ::sectioned boolean?)
 (spec/def ::supported boolean?)
 
@@ -124,8 +128,10 @@
                       ::skirt-thickness ::skirt-length ::slope
                       ::legend
                       ::nozzle-width ::horizontal-support-height
-                      ::error-stem-positive ::error-stem-negative
-                      ::error-body-positive ::sectioned ::supported]))
+                      ::error-body-positive ::error-side-negative
+                      ::error-stem-negative ::error-stem-positive
+                      ::error-top-negative
+                      ::sectioned ::supported]))
 
 ;; A composite spec for all valid parameters going into the keycap model.
 (spec/def ::keycap-parameters

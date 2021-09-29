@@ -74,8 +74,10 @@
    :nozzle-width 0.5
    :horizontal-support-height 0.5
    :error-body-positive -0.5
+   :error-side-negative 0
+   :error-stem-negative 0
    :error-stem-positive 0
-   :error-stem-negative 0})
+   :error-top-negative 0})
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;

@@ -24,6 +24,10 @@
 
 (defn- nilable-number [raw] (when-not (= raw "nil") (Float/parseFloat raw)))
 (defn- nilable-vector [raw] (if (= raw [nil nil nil]) nil raw))
+(defn- error [option-keyword]
+  [nil (format "--%s N" (name option-keyword)) "Printer error in mm"
+   :default (option-keyword data/option-defaults)
+   :parse-fn #(Float/parseFloat %)])
 
 (def static-cli-options
   "Define command-line interface flags."
@@ -73,15 +77,11 @@
    [nil "--horizontal-support-height N" "Height of support with --supported"
     :default (:horizontal-support-height data/option-defaults)
     :parse-fn #(Float/parseFloat %)]
-   [nil "--error-body-positive N" "Printer error in mm"
-    :default (:error-body-positive data/option-defaults)
-    :parse-fn #(Float/parseFloat %)]
-   [nil "--error-stem-positive N" "Printer error in mm"
-    :default (:error-stem-positive data/option-defaults)
-    :parse-fn #(Float/parseFloat %)]
-   [nil "--error-stem-negative N" "Printer error in mm"
-    :default (:error-stem-negative data/option-defaults)
-    :parse-fn #(Float/parseFloat %)]])
+   (error :error-body-positive)
+   (error :error-side-negative)
+   (error :error-stem-negative)
+   (error :error-stem-positive)
+   (error :error-top-negative)])
 
 (def legend-cli-options
   (apply concat

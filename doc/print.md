@@ -13,13 +13,12 @@ a vaulted ceiling) should need no further support and no brim.
 
 Consider the main alternative for FDM: Printing each key upside down. This will
 often give you a cleaner stem and skirt, but if the face of the key is not even
-(i.e. `bowl-radii` is not `nil`), cleaning up the print will be more
-difficult. In particular, even with fairly dense supports added by a slicer,
-you will probably find tiny cavities behind the face, to such a depth that a
-really good surface finish is hard to achieve even with a suitable rotary tool.
-Still, if you intend to paint your prints anyway, or if you have a dual-head
-printer with a soluble support material, printing upside down may ultimately be
-a better option.
+(i.e. `bowl-radii` is not `nil`), cleaning up the print will be more difficult.
+In particular, even with fairly dense supports added by a slicer, you will
+probably find cavities behind the face to such a depth that a really good
+surface finish is hard to achieve. Still, if you intend to paint your prints
+anyway, or if you have a dual-head printer with a soluble support material,
+printing upside down may ultimately be a better option.
 
 For SLA printing, try rotating the cap and adding supports in your slicer to
 drain excess resin away from the tip of the stem on the cap.
@@ -125,5 +124,6 @@ In particular:
   hardware can handle.
 
 When you know what you can achieve this way, design your legends for your
-hardware. Make your figures thick enough that they survive slicing and printing
-with the amount of manual cleanup you want to do.
+hardware or apply negative `--error-top-negative`/`--error-side-negative`.
+Make your figures thick enough that they survive slicing and printing with the
+amount of manual cleanup you want to do.

@@ -104,7 +104,7 @@
   {:pre [(number? x) (number? y) (number? radius)]}
   (let [initial #(- % (* 2 radius))]
     (->> (model/square (initial x) (initial y))
-         (model/offset radius))))
+         (maybe/offset radius))))
 
 (defn- rounded-square
   [{:keys [footprint radius xy-offset] :or {radius 1.8, xy-offset 0}}]
@@ -253,10 +253,13 @@
 
 (defn- engraved-legend
   "An extrusion from a 2D legend image into a 3D negative."
-  [filepath]
-  (model/extrude-linear {:height (measure/key-length 1)  ; Rough.
-                         :convexity 6}
-    (model/import filepath)))
+  [error filepath]
+  (->> filepath
+    (model/import)
+    (maybe/offset (- error))
+    (model/extrude-linear {:height (measure/key-length 1)  ; Rough.
+                           :convexity 6})))
+
 
 (defn- bowl-model
   "A sphere for use as negative space."
@@ -268,7 +271,7 @@
 
 (defn- bowl-with-legend
   "Negative space with a legend protruding from a spheroid."
-  [{:keys [bowl-radii legend] :as options}]
+  [{:keys [bowl-radii legend error-top-negative] :as options}]
   (let [overrides {:bowl-radii (mapv #(+ (:depth legend) %) bowl-radii)
                    :z-override (third bowl-radii)}]
     (model/union
@@ -276,11 +279,11 @@
       (model/color color-legend
        (model/intersection
          (bowl-model (merge options overrides))
-         (engraved-legend (get-in legend [:faces :top])))))))
+         (engraved-legend error-top-negative (get-in legend [:faces :top])))))))
 
 (defn- legend-without-bowl
   "Negative space constituting the top-face legend without a curvature."
-  [{:keys [legend top-size]}]
+  [{:keys [legend top-size error-top-negative]}]
   (let [depth (:depth legend)
         filepath (get-in legend [:faces :top])]
    (model/translate [0 0 wafer]  ; Cleaner OpenSCAD preview.
@@ -288,7 +291,7 @@
        (model/intersection
          (model/translate [0 0 (- (third top-size) (/ depth 2))]
            (model/cube big big depth))
-         (engraved-legend filepath))))))
+         (engraved-legend error-top-negative filepath))))))
 
 (defn- has-finalized-legend?
   [options face]
@@ -311,7 +314,7 @@
   short skirts or tall tops. Rotation of the image is also not supported
   from parameters: All such modifications currently need to happen in the 2D
   image itself."
-  [{:keys [legend skirt-length slope unit-size] :as options} face]
+  [{:keys [legend skirt-length slope unit-size error-side-negative] :as options} face]
   (when (has-finalized-legend? options face)
     (let [{:keys [coord-mask z-angle]} (face data/faces)
           masked-size (mapv * coord-mask unit-size)
@@ -319,7 +322,7 @@
           unit-length (abs (first (remove zero? masked-size)))
           slope-tilt (- (Math/atan (/ (* slope unit-length) skirt-length)))]
       (->> (get-in legend [:faces face])
-        (engraved-legend)
+        (engraved-legend error-side-negative)
         (model/rotate [slope-tilt 0 0])
         (model/rotate [(/ π 2) 0 z-angle])
         (model/translate (conj real-size 0))))))
