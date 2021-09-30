@@ -5,22 +5,23 @@ This log follows the conventions of
 ## [Unreleased]
 Nothing yet.
 
-## Changed
+## [Version 0.7.0] - 2021-09-30
+### Changed
 - Engraved legends on the sides of keycaps cut more deeply:
   Closer to the depth of legends on the tops of keycaps.
 
-## Added
+### Added
 - New parameters to tweak the size of legends for printer error.
 
-## Fixed
-- Incorrect default `bowl-radii` for keycaps.
+### Fixed
+- Incorrect default `bowl-radii` for keycaps. Regressed in v0.6.0.
 
 ## [Version 0.6.0] - 2021-09-12
-## Added
+### Added
 - A new operating mode, `--jig-mode`. This makes a model of a jig for sanding
   down the top bowls of printed keycaps to the desired finish.
 
-## Fixed
+### Fixed
 - Intermediate directories are now automatically created as needed for a
   montage and for generated SVG files (`:char` legends).
 
@@ -109,7 +110,8 @@ Nothing yet.
 ### Added
 - Minimal and maquette styles.
 
-[Unreleased]: https://github.com/veikman/dmote-keycap/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/veikman/dmote-keycap/compare/v0.7.0...HEAD
+[Version 0.7.0]: https://github.com/veikman/dmote-keycap/compare/v0.6.0...v0.7.0
 [Version 0.6.0]: https://github.com/veikman/dmote-keycap/compare/v0.5.1...v0.6.0
 [Version 0.5.1]: https://github.com/veikman/dmote-keycap/compare/v0.5.0...v0.5.1
 [Version 0.5.0]: https://github.com/veikman/dmote-keycap/compare/v0.4.0...v0.5.0
