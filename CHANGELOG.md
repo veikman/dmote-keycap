@@ -9,6 +9,9 @@ Nothing yet.
 - Engraved legends on the sides of keycaps cut more deeply:
   Closer to the depth of legends on the tops of keycaps.
 
+## Added
+- New parameters to tweak the size of legends for printer error.
+
 ## Fixed
 - Incorrect default `bowl-radii` for keycaps.
 
