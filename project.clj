@@ -10,6 +10,6 @@
                  [me.raynes/fs "1.4.6"]
                  [scad-app "1.0.0"]
                  [scad-clj "0.5.3"]
-                 [scad-tarmi "0.8.0-SNAPSHOT"]]
+                 [scad-tarmi "0.8.0"]]
   :plugins [[lein-environ "1.1.0"]]
   :main ^:skip-aot dmote-keycap.core)
