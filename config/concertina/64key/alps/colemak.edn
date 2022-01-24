@@ -4,7 +4,7 @@
 {;; A section of keys with mid-size top legends for letters, and
  ;; rotated, smaller legends on the top row in each column.
  {:top-size [10 10 2.6]
-  :skirt-thickness 2.4
+  :skirt-thickness 1.2
   :legend {:faces {:top {:text-options {:style {:font-size "1.8mm"}}}
                    :north {:text-options {:style {:font-size "1.4mm"
                                                   :dominant-baseline "baseline"}
@@ -60,7 +60,7 @@
  ;; Another section for normal-height keys with non-letter top legends in a
  ;; larger font. Most of these keys go in the thumb clusters.
  {:top-size [10 10 2.6]
-  :skirt-thickness 2.4
+  :skirt-thickness 1.2
   :legend {:faces {:top {:text-options {:style {:font-size "2.8mm"}}}
                    :north {:text-options {:style {:font-size "1.8mm"
                                                   :dominant-baseline "baseline"}
