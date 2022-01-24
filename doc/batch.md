@@ -19,7 +19,7 @@ Valid examples of the expected format are available under `config`. Here is a
 usage example calling one of those examples without any further customization
 through the CLI:
 
-`lein run -- --batch config/concertina/64key/alps/colemak.edn --render`
+    lein run -- --batch config/concertina/64key/alps/colemak.edn --render
 
 OpenSCAD and Inkscape are required to run this example.
 
