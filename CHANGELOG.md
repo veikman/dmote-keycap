@@ -7,6 +7,10 @@ This log follows the conventions of
 - A 1-minute delay between the application’s useful work and its termination
   following any use of the application that involved Inkscape to process
   legends.
+- `skirt-thickness`, `nozzle-width` and `horizontal-support-height` specified
+  in an EDN batch file were being ignored, because default values
+  for the application CLI took precedence over them. (The default `facet-size`
+  still takes precedence over a batch file.)
 - Incorrect `skirt-thickness` settings in the Concertina configuration.
 
 ## [Version 0.7.0] - 2021-09-30

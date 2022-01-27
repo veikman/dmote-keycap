@@ -69,13 +69,13 @@
    [nil "--skirt-length N" "Height of keycap up to top of switch stem"
     :parse-fn #(Float/parseFloat %)]
    [nil "--skirt-thickness N" "Thickness of walls descending around switch"
-    :default (:skirt-thickness data/option-defaults)
+    :default-desc (str (:skirt-thickness data/option-defaults))
     :parse-fn #(Float/parseFloat %)]
    [nil "--nozzle-width N" "FDM printer nozzle (aperture) width in mm"
-    :default (:nozzle-width data/option-defaults)
+    :default-desc (str (:nozzle-width data/option-defaults))
     :parse-fn #(Float/parseFloat %)]
    [nil "--horizontal-support-height N" "Height of support with --supported"
-    :default (:horizontal-support-height data/option-defaults)
+    :default-desc (str (:horizontal-support-height data/option-defaults))
     :parse-fn #(Float/parseFloat %)]
    (error :error-body-positive)
    (error :error-side-negative)
