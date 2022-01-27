@@ -166,4 +166,9 @@
      (some? (:errors args)) (error)
      (get-in args [:options :batch]) (batch! (:options args))
      (get-in args [:options :jig-mode]) (jig! (:options args))
-     :else (build! (:options args)))))
+     :else (build! (:options args)))
+   ; At this point, all work is complete.
+   ; A call to shutdown-agents here stops a thread pool that is no longer used.
+   ; Such a pool will have been created if a subprocess ran via
+   ; clojure.java.shell/sh, e.g. Inkscape processing keycap legends.
+   (shutdown-agents)))

@@ -3,7 +3,11 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
-Nothing yet.
+### Fixed
+- A 1-minute delay between the application’s useful work and its termination
+  following any use of the application that involved Inkscape to process
+  legends.
+- Incorrect `skirt-thickness` settings in the Concertina configuration.
 
 ## [Version 0.7.0] - 2021-09-30
 ### Changed
