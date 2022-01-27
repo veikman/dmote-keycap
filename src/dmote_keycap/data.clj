@@ -64,7 +64,7 @@
    :unit-size [1 1]
    :slope 0.73
    :bowl-plate-offset 0
-   :skirt-thickness 2.1
+   :skirt-thickness 1
    :legend {:depth 0.4  ; Suitable for SLA engraving.
             :faces (into {}
                      (for [f face-keys]

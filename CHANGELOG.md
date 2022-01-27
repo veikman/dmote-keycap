@@ -11,7 +11,9 @@ This log follows the conventions of
   in an EDN batch file were being ignored, because default values
   for the application CLI took precedence over them. (The default `facet-size`
   still takes precedence over a batch file.)
-- Incorrect `skirt-thickness` settings in the Concertina configuration.
+- Skirt thickness values following the change in interpretation made in v0.7.0.
+    - Incorrect `skirt-thickness` setting in built-in defaults.
+    - Incorrect `skirt-thickness` settings in the Concertina configuration.
 
 ## [Version 0.7.0] - 2021-09-30
 ### Changed
@@ -22,6 +24,10 @@ This log follows the conventions of
 - New parameters to tweak the size of legends for printer error.
 
 ### Fixed
+- Corrected the interpretation of `skirt-thickness` by doubling its effect.
+  Incrementing the setting by 1 now adds 1 mm to the thickness of the skirt
+  itself, whereas before, it added 1 mm to the diameter of a cap but only 0.5
+  mm to the skirt.
 - Incorrect default `bowl-radii` for keycaps. Regressed in v0.6.0.
 
 ## [Version 0.6.0] - 2021-09-12

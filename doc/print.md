@@ -68,7 +68,7 @@ was too close to the print bed; trim that lip with a hobby knife.
 
 Try running `dmote-keycap` with a large error setting, e.g.
 `--error-body-positive -0.8`. Such a setting will make the walls thin.
-Compensate with a non-default `--skirt-thickness` setting, e.g. 2.5.
+Compensate with a non-default `--skirt-thickness` setting, e.g. 1.5.
 Adjust those two settings with the knowledge that they work on somewhat
 different scales: Decrementing `--skirt-thickness` by 1 removes 1 mm from the
 outside of the skirt, while decrementing `--error-body-positive` by 1 removes
