@@ -24,6 +24,8 @@ This log follows the conventions of
 - Skirt thickness values following the change in interpretation made in v0.7.0.
     - Incorrect `skirt-thickness` setting in built-in defaults.
     - Incorrect `skirt-thickness` settings in the Concertina configuration.
+    - In addition, the parameter schema now requires `skirt-thickness` to be
+      positive.
 
 ## [Version 0.7.0] - 2021-09-30
 ### Changed

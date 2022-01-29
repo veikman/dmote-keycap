@@ -41,6 +41,7 @@
                      :bowl-plate-offset num
                      :skirt-length num
                      :skirt-thickness num
+                     :skirt-space num
                      :slope num
                      :legend (map-like
                                {:depth num
@@ -88,8 +89,9 @@
 (spec/def ::bowl-radii (spec/and (spec/nilable ::tarmi/point-3d)
                                  (partial not-any? zero?)))
 (spec/def ::bowl-plate-offset number?)
-(spec/def ::skirt-thickness number?)
 (spec/def ::skirt-length (spec/and number? #(>= % 0)))
+(spec/def ::skirt-thickness (spec/and number? #(> % 0)))
+(spec/def ::skirt-space (spec/and number? #(>= % 0)))
 (spec/def ::slope (spec/and number? #(>= % 0)))
 
 (spec/def ::depth (spec/and number? #(>= % 0)))
