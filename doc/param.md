@@ -29,6 +29,8 @@ function library, `dmote-keycap.models.keycap`.
   mm between the bowl and the top of the keycap.
 * `:skirt-thickness`: The horizontal thickness of material in the outer walls
   of a `minimal` cap.
+* `:skirt-space`: A horizontal measure of space between the outer wall of a
+  `minimal` cap and the switch inside, where they are closest.
 * `:skirt-length`: The length of material from the top of the stem
   down toward the switch mounting plate. By default, on a `minimal` cap, this
   is 1 mm less than the space available when the switch is pressed.

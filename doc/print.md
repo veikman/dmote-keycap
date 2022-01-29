@@ -66,18 +66,37 @@ Check general printer settings and make sure your prints are properly cleaned.
 If the first layer of the skirt has an inward lip to it, that means your nozzle
 was too close to the print bed; trim that lip with a hobby knife.
 
-Try running `dmote-keycap` with a large error setting, e.g.
-`--error-body-positive -0.8`. Such a setting will make the walls thin.
-Compensate with a non-default `--skirt-thickness` setting, e.g. 1.5.
-Adjust those two settings with the knowledge that they work on somewhat
-different scales: Decrementing `--skirt-thickness` by 1 removes 1 mm from the
-outside of the skirt, while decrementing `--error-body-positive` by 1 removes
-0.5 mm from the inside of the skirt. This is because the former parameter
-describes the ideal shape while the latter parameter describes a common printer
-behaviour, not the shape.
+If the problem persists, there are two parameters you can tweak:
 
-Notice that extra skirt thickness, in turn, can cause very tightly placed
-neighbouring keys to collide.
+* `--skirt-space` puts the skirt further away from the switch and leaves it
+  intact.
+* `--error-body-positive`, when set to a negative value, creates a block of
+  negative space around the body of the switch, following the shape of the
+  switch itself more closely than `--skirt-space`.
+
+The former parameter describes the ideal shape. The latter describes a common
+printer behaviour, not the ideal shape. The negative space created by the error
+parameter eats the skirt from the inside, specifically to compensate for
+printer inaccuracy.
+
+The two parameters do not interact with one another, nor with
+`--skirt-thickness`. If `--skirt-space` is much larger than the error parameter,
+the error parameter will have no effect. If, on the other hand, the error
+parameter is set to such a negative value that it does have an effect on the
+skirt, you may need to compensate by raising `--skirt-thickness`. Notice that
+extra skirt thickness, in turn, can cause neighbouring keys to collide.
+
+Finally, the two parameters work on different scales and in different
+directions. Decrementing `--skirt-space` by 1 brings skirt and switch 1 mm closer
+on every side, which decreases the width of the keycap by 2 mm on each side.
+Decrementing `--error-body-positive` by 1 removes 0.5 mm from the inside of the
+skirt, if there is no gap at all.
+
+In general, if you want keycaps that are truly minimal, set `--skirt-space` to
+zero and `--error-body-positive` as close to zero as the quality of your
+printer will allow. If instead you prefer good-looking prints with even wall
+thickness, sacrificing key density, set `--error-body-positive` to zero and
+raise `--skirt-space` until your prints are no longer too narrow.
 
 #### The cap shrinks after printing
 
