@@ -1,6 +1,6 @@
 ## Parameters to the `keycap` function
 
-The following are the most interesting parameters to the main function in this
+The following are the main parameters to the main function in this
 function library, `dmote-keycap.models.keycap`.
 
 * `:style`: One of `:minimal` or `:maquette` (see [the readme](../README.md)).
@@ -11,6 +11,14 @@ function library, `dmote-keycap.models.keycap`.
   (the depth) is 2 for the Enter key and 1 for all other keys. Please note that
   a non-rectangular shape, as is typical for the Enter key, is not yet
   supported by this library.
+* `:legend`: Sources of and related parameters for 2D designs, documented
+  [here](legend.md).
+
+### Detailed control of keycap shape
+
+Some of these parameters have global default values, while others have default
+values associated with particular styles, for ease of use.
+
 * `:top-size`: A 3-tuple describing the finger contact surface, including its
   thickness in the middle, directly above the stem of the keycap. The first two
   numbers in this 3-tuple can be omitted by replacing them with `nil`, in which
@@ -34,28 +42,30 @@ function library, `dmote-keycap.models.keycap`.
 * `:skirt-length`: The length of material from the top of the stem
   down toward the switch mounting plate. By default, on a `minimal` cap, this
   is 1 mm less than the space available when the switch is pressed.
-* `:legend`: Sources of and related parameters for 2D designs, documented
-  [here](legend.md).
+
+### Design for manufacture (DFM)
+
+* `:supported`: If true, support structures are added underneath the model.
+  There are other parameters to control these supports in more detail.
+    * `:horizontal-support-height`: The height (measured from the floor) of
+      support structures on the floor that are added by `:supported`, where
+      height is not automatically determined by the parts they support.
+    * `:truss-offset`: The starting height (measured from the top of the
+      switch) of support structures added by `:supported` inside vaults which
+      in turn are created inside the top of a cap with tall `:top-size`.
+      The function of these “trusses” is to prevent a moving print head from
+      bending the stem of a cap before it is connected to the rest of the cap
+      at the very top.
+    * `:nozzle-width`: The width of the printer nozzle that will be used to
+      print the cap. This parameter is only used to build supports, which will
+      have the width of the nozzle because this improves print speed and
+      quality.
 * `:sectioned`: If true, the model is cut in half for a sectioned view.
   This is useful in previews and development.
-* `:supported`: If true, support structures are added underneath the model.
-* `:nozzle-width`: The width of the printer nozzle that will be used to print
-  the cap. This parameter is only used to build supports, which will have the
-  width of the nozzle because this improves print speed and quality.
-* `:horizontal-support-height`: The height (measured from the floor) of support
-  structures on the floor that are added by `:supported`, where height is not
-  automatically determined by the parts they support.
-* `:truss-offset`: The starting height (measured from the top of the switch) of
-  support structures added by `:supported` inside vaults which in turn are
-  created inside the top of a cap with tall `:top-size`.
-* `:error-body-positive`, `:error-side-negative`, `:error-stem-negative`,
-  `:error-stem-positive`, `:error-top-negative`:
-  Printer-dependent measurements of error for different parts of the cap.
+* The “error parameters”: `:error-body-positive`, `:error-side-negative`,
+  `:error-stem-negative`, `:error-stem-positive`, `:error-top-negative`.
+  These describe your 3D printer’s accuracy for different parts of a keycap.
   Usage advice is available [here](print.md).
-
-Some of these parameters have global default values, while others have default
-values associated with particular styles, for ease of use. The long-term plan
-is to model a variety of traditional “families” with just a few parameters.
 
 ## Parameters to the command-line application
 
