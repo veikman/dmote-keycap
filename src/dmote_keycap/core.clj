@@ -72,7 +72,7 @@
     :default-desc (str (:skirt-thickness data/option-defaults))
     :parse-fn #(Float/parseFloat %)]
    [nil "--skirt-space N" "Gap between switch and skirt"
-    :default-desc (str (:skirt-gap data/option-defaults))
+    :default-desc (str (:skirt-space data/option-defaults))
     :parse-fn #(Float/parseFloat %)]
    [nil "--nozzle-width N" "FDM printer nozzle (aperture) width in mm"
     :default-desc (str (:nozzle-width data/option-defaults))
