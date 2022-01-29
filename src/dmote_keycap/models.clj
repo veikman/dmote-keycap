@@ -201,8 +201,11 @@
 (defn- vaulted-ceiling
   "An interior triangular profile resembling a gabled roof. The purpose of this
   shape is to reduce the need for printed supports while also saving some
-  material in the top plate of a tall minimal-style cap."
-  [{:keys [switch-type top-size error-stem-positive error-body-positive]}]
+  material in the top plate of a tall minimal-style cap.
+  When running with generated supports, there are roof trusses under the
+  ceiling, bridging the inner and outer surfaces of the vaulting early, to
+  prevent a printer head from bending the stem."
+  [{:keys [switch-type top-size nozzle-width supported error-stem-positive error-body-positive]}]
   (let [peak-z (dec (third top-size))
         overshoot (* 2 peak-z)
         outer-profile
@@ -217,7 +220,12 @@
           outer-profile)
         (model/hull
           (model/translate [0 0 overshoot] outer-profile)
-          inner-profile)))))
+          inner-profile)
+        (when supported
+          (model/translate [0 0 (+ plenty nozzle-width)]
+            (model/union
+              (model/cube nozzle-width big big)
+              (model/cube big nozzle-width big))))))))
 
 (defn- tight-shell-sequence
   [{:keys [switch-type] :as options}]

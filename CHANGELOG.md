@@ -6,6 +6,8 @@ This log follows the conventions of
 ### Added
 - `skirt-space` parameter, controlling the nominal distance between switch and
   skirt on a `minimal`-style cap.
+- Trusses inside the vaulted ceiling of a `minimal`-style cap with a high top,
+  when `--supported`.
 
 ### Changed
 - The skirt on a `minimal` cap is of more even thickness, because it is now
