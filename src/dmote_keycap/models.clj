@@ -283,12 +283,13 @@
                            :convexity 6})))
 
 (defn- bowl-model
-  "A sphere for use as negative space."
+  "A sphere for use as negative space.
+  Use low detail for quick previews, except on a spherical-cap."
   [{:keys [top-size bowl-radii bowl-plate-offset z-override]}]
   (let [bowl-z (or z-override (third bowl-radii))]
     (model/translate [0 0 (+ (third top-size) bowl-z bowl-plate-offset)]
       (model/resize (map #(* 2 %) bowl-radii)  ; Bowl diameters.
-        (model/sphere 3)))))  ; Low detail for quick previews.
+        (model/sphere (max (apply min bowl-radii) 3))))))
 
 (defn- bowl-with-legend
   "Negative space with a legend protruding from a spheroid."
