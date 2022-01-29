@@ -19,8 +19,9 @@ keyboards, and a CLI (command-line interface) utility. Both offer:
   which can have ergonomic advantages. Dust protection is better than a 0.75 u
   cap that does not extend down the sides of the switch.
 * A “maquette” keycap style for previewing keyboard designs.
-* [Legends](doc/legend.md): Arbitrary 2D designs can be “engraved” into any of
-  the faces of a non-maquette cap: The top and sides, in any combination.
+* [Legends](doc/legend.md): Arbitrary 2D designs can be metaphorically engraved
+  into any of the faces of a non-maquette cap: The top and sides, in any
+  combination.
 
 `dmote-keycap` has no support for stabilizers, raised legends, or multiple
 materials (printing to simulate “double shot” injection moulding).
@@ -28,7 +29,7 @@ materials (printing to simulate “double shot” injection moulding).
 ## Usage
 
 To run the utility and generate a printable model, enter `lein run` at your
-command line, in this folder.
+command line, in this folder. You must have Leiningen installed for that.
 
 The CLI utility uses what the library exposes as `dmote-kgeycap.models/keycap`.
 That function takes a number of parameters and returns a `scad-clj`
@@ -44,7 +45,7 @@ Printing advice is available [here](doc/print.md).
 
 ## License
 
-Copyright © 2019–2021 Viktor Eikman
+Copyright © 2019–2022 Viktor Eikman
 
 This software is distributed under the [Eclipse Public License](LICENSE-EPL)
 (EPL) v2.0 or any later version thereof. This software may also be made
