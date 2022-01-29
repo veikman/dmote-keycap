@@ -55,10 +55,12 @@ Recommended solutions to common problems.
 Check general printer settings and try running `dmote-keycap` with error
 compensation.
 
-* For an `:alps` stem that is too thick, run with `--error-stem-positive 0.1`
-  or more.
-* For an `:mx` stem that does not fit over the cross of the stem, run with
-  `--error-stem-negative -0.1` or less.
+* For an `:alps` keycap where the stem is too thick to fit inside the stem of
+  the switch, run with `--error-stem-positive 0.1` or more.
+* For an `:mx` keycap where the stem does not fit inside the switch as it
+  descends on the spring, run with `--error-stem-positive 0.1` or more.
+* For an `:mx` keyp that does not fit over the cross of the switch’s stem, run
+  with `--error-stem-negative -0.1` or less.
 
 #### The cap is too narrow when printed
 
