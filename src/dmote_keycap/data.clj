@@ -64,16 +64,16 @@
    :unit-size [1 1]
    :slope 0.73
    :bowl-plate-offset 0
-   :skirt-thickness 1
-   :skirt-space 0.5
+   :skirt-thickness 0.8
+   :skirt-space 0.4
    :legend {:depth 0.4  ; Suitable for SLA engraving.
             :faces (into {}
                      (for [f face-keys]
                        [f {:text-options {:style text-style-defaults
                                           :x "0"
                                           :y "1"}}]))}
-   :nozzle-width 0.5
-   :horizontal-support-height 0.5
+   :nozzle-width 0.4
+   :horizontal-support-height 0.8
    :error-body-positive 0
    :error-side-negative 0
    :error-stem-negative 0
