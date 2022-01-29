@@ -12,6 +12,9 @@ This log follows the conventions of
   based on insetting the outer shell, whereas before, the interior and exterior
   of the skirt were offsets, with the same radius, from different-size
   rectangles.
+- In tandem with the addition of `skirt-space`, the default value of the
+  `error-body-positive` parameter has changed from -0.5 to 0. This makes
+  all error parameters neutral by default.
 
 ### Fixed
 - A 1-minute delay between the application’s useful work and its termination

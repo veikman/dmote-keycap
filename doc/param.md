@@ -48,9 +48,7 @@ function library, `dmote-keycap.models.keycap`.
 * `:error-body-positive`, `:error-side-negative`, `:error-stem-negative`,
   `:error-stem-positive`, `:error-top-negative`:
   Printer-dependent measurements of error for different parts of the cap.
-  A **breaking change** is planned for version 1.0.0 or some feature release
-  before it: All of these error values will default to zero to broaden support
-  for different printing technologies.
+  Usage advice is available [here](print.md).
 
 Some of these parameters have global default values, while others have default
 values associated with particular styles, for ease of use. The long-term plan
@@ -70,7 +68,7 @@ The CLI supports some additional parameters that are not interpreted by the
   [here](batch.md).
 * `--jig-mode`: An alternative operating mode for a tool and no keys,
   documented [here](jig.md).
-* `--face-size`: Rendering resolution.
+* `--facet-size`: Rendering resolution.
 * `--filename`: For your own CLI-based scripting needs.
 * `--render`: Render results to STL under `output/stl`.
 * `--montage`: With `--render`, render to PNG  under `output/png`.
