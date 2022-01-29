@@ -3,6 +3,12 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+### Changed
+- The skirt on a `minimal` cap is of more even thickness, because it is now
+  based on insetting the outer shell, whereas before, the interior and exterior
+  of the skirt were offsets, with the same radius, from different-size
+  rectangles.
+
 ### Fixed
 - A 1-minute delay between the application’s useful work and its termination
   following any use of the application that involved Inkscape to process

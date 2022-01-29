@@ -25,6 +25,7 @@
 (def color-legend [0.2 0.3 0.4])
 
 (defn- third [coll] (nth coll 2))
+(defn- override-each [over coll] (map (partial merge over) coll))
 
 (defn- positives [coll key] (get-in coll [key :positive]))
 (defn- negatives [coll key] (not (get-in coll [key :positive])))
@@ -87,7 +88,9 @@
     (data/switch-parts switch-type)))
 
 (defn- rectangular-sections
-  "Simplified switch sections for a squarish outer body of a keycap."
+  "Simplified switch sections for a squarish outer body of a keycap.
+  Return a map of layer heights (vertical measurements) to 2-tuples of
+  footprints (horizontal measurements at layer height)."
   [switch-type]
   (let [full (switch-sections switch-type)]
     (reduce
@@ -113,14 +116,26 @@
          (number? xy-offset)]}
   (inset-corner (map #(+ % (* 2 xy-offset)) footprint) radius))
 
-(defn- rounded-block
-  [{:keys [z-offset z-thickness]
-    :or {z-offset 0, z-thickness wafer}
-    :as dimensions}]
+(defn- rounded-stack [option-sets] (mapv rounded-square option-sets))
+
+(defn- inflate
+  "Extrude one 2D slice of a keycap into 3D, at the right height."
+  [{:keys [z-offset z-thickness] :or {z-offset 0, z-thickness wafer}}
+   shape-2d]
   {:pre [(number? z-offset)]}
-  (->> (rounded-square dimensions)
-       (model/extrude-linear {:height z-thickness, :center false})
-       (maybe/translate [0 0 z-offset])))
+  (->> shape-2d
+    (model/extrude-linear {:height z-thickness, :center false})
+    (maybe/translate [0 0 z-offset])))
+
+(defn- rounded-block [options] (inflate options (rounded-square options)))
+
+(defn- pillar
+  "Take a sequence of z-axis data maps and a matching sequence of 2D shapes.
+  Combine them into a sequence of 3D shapes."
+  [z-data shapes-2d]
+  (map-indexed
+    (fn [index z-datum] (inflate z-datum (get shapes-2d index)))
+    z-data))
 
 (defn- switch-body-cube
   [{:keys [switch-type error-body-positive]}
@@ -204,18 +219,6 @@
           (model/translate [0 0 overshoot] outer-profile)
           inner-profile)))))
 
-(defn- rounded-pillar
-  "A sequence of rounded blocks. Passed overrides update each item of the
-  source sequences, e.g. for adjusting its width."
-  [overrides sequence]
-  (map (fn [item] (rounded-block (merge item overrides))) sequence))
-
-(defn- rounded-layers
-  "Multiple sequences of rounded blocks at different thicknesses.
-  Return a vector for indexing."
-  [thicknesses sequence]
-  (mapv #(rounded-pillar {:xy-offset %} sequence) thicknesses))
-
 (defn- tight-shell-sequence
   [{:keys [switch-type] :as options}]
   (let [rectangles-by-z (rectangular-sections switch-type)]
@@ -234,22 +237,32 @@
   (and (some? bowl-radii) (every? some? bowl-radii)))
 
 (defn- minimal-shell-sequences
-  "The layers of a minimal keycap shell.
-  In order: An outer layer, an intermediate layer at engraving depth, and an
-  inner layer that hugs the switch. The outer and intermediate layers are
-  extended away from the switch by the top plate."
-  [{:keys [top-size bowl-radii skirt-thickness legend] :as options}]
+  "The four layers of a minimal keycap shell.
+  Each layer is a sequence of 3D shapes ready for combination by lofting.
+  They are returned in order from outermost to innermost.
+  The first two are extended away from the switch by the top plate."
+  [{:keys [top-size bowl-radii skirt-thickness skirt-space legend] :as options}]
   (let [engraving-depth (:depth legend)
-        engraving-thickness (max (- skirt-thickness engraving-depth) 0)
         [x y top-z] top-size
         outer-top {:footprint [x y]
                    :z-thickness (+ top-z (if (bowl? options) (third bowl-radii) 0))}
         inner-top (assoc outer-top :xy-offset (- engraving-depth))
-        raw (rounded-layers [skirt-thickness engraving-thickness 0]
-                            (tight-shell-sequence options))]
-    (-> raw
-        (update 0 #(cons % (rounded-block (merge options outer-top))))
-        (update 1 #(cons % (rounded-block (merge options inner-top)))))))
+        inner-shell (tight-shell-sequence options)
+        outer-shell (override-each {:xy-offset (+ skirt-thickness skirt-space)}
+                                   inner-shell)
+        outer-stack (rounded-stack outer-shell)]
+    [;; The blocky exterior of the keycap.
+     (cons (pillar inner-shell outer-stack)
+           (rounded-block (merge options outer-top)))
+     ;; The depth to which any engraving will be done.
+     (cons (pillar inner-shell (mapv (partial model/offset (- engraving-depth))
+                                     outer-stack))
+           (rounded-block (merge options inner-top)))
+     ;; The interior hollow of the skirt, drawn in from the outermost layer.)
+     (pillar inner-shell (mapv (partial model/offset (- skirt-thickness))
+                               outer-stack))
+     ;; The shape of the switch, for printer error compensation.
+     (pillar inner-shell (rounded-stack inner-shell))]))
 
 (defn- engraved-legend
   "An extrusion from a 2D legend image into a 3D negative."
@@ -259,7 +272,6 @@
     (maybe/offset (- error))
     (model/extrude-linear {:height (measure/key-length 1)  ; Rough.
                            :convexity 6})))
-
 
 (defn- bowl-model
   "A sphere for use as negative space."
@@ -338,11 +350,11 @@
   The ‘top-size’ argument describes the plate, including the final thickness
   of the plate at its center."
   [{:keys [skirt-length shell-sequence-fn] :as options}]
-  (let [[positive intermediate negative] (shell-sequence-fn options)
+  (let [[outermost intermediate interior _] (shell-sequence-fn options)
         side-legends (side-faces options)]
     (model/difference
       (maybe/difference
-        (util/loft positive)
+        (util/loft outermost)
         (top-face options)
         (when side-legends
           (model/color color-legend
@@ -352,7 +364,7 @@
       (switch-body options)
       (vaulted-ceiling options)
       (model/intersection  ; Make sure the inner negative cuts off at z = 0.
-        (util/loft negative)
+        (util/loft interior)
         (model/translate [0 0 (- plenty)]
           (model/cube big big big)))
       ;; Cut everything before hitting the mounting plate:
