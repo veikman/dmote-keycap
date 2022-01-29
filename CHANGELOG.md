@@ -3,6 +3,10 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+### Added
+- `skirt-space` parameter, controlling the nominal distance between switch and
+  skirt on a `minimal`-style cap.
+
 ### Changed
 - The skirt on a `minimal` cap is of more even thickness, because it is now
   based on insetting the outer shell, whereas before, the interior and exterior
