@@ -42,9 +42,12 @@ function library, `dmote-keycap.models.keycap`.
 * `:nozzle-width`: The width of the printer nozzle that will be used to print
   the cap. This parameter is only used to build supports, which will have the
   width of the nozzle because this improves print speed and quality.
-* `:horizontal-support-height`: The height of support structures added by
-  `:supported`, where this are not already determined by the parts they
-  support.
+* `:horizontal-support-height`: The height (measured from the floor) of support
+  structures on the floor that are added by `:supported`, where height is not
+  automatically determined by the parts they support.
+* `:truss-offset`: The starting height (measured from the top of the switch) of
+  support structures added by `:supported` inside vaults which in turn are
+  created inside the top of a cap with tall `:top-size`.
 * `:error-body-positive`, `:error-side-negative`, `:error-stem-negative`,
   `:error-stem-positive`, `:error-top-negative`:
   Printer-dependent measurements of error for different parts of the cap.

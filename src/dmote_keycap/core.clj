@@ -80,6 +80,9 @@
    [nil "--horizontal-support-height N" "Height of support with --supported"
     :default-desc (str (:horizontal-support-height data/option-defaults))
     :parse-fn #(Float/parseFloat %)]
+   [nil "--truss-offset N" "Start of trusses inside raised top with --supported"
+    :default-desc (str (:truss-offset data/option-defaults))
+    :parse-fn #(Float/parseFloat %)]
    (error :error-body-positive)
    (error :error-side-negative)
    (error :error-stem-negative)

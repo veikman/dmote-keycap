@@ -54,6 +54,7 @@
                                                               identity)}))})
                      :nozzle-width num
                      :horizontal-support-height num
+                     :truss-offset num
                      :error-body-positive num
                      :error-side-negative num
                      :error-stem-negative num
@@ -107,6 +108,7 @@
 
 (spec/def ::nozzle-width (spec/and number? #(> % 0)))
 (spec/def ::horizontal-support-height (spec/and number? #(>= % 0)))
+(spec/def ::truss-offset number?)
 (spec/def ::error-body-positive number?)
 (spec/def ::error-side-negative number?)
 (spec/def ::error-stem-negative number?)
@@ -127,9 +129,10 @@
   (spec/keys :opt-un [::importable-filepath-fn
                       ::style ::unit-size ::top-size ::top-rotation
                       ::bowl-radii ::bowl-plate-offset
-                      ::skirt-thickness ::skirt-length ::slope
+                      ::skirt-length ::skirt-thickness ::skirt-space
+                      ::slope
                       ::legend
-                      ::nozzle-width ::horizontal-support-height
+                      ::nozzle-width ::horizontal-support-height ::truss-offset
                       ::error-body-positive ::error-side-negative
                       ::error-stem-negative ::error-stem-positive
                       ::error-top-negative

@@ -74,6 +74,7 @@
                                           :y "1"}}]))}
    :nozzle-width 0.4
    :horizontal-support-height 0.8
+   :truss-offset 0
    :error-body-positive 0
    :error-side-negative 0
    :error-stem-negative 0

@@ -205,7 +205,8 @@
   When running with generated supports, there are roof trusses under the
   ceiling, bridging the inner and outer surfaces of the vaulting early, to
   prevent a printer head from bending the stem."
-  [{:keys [switch-type top-size nozzle-width supported error-stem-positive error-body-positive]}]
+  [{:keys [switch-type top-size nozzle-width supported truss-offset
+           error-stem-positive error-body-positive]}]
   (let [peak-z (dec (third top-size))
         overshoot (* 2 peak-z)
         outer-profile
@@ -222,7 +223,7 @@
           (model/translate [0 0 overshoot] outer-profile)
           inner-profile)
         (when supported
-          (model/translate [0 0 (+ plenty nozzle-width)]
+          (model/translate [0 0 (+ plenty truss-offset)]
             (model/union
               (model/cube nozzle-width big big)
               (model/cube big nozzle-width big))))))))
