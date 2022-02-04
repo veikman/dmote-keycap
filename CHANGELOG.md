@@ -19,6 +19,15 @@ This log follows the conventions of
 - In tandem with the addition of `skirt-space`, the default value of the
   `error-body-positive` parameter has changed from -0.5 to 0. This makes
   all error parameters neutral by default.
+- The precise shape of the top of a `minimal` cap with non-neutral
+  `bowl-radii`. The user-defined top (specified with `top-size`) is no longer
+  extended upward for the bowl to cut into. Instead, a separate positive shape
+  is added above it, extending less and shrinking horizontally according to the
+  `slope` argument. This improves the appearance of the keycap for extreme
+  `bowl-radii`.
+- Default parameter values have changed to reflect both the redesign of the
+  `minimal` skirt and the fact that 0.4 mm FDM printer nozzles
+  are more common than the previous 0.5 mm.
 
 ### Fixed
 - A 1-minute delay between the application’s useful work and its termination

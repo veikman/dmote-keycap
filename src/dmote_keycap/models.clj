@@ -245,29 +245,54 @@
   [{:keys [bowl-radii]}]
   (and (some? bowl-radii) (every? some? bowl-radii)))
 
+;; Bowl overshoot is the distance between the centre of the sphere that hollows
+;; out a bowl-shaped top and a wafer inserted over the user-configured “top”.
+(defn- bowl-overshoot [s r] (* r (Math/cos (Math/atan (/ (/ s 2) r)))))
+
+(defn- top-sizes
+  "List atomic positive elements of the top of a keycap."
+  [{:keys [slope top-size bowl-radii] :as options} la]
+  (if (bowl? options)
+    (let [rz (third bowl-radii)
+          [sx sy sz] top-size]
+      [top-size  ; User-configured original.
+       ;; The bowl is cut to the depth of the user-configured top, no further.
+       ;; The following adds a taller block of material for the bowl to cut
+       ;; through.
+       ;; The height of this block is based on the z-axis bowl radius, together
+       ;; with the width of the user-configured top on each side.
+       ;; The formula is intended to prevent absurdity in the case of a bowl
+       ;; thinner or much wider than the user-configured top itself.
+       [(* slope sx)
+        (* slope sy)
+        (+ sz (- rz (min (bowl-overshoot sx rz) (bowl-overshoot sy rz))))]])
+    [top-size]))
+
+(defn- tuple-to-pillarspec [[x y z]] {:footprint [x y], :z-thickness z})
+
 (defn- minimal-shell-sequences
   "The four layers of a minimal keycap shell.
   Each layer is a sequence of 3D shapes ready for combination by lofting.
   They are returned in order from outermost to innermost.
   The first two are extended away from the switch by the top plate."
-  [{:keys [top-size bowl-radii skirt-thickness skirt-space legend] :as options}]
+  [{:keys [skirt-thickness skirt-space legend] :as options}]
   (let [engraving-depth (:depth legend)
-        [x y top-z] top-size
-        outer-top {:footprint [x y]
-                   :z-thickness (+ top-z (if (bowl? options) (third bowl-radii) 0))}
-        inner-top (assoc outer-top :xy-offset (- engraving-depth))
         inner-shell (tight-shell-sequence options)
+        outer-top (->> (top-sizes options inner-shell)
+                       (map tuple-to-pillarspec)
+                       (map (partial merge options)))
+        inner-top (map #(assoc % :xy-offset (- engraving-depth)) outer-top)
         outer-shell (override-each {:xy-offset (+ skirt-thickness skirt-space)}
                                    inner-shell)
         outer-stack (rounded-stack outer-shell)]
     [;; The blocky exterior of the keycap.
-     (cons (pillar inner-shell outer-stack)
-           (rounded-block (merge options outer-top)))
+     (cons (pillar inner-shell outer-stack) (map rounded-block outer-top))
      ;; The depth to which any engraving will be done.
-     (cons (pillar inner-shell (mapv (partial model/offset (- engraving-depth))
-                                     outer-stack))
-           (rounded-block (merge options inner-top)))
-     ;; The interior hollow of the skirt, drawn in from the outermost layer.)
+     (cons (pillar inner-shell
+                   (mapv (partial model/offset (- engraving-depth))
+                         outer-stack))
+           (map rounded-block inner-top))
+     ;; The interior hollow of the skirt, drawn in from the outermost layer.
      (pillar inner-shell (mapv (partial model/offset (- skirt-thickness))
                                outer-stack))
      ;; The shape of the switch, for printer error compensation.
