@@ -10,6 +10,8 @@ This log follows the conventions of
   when `supported`.
     - A `truss-offset` parameter to control the height at which these trusses
       appear.
+- The `slope` parameter, which already existed in the API, is now exposed in
+  the CLI as well.
 
 ### Changed
 - The skirt on a `minimal` cap is of more even thickness, because it is now

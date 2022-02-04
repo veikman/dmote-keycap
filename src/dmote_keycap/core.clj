@@ -74,6 +74,10 @@
    [nil "--skirt-space N" "Gap between switch and skirt"
     :default-desc (str (:skirt-space data/option-defaults))
     :parse-fn #(Float/parseFloat %)]
+   [nil "--slope N"
+    "The slope of the sides of a maquette; of details on a minimal cap"
+    :default-desc (str (:slope data/option-defaults))
+    :parse-fn #(Float/parseFloat %)]
    [nil "--nozzle-width N" "FDM printer nozzle (aperture) width in mm"
     :default-desc (str (:nozzle-width data/option-defaults))
     :parse-fn #(Float/parseFloat %)]

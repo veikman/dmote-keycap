@@ -23,9 +23,10 @@ values associated with particular styles, for ease of use.
   thickness in the middle, directly above the stem of the keycap. The first two
   numbers in this 3-tuple can be omitted by replacing them with `nil`, in which
   case `:slope` (see below) will take precedence. All measurements in mm.
-* `:slope`: A ratio between the top and bottom widths of the keycap. This
-  setting is used to compute top size if `:top-size` is left incomplete, and
-  to position legends on the sides of the cap.
+* `:slope`: A ratio between the top and bottom widths of the keycap or of one
+  of its parts. This setting is used to compute top size if `:top-size` is left
+  incomplete, and to position legends on the sides of the cap, and to shape
+  the upper edge of a cap with `bowl-radii`.
 * `:top-rotation`: A 3-tuple describing the angle of the finger contact
   surface, in radians. This would be `[0 0 0]` for a (row 3 or standard) DSA
   profile and would have a different non-zero first value for each row of an
