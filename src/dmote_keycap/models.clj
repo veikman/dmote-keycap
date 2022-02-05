@@ -4,7 +4,7 @@
   (:require [clojure.spec.alpha :as spec]
             [clojure.java.io :as io]
             [scad-clj.model :as model]
-            [scad-tarmi.core :refer [abs π] :as tarmi]
+            [scad-tarmi.core :refer [abs π √] :as tarmi]
             [scad-tarmi.dfm :refer [error-fn]]
             [scad-tarmi.maybe :as maybe]
             [scad-tarmi.util :as util]
@@ -245,27 +245,30 @@
   [{:keys [bowl-radii]}]
   (and (some? bowl-radii) (every? some? bowl-radii)))
 
-;; Bowl overshoot is the distance between the centre of the sphere that hollows
-;; out a bowl-shaped top and a wafer inserted over the user-configured “top”.
-(defn- bowl-overshoot [s r] (* r (Math/cos (Math/atan (/ (/ s 2) r)))))
+(defn- depth-of-cut
+  "Compute how much extra material to add for the bowl to be cut from.
+  The bowl is cut to the depth of the user-configured top, no further.
+  The following specifies extra height for the bowl to cut through.
+  It’s based on the z-axis radius of the bowl, together
+  with the diagonal of the user-configured top.
+  The formula is intended to prevent absurdity in the case of a bowl
+  thinner or much wider than the user-configured top itself."
+  [{:keys [top-size bowl-radii] :as options}]
+  (let [rz (third bowl-radii)
+        [sx sy sz] top-size
+        ² #(Math/pow % 2)
+        d (√ (+ (² sx) (² sy)))  ; Diagonal across top, between corners.
+        c (√ (- (² rz) (/ d 2)))]  ; Half of chord of circle over corners.
+    (- rz (if (Double/isNaN c) 0 c))))
 
 (defn- top-sizes
   "List atomic positive elements of the top of a keycap."
-  [{:keys [slope top-size bowl-radii] :as options} la]
+  [{:keys [slope top-size bowl-radii] :as options}]
   (if (bowl? options)
-    (let [rz (third bowl-radii)
-          [sx sy sz] top-size]
-      [top-size  ; User-configured original.
-       ;; The bowl is cut to the depth of the user-configured top, no further.
-       ;; The following adds a taller block of material for the bowl to cut
-       ;; through.
-       ;; The height of this block is based on the z-axis bowl radius, together
-       ;; with the width of the user-configured top on each side.
-       ;; The formula is intended to prevent absurdity in the case of a bowl
-       ;; thinner or much wider than the user-configured top itself.
-       [(* slope sx)
-        (* slope sy)
-        (+ sz (- rz (min (bowl-overshoot sx rz) (bowl-overshoot sy rz))))]])
+    [top-size  ; User-configured original.
+     [(* slope (first top-size))
+      (* slope (second top-size))
+      (+ (third bowl-radii) (depth-of-cut options))]]
     [top-size]))
 
 (defn- tuple-to-pillarspec [[x y z]] {:footprint [x y], :z-thickness z})
@@ -278,7 +281,7 @@
   [{:keys [skirt-thickness skirt-space legend] :as options}]
   (let [engraving-depth (:depth legend)
         inner-shell (tight-shell-sequence options)
-        outer-top (->> (top-sizes options inner-shell)
+        outer-top (->> (top-sizes options)
                        (map tuple-to-pillarspec)
                        (map (partial merge options)))
         inner-top (map #(assoc % :xy-offset (- engraving-depth)) outer-top)
