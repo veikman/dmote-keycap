@@ -105,9 +105,10 @@
 (defn- inset-corner
   [[x y] radius]
   {:pre [(number? x) (number? y) (number? radius)]}
-  (let [initial #(- % (* 2 radius))]
+  (let [r (min (/ x 2) (/ y 2) radius)
+        initial #(max wafer (- % (* 2 r)))]
     (->> (model/square (initial x) (initial y))
-         (maybe/offset radius))))
+         (maybe/offset r))))
 
 (defn- rounded-square
   [{:keys [footprint radius xy-offset] :or {radius 1.8, xy-offset 0}}]
@@ -245,30 +246,54 @@
   [{:keys [bowl-radii]}]
   (and (some? bowl-radii) (every? some? bowl-radii)))
 
-(defn- depth-of-cut
-  "Compute how much extra material to add for the bowl to be cut from.
-  The bowl is cut to the depth of the user-configured top, no further.
-  The following specifies extra height for the bowl to cut through.
-  It’s based on the z-axis radius of the bowl, together
-  with the diagonal of the user-configured top.
+(defn- sacrificial-depth
+  "Compute how much vertical material to add for the bowl to be cut from.
+  The bowl is cut *to* the depth of the user-configured top, no further.
+  The following specifies extra height for the bowl to cut *through*.
+  It’s based on the z-axis radius of the bowl, together with the diagonal of
+  the user-configured top.
   The formula is intended to prevent absurdity in the case of a bowl
   thinner or much wider than the user-configured top itself."
-  [{:keys [top-size bowl-radii] :as options}]
+  [{:keys [top-size bowl-radii]}]
   (let [rz (third bowl-radii)
-        [sx sy sz] top-size
-        ² #(Math/pow % 2)
-        d (√ (+ (² sx) (² sy)))  ; Diagonal across top, between corners.
-        c (√ (- (² rz) (/ d 2)))]  ; Half of chord of circle over corners.
+        [sx sy _] top-size
+        square #(Math/pow % 2)
+        d (√ (+ (square sx) (square sy)))  ; Diagonal across top, between corners.
+        c (√ (- (square rz) (square (/ d 2))))]  ; Half of chord of circle over corners.
     (- rz (if (Double/isNaN c) 0 c))))
+
+(defn- sacrificial-surface
+  "Compute a horizontal extent on one side, and matching vertical extent,
+  of material from which to cut a bowl."
+  [θ height full-side]
+  (let [s (/ full-side 2)  ; Trigonometry is done on offset from centre.
+        ratio (Math/tan θ)  ; Required ratio of height over half-side.
+        z (min height (* ratio s))]
+    (if (< z height)
+      ;; A pointy pyramid less tall than the potential depth of cut through it.
+      [wafer z]
+      ;; A ziggurat at full height. Width at top is governed by ratio.
+      [(* 2 (- s (/ z ratio))) z])))
+
+(defn- sarificial-block
+  "Find the size of a block of material from which to cut a bowl."
+  [{:keys [top-size slope] :as options}]
+  (let [sacrifice (partial sacrificial-surface
+                           (* (/ π 2) slope)
+                           (sacrificial-depth options))
+        xz (sacrifice (first top-size))
+        yz (sacrifice (second top-size))]
+    ;; If the requested top is uneven, compromise on the slope.
+    [(first xz) (first yz) (/ (+ (second xz) (second yz)) 2)]))
 
 (defn- top-sizes
   "List atomic positive elements of the top of a keycap."
-  [{:keys [slope top-size bowl-radii] :as options}]
+  ;; In order from lowest to highest.
+  [{:keys [top-size] :as options}]
   (if (bowl? options)
-    [top-size  ; User-configured original.
-     [(* slope (first top-size))
-      (* slope (second top-size))
-      (+ (third bowl-radii) (depth-of-cut options))]]
+    ;; Add a taller block from which the bowl is to be cut.
+    [top-size (update (sarificial-block options) 2 #(+ % (third top-size)))]
+    ;; No bowl, no rim.
     [top-size]))
 
 (defn- tuple-to-pillarspec [[x y z]] {:footprint [x y], :z-thickness z})
