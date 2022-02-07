@@ -20,6 +20,8 @@ This log follows the conventions of
 - Default parameter values have changed to reflect both the redesign of the
   `minimal` skirt and the fact that 0.4 mm FDM printer nozzles
   are more common than the previous 0.5 mm.
+- Minor redesign of Concertina keycaps using consistent `bowl-radii`, that is,
+  a sphere.
 
 ### Added
 - `skirt-space` parameter, controlling the nominal distance between switch and

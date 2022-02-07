@@ -4,7 +4,7 @@
 {;; A section of keys with mid-size top legends for letters, and
  ;; rotated, smaller legends on the top row in each column.
  {:top-size [10 10 2.6]
-  :skirt-thickness 1.2
+  :bowl-radii [20 20 20]
   :legend {:faces {:top {:text-options {:style {:font-size "1.8mm"}}}
                    :north {:text-options {:style {:font-size "1.4mm"
                                                   :dominant-baseline "baseline"}
@@ -57,10 +57,10 @@
   {:legend {:faces {:top {:unimportable "resources/legend/2linetext/undirected_single_and_double_quote.svg"}}}}
   {:legend {:faces {:top {:unimportable "resources/legend/2linetext/backslash_with_vertical_bar.svg"}
                     :north {:char "F11"}}}}]
- ;; Another section for normal-height keys with non-letter top legends in a
- ;; larger font. Most of these keys go in the thumb clusters.
+ ;; Another section for non-letter top legends in a larger font. Most of these
+ ;; keys go in the thumb clusters.
  {:top-size [10 10 2.6]
-  :skirt-thickness 1.2
+  :bowl-radii [20 20 20]
   :legend {:faces {:top {:text-options {:style {:font-size "2.8mm"}}}
                    :north {:text-options {:style {:font-size "1.8mm"
                                                   :dominant-baseline "baseline"}
