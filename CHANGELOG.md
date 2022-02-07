@@ -3,16 +3,6 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
-### Added
-- `skirt-space` parameter, controlling the nominal distance between switch and
-  skirt on a `minimal`-style cap.
-- Trusses inside the vaulted ceiling of a `minimal`-style cap with a high top,
-  when `supported`.
-    - A `truss-offset` parameter to control the height at which these trusses
-      appear.
-- The `slope` parameter, which already existed in the API, is now exposed in
-  the CLI as well.
-
 ### Changed
 - The skirt on a `minimal` cap is of more even thickness, because it is now
   based on insetting the outer shell, whereas before, the interior and exterior
@@ -30,6 +20,16 @@ This log follows the conventions of
 - Default parameter values have changed to reflect both the redesign of the
   `minimal` skirt and the fact that 0.4 mm FDM printer nozzles
   are more common than the previous 0.5 mm.
+
+### Added
+- `skirt-space` parameter, controlling the nominal distance between switch and
+  skirt on a `minimal`-style cap.
+- Trusses inside the vaulted ceiling of a `minimal`-style cap with a high top,
+  when `supported`.
+    - A `truss-offset` parameter to control the height at which these trusses
+      appear.
+- The `slope` parameter, which already existed in the API, is now exposed in
+  the CLI as well.
 
 ### Fixed
 - A 1-minute delay between the application’s useful work and its termination
