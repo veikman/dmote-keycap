@@ -2,48 +2,68 @@
 
 (ns dmote-keycap.sand
   (:require [scad-clj.model :as model]
-            [scad-tarmi.core :refer [π sin cos]]
+            [scad-tarmi.core :refer [√ π sin cos]]
             [scad-tarmi.util :refer [loft]]
+            [scad-tarmi.maybe :as maybe]
             [dmote-keycap.data :refer [style-defaults]]))
 
 (def base-height 2.5)
 
+(defn- chord
+  "The chord length of a circle with x as its sagitta."
+  [x r]
+  (√ (* (- r (/ x 2)) (* 8 x))))
+
+(defn- medallion-chords
+  "Compute the chords of each dimension of a medallion.
+  This assumes, incorrectly, the shape of a circle in each dimension.
+  It gives increasingly misleading results for heterogenous bowl-radii."
+  [{:keys [bowl-radii medallion-height]}]
+  (map (partial chord medallion-height) bowl-radii))
+
 (defn- plinth
   "The basic shape of a sanding block."
-  [{:keys [jig-angle paper-width bowl-diameters]}]
-  (let [y-bowl (first bowl-diameters)
+  [{:keys [jig-angle paper-width bowl-radii to-ground face-shape] :as options}]
+  (let [y-bowl (* 2 (first bowl-radii))  ; Can’t use chords here.
         y-base (+ y-bowl 3)
         r-base (* y-bowl (sin jig-angle))
         cylinder (model/cylinder r-base paper-width)]
-    (model/rotate [jig-angle 0 0]
-      (model/rotate [0 (/ π 2) 0]
-        (model/hull
-          (model/translate [0 (/ y-base 2) 0] cylinder)
-          (model/translate [0 (/ y-base -2) 0] cylinder))))))
+    (maybe/union
+      (maybe/hull
+        (model/rotate [jig-angle 0 0]
+          (maybe/union
+            (model/rotate [0 (/ π 2) 0]
+              (model/hull
+                (model/translate [0 (/ y-base 2) 0] cylinder)
+                (model/translate [0 (/ y-base -2) 0] cylinder)))))
+        (when to-ground
+          (model/translate [0 0 (- base-height)]
+            (model/extrude-linear {:height 1, :center false}
+              (model/cut (plinth (dissoc options :to-ground :face-shape)))))))
+      (when face-shape
+        (model/rotate [jig-angle 0 0]
+          (model/translate [0 0 r-base]
+            face-shape))))))
 
 (defn- lane
   "A medallion shaped like the negative of a keycap’s top bowl, on a plinth."
-  [{:keys [jig-angle paper-width bowl-diameters] :as options}]
-  (let [[y-bowl x-bowl z-bowl] bowl-diameters
-        bm (apply max bowl-diameters)
-        y-base (+ y-bowl 3)
-        r-base (* y-bowl (sin jig-angle))]
+  [{:keys [paper-width bowl-radii medallion-height] :as options}]
+  (let [[_ __ rz] bowl-radii
+        [y-bowl x-bowl z-bowl] (mapv #(* 2 %) bowl-radii)]
     (model/difference
-      (model/union
-        ;; The medallion.
-        (model/rotate [jig-angle 0 0]
-          (model/translate [0 0 r-base]
-            (model/hull
-              (model/extrude-linear {:height 0.1}
-                (model/resize [paper-width y-base] (model/circle bm)))
-              (model/translate [0 0 0.3]
-                (model/resize [x-bowl y-bowl z-bowl] (model/sphere bm))))))
-        ;; The plinth hulled with its own shadow at the base.
-        (model/hull
-          (plinth options)
-          (model/translate [0 0 (- base-height)]
-            (model/extrude-linear {:height 1, :center false}
-              (model/cut (plinth options))))))
+      (plinth
+        (assoc options
+          :to-ground true
+          :face-shape
+          ;; The medallion.
+          (model/intersection
+            (model/translate [0 0 (min 0 (- medallion-height rz))]
+              (model/resize [x-bowl y-bowl z-bowl]
+                (model/sphere
+                  (apply max (medallion-chords options)))))
+            ;; Block off any part of the sphere below the face of the plinth.
+            (model/translate [0 0 50]
+              (model/cube paper-width y-bowl 100)))))
       ;; Cut away below the base at the back.
       (model/translate [0 0 (- (- base-height) 100)] (model/cube 200 200 200))
       ;; Cut away to the upper edge of the base at the front.
@@ -63,11 +83,11 @@
   on the same setting, “bowl-radii”."
   [{:keys [jig-lanes jig-angle paper-width bowl-radii] :as explicit-options}]
   (let [radii (or bowl-radii (get-in style-defaults [:minimal :bowl-radii]))
-        diameters (mapv #(* 2 %) radii)
-        options (assoc explicit-options :bowl-radii radii
-                                        :bowl-diameters diameters)
+        options (assoc explicit-options
+                       :bowl-radii radii
+                       :medallion-height (min (last radii) 3.5))
         pitch (+ paper-width 8)
-        screw-offset (/ (* (first diameters) (cos jig-angle)) 2)]
+        screw-offset (/ (* (apply max (medallion-chords options)) (cos jig-angle)) 2)]
     (model/difference
       (model/union
         ;; The array of individual lanes.
