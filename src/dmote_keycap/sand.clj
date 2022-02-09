@@ -9,24 +9,30 @@
 
 (def base-height 2.5)
 
-(defn- chord
-  "The chord length of a circle with x as its sagitta."
-  [x r]
-  (√ (* (- r (/ x 2)) (* 8 x))))
+(defn- chord-of-circle
+  "The chord length of a circle with s as its sagitta."
+  [s r]
+  (√ (* (- r (/ s 2)) (* 8 s))))
+
+(defn- chord-of-ellipse
+  "Or an approximation thereof."
+  [s w h]  ;; s for sagitta, w for width (radius), h for height (radius).
+  (if (< h s)
+    (* 2 w)  ; Ellipse is too small for sagitta to apply. Return diameter.
+    (* (/ w h) (chord-of-circle s (min w h)))))
 
 (defn- medallion-chords
-  "Compute the chords of each dimension of a medallion.
-  This assumes, incorrectly, the shape of a circle in each dimension.
-  It gives increasingly misleading results for heterogenous bowl-radii."
+  "Compute the xz and yz chords of a medallion."
   [{:keys [bowl-radii medallion-height]}]
-  (map (partial chord medallion-height) bowl-radii))
+  (let [c (fn [r] (chord-of-ellipse medallion-height r (nth bowl-radii 2)))]
+    (map c (take 2 bowl-radii))))
 
 (defn- plinth
   "The basic shape of a sanding block."
-  [{:keys [jig-angle paper-width bowl-radii to-ground face-shape] :as options}]
-  (let [y-bowl (* 2 (first bowl-radii))  ; Can’t use chords here.
-        y-base (+ y-bowl 3)
-        r-base (* y-bowl (sin jig-angle))
+  [{:keys [jig-angle paper-width to-ground face-shape] :as options}]
+  (let [y-chord (apply max (medallion-chords options))
+        y-base (+ y-chord 3)
+        r-base (* y-chord (sin jig-angle))
         cylinder (model/cylinder r-base paper-width)]
     (maybe/union
       (maybe/hull
@@ -58,12 +64,12 @@
           ;; The medallion.
           (model/intersection
             (model/translate [0 0 (min 0 (- medallion-height rz))]
-              (model/resize [x-bowl y-bowl z-bowl]
+              (model/resize [(min x-bowl y-bowl) (max x-bowl y-bowl) z-bowl]
                 (model/sphere
                   (apply max (medallion-chords options)))))
             ;; Block off any part of the sphere below the face of the plinth.
             (model/translate [0 0 50]
-              (model/cube paper-width y-bowl 100)))))
+              (model/cube paper-width (max x-bowl y-bowl) 100)))))
       ;; Cut away below the base at the back.
       (model/translate [0 0 (- (- base-height) 100)] (model/cube 200 200 200))
       ;; Cut away to the upper edge of the base at the front.

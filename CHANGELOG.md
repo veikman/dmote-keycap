@@ -15,8 +15,7 @@ This log follows the conventions of
   `bowl-radii`. The user-defined top (specified with `top-size`) is no longer
   extended upward for the bowl to cut into. Instead, a separate positive shape
   is added above it, extending less and shrinking horizontally according to the
-  `slope` argument. This improves the appearance of the keycap for extreme
-  `bowl-radii`.
+  `slope` argument.
 - Default parameter values have changed to reflect both the redesign of the
   `minimal` skirt and the fact that 0.4 mm FDM printer nozzles
   are more common than the previous 0.5 mm.
@@ -32,6 +31,8 @@ This log follows the conventions of
       appear.
 - The `slope` parameter, which already existed in the API, is now exposed in
   the CLI as well.
+- Support for a wider range of bowl radii, including a more responsive sanding
+  jig design.
 
 ### Fixed
 - A 1-minute delay between the application’s useful work and its termination
