@@ -2,17 +2,13 @@
 
 (ns dmote-keycap.sand
   (:require [scad-clj.model :as model]
-            [scad-tarmi.core :refer [√ π sin cos]]
+            [scad-tarmi.core :refer [π sin cos]]
             [scad-tarmi.util :refer [loft]]
             [scad-tarmi.maybe :as maybe]
-            [dmote-keycap.data :refer [style-defaults]]))
+            [dmote-keycap.data :refer [style-defaults]]
+            [dmote-keycap.misc :refer [chord-of-circle]]))
 
 (def base-height 2.5)
-
-(defn- chord-of-circle
-  "The chord length of a circle with s as its sagitta."
-  [s r]
-  (√ (* (- r (/ s 2)) (* 8 s))))
 
 (defn- chord-of-ellipse
   "Or an approximation thereof."
