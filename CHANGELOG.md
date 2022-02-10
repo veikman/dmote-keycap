@@ -3,6 +3,9 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+Nothing yet.
+
+## [Version 0.8.0] - 2021-02-10
 ### Changed
 - The skirt on a `minimal` cap is of more even thickness, because it is now
   based on insetting the outer shell, whereas before, the interior and exterior
@@ -159,7 +162,8 @@ This log follows the conventions of
 ### Added
 - Minimal and maquette styles.
 
-[Unreleased]: https://github.com/veikman/dmote-keycap/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/veikman/dmote-keycap/compare/v0.8.0...HEAD
+[Version 0.8.0]: https://github.com/veikman/dmote-keycap/compare/v0.7.0...v0.8.0
 [Version 0.7.0]: https://github.com/veikman/dmote-keycap/compare/v0.6.0...v0.7.0
 [Version 0.6.0]: https://github.com/veikman/dmote-keycap/compare/v0.5.1...v0.6.0
 [Version 0.5.1]: https://github.com/veikman/dmote-keycap/compare/v0.5.0...v0.5.1
