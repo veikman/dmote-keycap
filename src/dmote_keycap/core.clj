@@ -52,8 +52,11 @@
    [nil "--supported" "Include print supports underneath models"]
    [nil "--sectioned" "Show models in section (cut in half)"]
    [nil "--facet-size N" "Smaller number gives more detail"
-    :default 0.1, :parse-fn #(Float/parseFloat %),
+    :default 0.25, :parse-fn #(Float/parseFloat %),
     :validate [(partial spec/valid? ::app-schema/minimum-facet-size)]]
+   [nil "--facet-angle N" "Smaller number gives more detail"
+    :default 2, :parse-fn #(Float/parseFloat %),
+    :validate [(partial spec/valid? ::app-schema/minimum-facet-angle)]]
    [nil "--switch-type TYPE" "One of “alps” or “mx”"
     :default-desc "alps", :parse-fn keyword,
     :validate [(partial spec/valid? ::schema/switch-type)]]
@@ -133,7 +136,8 @@
   [options]
   (build-all! [{:name (:filename options)
                 :model-main (models/keycap options)
-                :minimum-facet-size (:facet-size options)}]
+                :minimum-facet-size (:facet-size options)
+                :minimum-facet-angle (:facet-angle options)}]
               options))
 
 (defn- batch!
@@ -157,7 +161,8 @@
   [options]
   (app-core/build-all [{:name "cap-sanding-jig"
                         :model-main (sand/jig options)
-                        :minimum-facet-size (:facet-size options)}]
+                        :minimum-facet-size (:facet-size options)
+                        :minimum-facet-angle (:facet-angle options)}]
                       options))
 
 (defn -main

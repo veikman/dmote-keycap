@@ -61,7 +61,8 @@
   (let [filename (namer i entry)]
     {:name filename
      :model-main (models/keycap (assoc entry :filename filename))
-     :minimum-facet-size (:facet-size entry)}))
+     :minimum-facet-size (:facet-size entry)
+     :minimum-facet-angle (:facet-angle entry)}))
 
 
 ;;;;;;;;;;;;;;;

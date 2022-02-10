@@ -82,7 +82,7 @@ The CLI supports some additional parameters that are not interpreted by the
   [here](batch.md).
 * `--jig-mode`: An alternative operating mode for a tool and no keys,
   documented [here](jig.md).
-* `--facet-size`: Rendering resolution.
+* `--facet-size`, `--facet-angle`: Rendering resolution.
 * `--filename`: For your own CLI-based scripting needs.
 * `--render`: Render results to STL under `output/stl`.
 * `--montage`: With `--render`, render to PNG  under `output/png`.

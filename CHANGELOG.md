@@ -33,6 +33,8 @@ This log follows the conventions of
   the CLI as well.
 - Support for a wider range of bowl radii, including a more responsive sanding
   jig design.
+- `--facet-angle` CLI argument for improved detail with larger bowl radii.
+  Default `--facet-size` was raised to compensate.
 
 ### Fixed
 - A 1-minute delay between the application’s useful work and its termination
