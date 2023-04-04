@@ -147,13 +147,8 @@
     (model/translate [0 0 (- (/ z 2) (measure/switch-height switch-type))]
       (model/cube (compensator x) (compensator y) z))))
 
-(defn- stem-body-cuboid
-  "Overly similar to switch-body-cube but for stems.
-  The stem body is extremely sensitive to printing inaccuracies.
-  Generally, an ALPS-style stem will print OK without compensation for error
-  on a Lulzbot TAZ6, whereas the negative space inside an MX-style stem will
-  be too tight without compensation and too loose with standard nozzle-width
-  compensation."
+(defn- stem-bodypart
+  "Similar to switch-body-cube but for one part of a stem."
   [{:keys [error-stem-positive error-stem-negative]}
    part-properties]
   {:pre [(map? part-properties)
@@ -163,7 +158,9 @@
                                               error-stem-negative)
         compensator (error-fn error)]
     (model/translate [0 0 (/ z -2)]
-      (model/cube (compensator x) (compensator y) z))))
+      (case (:shape part-properties)
+        :cylinder (model/cylinder (compensator (/ x 2)) z)
+        (model/cube (compensator x) (compensator y) z)))))
 
 (defn- switch-body
   "Minimal interior space for a switch, starting at z = 0.
@@ -437,7 +434,7 @@
 (defn- stem-builder
   [{:keys [switch-type] :as options} pred]
   (let [data (switch-data switch-type :stem)]
-    (map #(stem-body-cuboid options (get data %))
+    (map #(stem-bodypart options (get data %))
          (section-keys data pred))))
 
 (defn- stem-model

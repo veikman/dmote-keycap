@@ -3,7 +3,8 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
-Nothing yet.
+### Added
+- The `kailh-box-silent` switch type.
 
 ## [Version 0.8.0] - 2021-02-10
 ### Changed

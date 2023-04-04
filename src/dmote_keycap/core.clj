@@ -57,7 +57,9 @@
    [nil "--facet-angle N" "Smaller number gives more detail"
     :default 2, :parse-fn #(Float/parseFloat %),
     :validate [(partial spec/valid? ::app-schema/minimum-facet-angle)]]
-   [nil "--switch-type TYPE" "One of “alps” or “mx”"
+   [nil "--switch-type TYPE" (format "One of %s"
+                                     (join ", " (map #(format "“%s”" (name %))
+                                                     (keys data/switches))))
     :default-desc "alps", :parse-fn keyword,
     :validate [(partial spec/valid? ::schema/switch-type)]]
    [nil "--style TYPE" "Main body; “minimal” or “maquette”"

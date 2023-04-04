@@ -13,6 +13,15 @@
 (def key-width-1u 18.25)
 (def key-margin (/ (- mount-1u key-width-1u) 2))
 
+;; Reusable pieces of switch data.
+(def mx-cross
+  {:cross-x {:size {:x 4,   :y 1.25, :z 3.6} :positive false}
+   :cross-y {:size {:x 1.1, :y 4,    :z 3.6} :positive false}})
+(def mx-body
+  {:top  {:size {:x 10.2, :y 11,   :z 6.6}}
+   :core {:size {:x 14.7, :y 14.7, :z 1}}
+   :base {:size {:x 15.6, :y 15.6, :z 0.7}}})
+
 ;; Switch data here is based on real-world observation, not purely on data
 ;; sheets. Some components are modelled for printability and may be
 ;; incompatible with some versions of real switches.
@@ -27,15 +36,16 @@
             :snap           {:size {:x 12,    :y 13.03, :z 4.75}}}}
    :mx
     {:travel 4
-     :stem {:shell          {:size {:x 7,     :y 5.25,  :z 3.6}
-                             :positive true}
-            :cross-x        {:size {:x 4,     :y 1.25,  :z 3.6}
-                             :positive false}
-            :cross-y        {:size {:x 1.1,   :y 4,     :z 3.6}
-                             :positive false}}
-     :body {:top            {:size {:x 10.2,  :y 11,    :z 6.6}}
-            :core           {:size {:x 14.7,  :y 14.7,  :z 1}}
-            :base           {:size {:x 15.6,  :y 15.6,  :z 0.7}}}}})
+     :stem (merge mx-cross
+             {:shell        {:size {:x 7,     :y 5.25,  :z 3.6}
+                             :positive true}})
+     :body mx-body}
+   :kailh-box-silent
+    {:travel 3.6
+     :stem (merge mx-cross
+             {:shell        {:size {:x 6,     :y 6,     :z 3.6}
+                             :shape :cylinder, :positive true}})
+     :body mx-body}})
 
 ;; Face data concerns how legends are placed on the sides of keys.
 (def face-keys [:top :north :east :south :west])
