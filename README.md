@@ -45,7 +45,7 @@ Printing advice is available [here](doc/print.md).
 
 ## License
 
-Copyright © 2019–2022 Viktor Eikman
+Copyright © 2019–2023 Viktor Eikman
 
 This software is distributed under the [Eclipse Public License](LICENSE-EPL)
 (EPL) v2.0 or any later version thereof. This software may also be made
