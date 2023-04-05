@@ -25,6 +25,7 @@
 ;; Switch data here is based on real-world observation, not purely on data
 ;; sheets. Some components are modelled for printability and may be
 ;; incompatible with some versions of real switches.
+;; Data under :suppport is auxiliary and does not describe real switches.
 (def switches
   {:alps
     {:travel 3.5
@@ -39,13 +40,15 @@
      :stem (merge mx-cross
              {:shell        {:size {:x 7,     :y 5.25,  :z 3.6}
                              :positive true}})
-     :body mx-body}
+     :body mx-body
+     :support {:stem {:inset-line-count 0.8}}}
    :kailh-box-silent
     {:travel 3.6
      :stem (merge mx-cross
              {:shell        {:size {:x 6,     :y 6,     :z 3.6}
                              :shape :cylinder, :positive true}})
-     :body mx-body}})
+     :body mx-body
+     :support {:stem {:inset-line-count 1.5,  :angle (/ π 4)}}}})
 
 ;; Face data concerns how legends are placed on the sides of keys.
 (def face-keys [:top :north :east :south :west])

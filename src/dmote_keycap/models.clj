@@ -496,16 +496,20 @@
   "A completely hollow rectangular support structure with the width of the
   printer nozzle, underneath the keycap stem."
   [{:keys [switch-type nozzle-width] :as options}]
-  (let [stem-z (stem-length switch-type)
-        difference (- (abs (print-bed-level options)) stem-z)
-        footprint (stem-footprint switch-type 0)
-        [foot-xₒ foot-yₒ] footprint
-        [foot-xᵢ foot-yᵢ] (map #(max 0 (- % (* 2 nozzle-width))) footprint)]
-    (model/translate [0 0 (+ (print-bed-level options) (/ difference 2))]
-      (maybe/difference
-        (model/cube foot-xₒ foot-yₒ difference)
-        (when (every? pos? [foot-xᵢ foot-yᵢ])
-          (model/cube foot-xᵢ foot-yᵢ difference))))))
+  (let [footprint (stem-footprint switch-type 0)
+        datum (fn [key default]
+                (get-in data/switches [switch-type :support :stem key] default))]
+    (model/translate [0 0 (print-bed-level options)]
+      (model/extrude-linear {:height (- (abs (print-bed-level options))
+                                        (stem-length switch-type))
+                             :center false}
+        (maybe/rotate [0 0 (datum :angle 0)]
+          (model/difference
+            (maybe/offset (* -1 nozzle-width (datum :inset-line-count 0))
+              (apply model/square footprint))
+            (maybe/offset (* -1 nozzle-width (+ (datum :inset-line-count 0)
+                                                (datum :thickness-line-count 1)))
+              (apply model/square footprint))))))))
 
 (defn- support-model
   [{:keys [switch-type skirt-length] :as options}]
