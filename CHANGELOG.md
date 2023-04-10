@@ -4,7 +4,7 @@ This log follows the conventions of
 
 ## [Unreleased]
 ### Added
-- The `kailh-box-silent` switch type.
+- The `kailh-box` switch type.
 - Tweaks to stem support, specific to each switch type.
 
 ## [Version 0.8.0] - 2021-02-10

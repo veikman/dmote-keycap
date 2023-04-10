@@ -42,7 +42,7 @@
                              :positive true}})
      :body mx-body
      :support {:stem {:inset-line-count 0.8}}}
-   :kailh-box-silent
+   :kailh-box
     {:travel 3.6
      :stem (merge mx-cross
              {:shell        {:size {:x 6,     :y 6,     :z 3.6}

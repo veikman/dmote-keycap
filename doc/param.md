@@ -100,17 +100,15 @@ above:
 
 * `:alps`: ALPS-like designs, including Matias.
 * `:mx`: Cherry MX and designs with very similar upper bodies.
-* `:kailh-box-silent`: Kailh BOX Silent series designs.
-  These have a body and cross-shaped stem compatible with `mx`, but there’s a
-  tube around the stem, with a circular profile.
+* `:kailh-box`: Kailh BOX series designs, including BOX Silent.
 
-The `mx` category covers, for example, Gateron’s KS-3 series and some of
-Kailh’s PG1511 series among other MX clones. However, the PG1511 series
-includes some models with shorter travel, and some types of stems (e.g.
-non-Silent BOX, CPG151101F) that will not fit with `dmote-keycap`.
+For MX clones, you may want to prefer `kailh-box` over `mx`. Both are known to
+work with Gateron’s KS-3 series. In Kailh’s PG1511 series, only the BOX subtype
+(e.g. CPG151101F) requires `kailh-box`, but the rest seem to work with
+`kailh-box` too. Be aware that some PG1511 switches feature shorter travel.
 
-Minor differences in the lower body of two types of switches, such as plate
-mount versus PCB mount, and lateral recesses on some MX-like switches but not
-on others, are not modelled by this library because they are irrelevant to
-keycaps. Version 0.7.0 of the DMOTE application introduced some support for
-additional switch types that are relevant to the mounting plate.
+Minor differences in the lower body of switches, such as plate mount versus PCB
+mount, and lateral recesses on some MX-like switches but not on others, are not
+modelled by this library because they are irrelevant to keycaps. Version 0.7.0
+of the DMOTE application introduced some support for additional switch types
+that are relevant to the mounting plate.
