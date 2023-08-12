@@ -36,19 +36,19 @@
             :slider-housing {:size {:x 13.35, :y 5.95,  :z 5.15}}
             :snap           {:size {:x 12,    :y 13.03, :z 4.75}}}}
    :mx
-    {:travel 4
-     :stem (merge mx-cross
-             {:shell        {:size {:x 7,     :y 5.25,  :z 3.6}
-                             :positive true}})
-     :body mx-body
-     :support {:stem {:inset-line-count 0.8}}}
-   :kailh-box
     {:travel 3.6
      :stem (merge mx-cross
              {:shell        {:size {:x 6,     :y 6,     :z 3.6}
                              :shape :cylinder, :positive true}})
      :body mx-body
-     :support {:stem {:inset-line-count 1.5,  :angle (/ π 4)}}}})
+     :support {:stem {:inset-line-count 1.5,  :angle (/ π 4)}}}
+   :rect-mx
+    {:travel 4
+     :stem (merge mx-cross
+             {:shell        {:size {:x 7,     :y 5.25,  :z 3.6}
+                             :positive true}})
+     :body mx-body
+     :support {:stem {:inset-line-count 0.8}}}})
 
 ;; Face data concerns how legends are placed on the sides of keys.
 (def face-keys [:top :north :east :south :west])

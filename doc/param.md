@@ -4,7 +4,7 @@ The following are the main parameters to the main function in this
 function library, `dmote-keycap.models.keycap`.
 
 * `:style`: One of `:minimal` or `:maquette` (see [the readme](../README.md)).
-* `:switch-type`: See below.
+* `:switch-type`: Usually `:mx` or `:alps`. See below for details.
 * `:unit-size`: A 2-tuple of horizontal size measured in u, hence non-linear.
   On a traditional ISO keyboard, the first value in this tuple (the width)
   varies from 1 for most keys to about 6 for a space bar. The second value
@@ -99,13 +99,18 @@ The following keywords are recognized for the switch type parameter mentioned
 above:
 
 * `:alps`: ALPS-like designs, including Matias.
-* `:mx`: Cherry MX and designs with very similar upper bodies.
-* `:kailh-box`: Kailh BOX series designs, including BOX Silent.
+* `:mx`: Main representation of Cherry MX and similar designs.
+* `:rect-mx`: An alternative representation of Cherry MX.
 
-For MX clones, you may want to prefer `kailh-box` over `mx`. Both are known to
-work with Gateron’s KS-3 series. In Kailh’s PG1511 series, only the BOX subtype
-(e.g. CPG151101F) requires `kailh-box`, but the rest seem to work with
-`kailh-box` too. Be aware that some PG1511 switches feature shorter travel.
+The difference in shape between `:mx` and `:rect-mx` is that keycaps for the
+`:mx` style have a cylindrical stem, while keycaps for `:rect-mx` have a cuboid
+stem, that is a stem with a rectangular footprint.
+
+Both `:mx` and `:rect-mx` are known to work with genuine MX switches and
+Gateron’s KS-3 series. In Kailh’s PG1511 series, only the BOX subtype (e.g.
+CPG151101F) requires `:mx`. Be aware that some PG1511 switches feature shorter
+travel. There are no known types switches that require `:rect-mx`, but there is
+more material in a `:rect-mx` stem, which can make it more sturdy.
 
 Minor differences in the lower body of switches, such as plate mount versus PCB
 mount, and lateral recesses on some MX-like switches but not on others, are not

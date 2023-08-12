@@ -3,8 +3,12 @@ This log follows the conventions of
 [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
+### Changed
+- The design of the `mx` switch type has changed. It now produces a cylindrical
+  stem on keycaps, compatible with a broader range of MX clones. The original
+  design is still available under the name `rect-mx`.
+
 ### Added
-- The `kailh-box` switch type.
 - Tweaks to stem support, specific to each switch type.
 
 ## [Version 0.8.0] - 2021-02-10
