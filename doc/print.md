@@ -23,15 +23,6 @@ printing upside down may ultimately be a better option.
 For SLA printing, try rotating the cap and adding supports in your slicer to
 drain excess resin away from the tip of the stem on the cap.
 
-### General printer settings
-
-For FDM printing, try reducing extrusion width in your slicer. In
-PrusaSlicer v2.3.0, for example, go into “Print settings” → “Advanced” →
-“Extrusion width” and reduce e.g. “Perimeters” to a value very close to, but
-not smaller than, the actual width of your nozzle. By default, slicers for FDM
-tend to overextrude filament to reduce gaps and compensate for thermal
-contraction, which doesn’t work for small objects like keycaps.
-
 ### Cleanup
 
 If you’re using `supported` and printing in an upright position, you will need
@@ -55,12 +46,12 @@ Recommended solutions to common problems.
 Check general printer settings and try running `dmote-keycap` with error
 compensation.
 
-* For an `:alps` keycap where the stem is too thick to fit inside the stem of
-  the switch, run with `--error-stem-positive 0.1` or more.
-* For an `:mx` keycap where the stem does not fit inside the switch as it
-  descends on the spring, run with `--error-stem-positive 0.1` or more.
+* For an `:alps` keycap where the stem is too thick to fit inside the the
+  switch, run with `--error-stem-positive 0.1` or more.
 * For an `:mx` keyp that does not fit over the cross of the switch’s stem, run
   with `--error-stem-negative -0.1` or less.
+* For an `:mx-rect` keycap where the stem does not fit inside the switch as it
+  descends on the spring, run with `--error-stem-positive 0.1` or more.
 
 #### The cap is too narrow when printed
 
@@ -110,7 +101,7 @@ will not warp where you intend to use it.
 #### The cap comes loose while printing
 
 Use standard techniques for print bed adhesion with your printer and filament.
-For FDM this means e.g. tape, glue stick, alcohol, bed heating, precise
+For FDM this means e.g. glue stick, isopropyl alcohol, bed heating, precise
 z-offset tuning, extra first-layer height and extrusion width, brim etc.
 
 If that does not help, or if the caps you are printing do not have the skirt
@@ -118,7 +109,7 @@ and stem going to the exact same level, run with `--supported` or have your
 slicer generate supports.
 
 If that still does not solve the problem, try nozzle lifting in your slicer. In
-PrusaSlicer v2.3.0, for example, go into “Printer settings” → “Extruder 1” →
+PrusaSlicer v2.6.0, for example, go into “Printer settings” → “Extruder 1” →
 “Retraction” and set “Lift Z” to a positive value so that the printer lifts
 before moving between stem and body, reducing shear. If the setting is at zero,
 try 0.2 mm.
@@ -132,13 +123,16 @@ that stabilize the stem by connecting it more strongly to the skirt. You will
 need to snip these off with flush cutters, which gets harder the more you
 increase the value.
 
-#### The top of the cap is bumpy
+#### The top of the cap is not smooth and solid
 
-Check general printer settings. In particular, reduce infill extrusion width
-closer to the width of your nozzle.
+For detailed but fairly solid objects like keycaps, it is important to trim in
+slicer settings for filling space. With a completely solid test model such as
+an 8 mm cube at 100% infill, check that your material’s extrusion multiplier,
+print line width (a.k.a. extrusion width) and infill-to-perimeter overlap all
+work together to produce a solid object without gaps or external blobs.
 
-Use ironing in your slicer to smooth out each layer of the top face before
-adding the next.
+Use ironing in your slicer, with little or no extrusion, to smooth out each
+layer of the top face before adding the next.
 
 #### Legends are hard to read
 
