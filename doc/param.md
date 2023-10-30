@@ -4,7 +4,7 @@ The following are the main parameters to the main function in this
 function library, `dmote-keycap.models.keycap`.
 
 * `:style`: One of `:minimal` or `:maquette` (see [the readme](../README.md)).
-* `:switch-type`: Usually `:mx` or `:alps`. See below for details.
+* `:switch-type`: Type of mechanical switch. See below for details.
 * `:unit-size`: A 2-tuple of horizontal size measured in u, hence non-linear.
   On a traditional ISO keyboard, the first value in this tuple (the width)
   varies from 1 for most keys to about 6 for a space bar. The second value
@@ -99,7 +99,7 @@ The following keywords are recognized for the switch type parameter mentioned
 above:
 
 * `:alps`: ALPS-like designs, including Matias.
-* `:mx`: Main representation of Cherry MX and similar designs.
+* `:mx` (default): Main representation of Cherry MX and similar designs.
 * `:rect-mx`: An alternative representation of Cherry MX.
 
 The difference in shape between `:mx` and `:rect-mx` is that keycaps for the

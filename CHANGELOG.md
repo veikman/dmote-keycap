@@ -4,9 +4,11 @@ This log follows the conventions of
 
 ## [Unreleased]
 ### Changed
-- The design of the `mx` switch type has changed. It now produces a cylindrical
-  stem on keycaps, compatible with a broader range of MX clones. The original
-  design is still available under the name `rect-mx`.
+- The default type of key switch has changed, from `alps` to `mx`.
+- The design of the `mx` switch type has changed. This type now produces a
+  cylindrical stem on keycaps. The new design is compatible with a broader
+  range of MX clones.
+  The original design is still available under the name `rect-mx`.
 
 ### Added
 - Tweaks to stem support, specific to each switch type.

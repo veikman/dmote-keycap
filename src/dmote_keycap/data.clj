@@ -73,7 +73,7 @@
 (def option-defaults
   {:filename "cap"
    :style :minimal
-   :switch-type :alps
+   :switch-type :mx
    :unit-size [1 1]
    :slope 0.73
    :bowl-plate-offset 0
