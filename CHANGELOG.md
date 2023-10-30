@@ -13,6 +13,9 @@ This log follows the conventions of
 ### Added
 - Tweaks to stem support, specific to each switch type.
 
+### Fixed
+- Minor improvements to vertical centering and font choice for the Concertina.
+
 ## [Version 0.8.0] - 2021-02-10
 ### Changed
 - The skirt on a `minimal` cap is of more even thickness, because it is now

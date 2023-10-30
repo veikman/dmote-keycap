@@ -141,8 +141,9 @@
             :faces {:top {:char "⎇" :text-options {:transform "scale(-1,1)"}} :south {:char "}"}}}}
   {:legend {:filename-suffix "numeric-layer"  ; For shifting layers in QMK firmware.
             :faces {:top {:char "ℕ"  ; Blackboard bold N.
-                          :text-options {:style {:font-family "Liberation Serif"}
-                                         :y 2}}}}}  ; Center.
+                          :text-options {:style {:font-family "DejaVu Serif"
+                                                 :font-size "2.4mm"}
+                                         :y "0.5mm"}}}}}  ; Center.
   {:legend {:filename-suffix "volume-up_acceleration2"
             :faces {:top {:char "🕪" :text-options {:style {:font-size "2.0mm"} :y 2}}
                     :north {:unimportable "resources/legend/nontext/mouse_acceleration2.svg"}}}}
