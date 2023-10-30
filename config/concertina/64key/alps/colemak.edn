@@ -5,9 +5,10 @@
  ;; rotated, smaller legends on the top row in each column.
  {:top-size [10 10 2.6]
   :bowl-radii [20 20 20]
-  :legend {:faces {:top {:text-options {:style {:font-size "1.8mm"}}}
+  :legend {:faces {:top {:text-options {:style {:font-size "1.8mm"}
+                                        :y "0.45mm"}}
                    :north {:text-options {:style {:font-size "1.4mm"
-                                                  :dominant-baseline "baseline"}
+                                                  :dominant-baseline "middle"}
                                           :transform "rotate(180, 0, 0)"}}}}}
  [;; Left-hand side, main key cluster, excluding navigation area and other
   ;; symbol keys.
@@ -72,10 +73,10 @@
  [;; Left-hand side, main key cluster.
   ;; Bottom column (index 5), near to far.
   {:legend {:filename-suffix "delete_insert"
-            :faces {:top {:char "⌦" :text-options {:style {:font-size "3.2mm"} :y 1.6}}
+            :faces {:top {:char "⌦" :text-options {:style {:font-size "3.2mm"} :y "0.48mm"}}
                     :west {:char "⎀" :text-options {:style {:font-size "2.0mm"}}}}}}
   {:legend {:filename-suffix "backspace"
-            :faces {:top {:char "⌫" :text-options {:style {:font-size "3.2mm"} :y 1.6}}}}}
+            :faces {:top {:char "⌫" :text-options {:style {:font-size "3.2mm"} :y "0.48mm"}}}}}
   {:legend {:filename-suffix "tab_F12"
             :faces {:top {:char "↹"}
                     :north {:char "F12"  ; Imitate other function keys.
@@ -84,9 +85,9 @@
                                            :transform "rotate(180, 0, 0)"}}}}}
   ;; Left-hand-side navigation area.
   {:legend {:filename-suffix "page-up"
-            :faces {:top {:char "⤒" :text-options {:y 2}}}}}
+            :faces {:top {:char "⤒" :text-options {:y "0.4mm"}}}}}
   {:legend {:filename-suffix "page-down"
-            :faces {:top {:char "⤓" :text-options {:y 2}}
+            :faces {:top {:char "⤓" :text-options {:y "0.4mm"}}
                     :south {:unimportable "resources/legend/nontext/nav_castle.svg"}}}}
   {:legend {:filename-suffix "home"
             :faces {:top {:char "⇤"}

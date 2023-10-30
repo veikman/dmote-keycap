@@ -62,7 +62,9 @@
 ;; whose global default values are exposed here.
 ;; Together with the default 1 y offset, the 1x1 scale of generated SVG
 ;; and the dominant baseline set here, generated legends should be
-;; vertically centered in relation to the font.
+;; nearly vertically centered in relation to the font. Note, however, that SVG
+;; by itself does not provide options for vertically centering letters or
+;; symbols. As the font and font size change, the y offset must also change.
 (def text-style-defaults {:font-size "1mm"
                           :font-family "DejaVu Sans Mono"
                           :text-anchor "middle"
