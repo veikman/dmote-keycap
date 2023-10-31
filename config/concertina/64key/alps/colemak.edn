@@ -3,14 +3,20 @@
 
 {;; A section of keys with mid-size top legends for letters, and
  ;; rotated, smaller legends on the top row in each column.
+ ;; These keys go in relatively tight portions of the main key clusters and
+ ;; therefore have short skirts, preventing collisions with MX switches.
+ ;; The specific skirt length is selected to match the bottom of the stem,
+ ;; simplifying printing.
+ ;; Longer skirts (5 mm) are possible with ALPS-style switches.
  {:top-size [10 10 2.6]
   :bowl-radii [20 20 20]
+  :skirt-length 3.6
   :legend {:faces {:top {:text-options {:style {:font-size "1.8mm"}
                                         :y "0.45mm"}}
                    ;; This north-face configuration is intended for function keys.
                    :north {:text-options {:style {:font-size "1.4mm"
                                                   :dominant-baseline "middle"}
-                                          :y "-0.2mm"
+                                          :y "-0.1mm"
                                           :transform "rotate(180, 0, 0)"}}}}}
  [;; Left-hand side, main key cluster, excluding navigation area and other
   ;; symbol keys.
@@ -71,9 +77,11 @@
                           :text-options {:style {:font-size "2.8mm"} :y "0.36mm"}}
                     :north {:char "F12"}}}}]  ; Imitate other function keys.
  ;; Another section for non-letter top legends in a larger font. Most of these
- ;; keys go in the thumb clusters.
+ ;; keys go in the thumb clusters and the rest go in navigational clusters.
+ ;; More space is available in both, so skirts can be longer even with MX switches.
  {:top-size [10 10 2.6]
   :bowl-radii [20 20 20]
+  :skirt-length 5
   :legend {:faces {:top {:text-options {:style {:font-size "2.8mm"}}}
                    :north {:text-options {:style {:font-size "1.8mm"
                                                   :dominant-baseline "baseline"}
