@@ -7,8 +7,10 @@
   :bowl-radii [20 20 20]
   :legend {:faces {:top {:text-options {:style {:font-size "1.8mm"}
                                         :y "0.45mm"}}
+                   ;; This north-face configuration is intended for function keys.
                    :north {:text-options {:style {:font-size "1.4mm"
                                                   :dominant-baseline "middle"}
+                                          :y "-0.2mm"
                                           :transform "rotate(180, 0, 0)"}}}}}
  [;; Left-hand side, main key cluster, excluding navigation area and other
   ;; symbol keys.
@@ -57,7 +59,17 @@
                     :south {:char "↻" :text-options {:style {:font-size "2.0mm"}}}}}}
   {:legend {:faces {:top {:unimportable "resources/legend/2linetext/undirected_single_and_double_quote.svg"}}}}
   {:legend {:faces {:top {:unimportable "resources/legend/2linetext/backslash_with_vertical_bar.svg"}
-                    :north {:char "F11"}}}}]
+                    :north {:char "F11"}}}}
+  ;; Left-hand side, bottom column (index 5), near to far.
+  {:legend {:filename-suffix "delete_insert"
+            :faces {:top {:char "⌦" :text-options {:style {:font-size "3.2mm"} :y "0.48mm"}}
+                    :west {:char "⎀" :text-options {:style {:font-size "2.0mm"}}}}}}
+  {:legend {:filename-suffix "backspace"
+            :faces {:top {:char "⌫" :text-options {:style {:font-size "3.2mm"} :y "0.48mm"}}}}}
+  {:legend {:filename-suffix "tab_F12"
+            :faces {:top {:char "↹"
+                          :text-options {:style {:font-size "2.8mm"} :y "0.36mm"}}
+                    :north {:char "F12"}}}}]  ; Imitate other function keys.
  ;; Another section for non-letter top legends in a larger font. Most of these
  ;; keys go in the thumb clusters.
  {:top-size [10 10 2.6]
@@ -70,20 +82,7 @@
                    :east {:text-options {:style {:font-size "1.8mm"} :y 2}}
                    :south {:text-options {:style {:font-size "1.8mm"} :y 2}}
                    :west {:text-options {:style {:font-size "1.8mm"} :y 2}}}}}
- [;; Left-hand side, main key cluster.
-  ;; Bottom column (index 5), near to far.
-  {:legend {:filename-suffix "delete_insert"
-            :faces {:top {:char "⌦" :text-options {:style {:font-size "3.2mm"} :y "0.48mm"}}
-                    :west {:char "⎀" :text-options {:style {:font-size "2.0mm"}}}}}}
-  {:legend {:filename-suffix "backspace"
-            :faces {:top {:char "⌫" :text-options {:style {:font-size "3.2mm"} :y "0.48mm"}}}}}
-  {:legend {:filename-suffix "tab_F12"
-            :faces {:top {:char "↹"}
-                    :north {:char "F12"  ; Imitate other function keys.
-                            :text-options {:style {:font-size "1.4mm"
-                                                   :dominant-baseline "baseline"}
-                                           :transform "rotate(180, 0, 0)"}}}}}
-  ;; Left-hand-side navigation area.
+ [;; Left-hand-side navigation area.
   {:legend {:filename-suffix "page-up"
             :faces {:top {:char "⤒" :text-options {:y "0.4mm"}}}}}
   {:legend {:filename-suffix "page-down"
