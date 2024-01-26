@@ -5,18 +5,22 @@ output a model of a tool, instead of the default model of a keycap.
 
 [![Image of a set of jigs](https://viktor.eikman.se/image/keycap-jigs-mounted-on-board/display)](https://viktor.eikman.se/image/keycap-jigs-mounted-on-board/)
 
-This tool is intended for use in the manual finishing of printed keycaps.
-Specifically, controlled by the standard `--bowl-radii` parameter to the CLI
-utility, the jig includes a pad with the same curvature as the bowl that tops
-off a `minimal`-style keycap.
+This tool is intended for use in the manual finishing of printed keycaps. It
+includes a rounded pad. The pad is convex, to match the inside of the bowl that
+curves inward on a `minimal`-style keycap. You strap sandpaper on the pad to
+get a jig for making the inside of the bowl smoother.
 
-The pad on the jig curves outward while the bowl curves inward.
-You put a strip of sandpaper in between to make the inside of the bowl
-smoother, so it looks good and stays clean without the need for paint or
+A smooth bowl looks good and stays clean, all without the need for paint or
 varnish. Sanding the inside of the bowl is more important than sanding the
 sides. The jig will not help you do the latter.
 
 ### Parameters
+
+The curvature of the bowl is determined by the `--bowl-radii` parameter to the
+CLI utility. This is the same parameter that governs the bowl of a keycap, and
+it has the exact same default value. For best results, override that default.
+Make all the radii about 0.6 mm smaller for the jig than for the keys. That
+way, there’s space for rough sandpaper in between the two.
 
 The following parameters to the CLI utility affect only its jig mode:
 
@@ -35,7 +39,7 @@ The jigs shown in the image above were made with `lein run --jig-mode
 ### Printing
 
 Sanding blocks are commonly made of cork or rubber to help make a smooth
-finish. The jig itself should ideally be printed in TPC or any similar,
+finish. The jig itself should ideally be printed in TPC, TPU, or any similar,
 middling-soft material. A tire-like Shore hardness around D45 works well, with
 up to 1 mm top shell thickness and 15–20% gyroid infill. Keep the layers thin
 for a smooth pad.
