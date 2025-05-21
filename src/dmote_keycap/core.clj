@@ -60,7 +60,7 @@
    [nil "--switch-type TYPE" (format "One of %s"
                                      (join ", " (map #(format "“%s”" (name %))
                                                      (keys data/switches))))
-    :default-desc "alps", :parse-fn keyword,
+    :default-desc "mx", :parse-fn keyword,
     :validate [(partial spec/valid? ::schema/switch-type)]]
    [nil "--style TYPE" "Main body; “minimal” or “maquette”"
     :default-desc "minimal", :parse-fn keyword,
