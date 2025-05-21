@@ -25,7 +25,7 @@
 ;; Switch data here is based on real-world observation, not purely on data
 ;; sheets. Some components are modelled for printability and may be
 ;; incompatible with some versions of real switches.
-;; Data under :suppport is auxiliary and does not describe real switches.
+;; Data under :support is auxiliary and does not describe real switches.
 (def switches
   {:alps
     {:travel 3.5
