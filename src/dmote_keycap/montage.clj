@@ -33,7 +33,7 @@
     true (assoc :filepath-fn (partial track-image-filepath tracker))
     montage (assoc :images
                    (concat
-                     [(specify-image :top   [0 0 40])
+                     [(specify-image :top   [0 0 50])
                       (specify-image :north [0 50 0])
                       (specify-image :east  [50 0 0])
                       (specify-image :south [0 -50 0])
@@ -71,8 +71,8 @@
 (defn montage!
   "Compose a 2D montage of images.
   This requires assets to have been transcoded to OpenSCAD and each image of
-  them to have been specified on the passed tracker, a map of asset names to
-  maps of side kes to Java file objects, all in an atom."
+  them to have been specified on the passed tracker: a map of asset names to
+  maps of sides of keys to Java file objects, all in an atom."
   [options tracker]
   (.mkdirs dir-tmp)
   (.mkdirs dir-montage)
@@ -85,4 +85,3 @@
                         (str res-asset "x" res-asset "+0+0")]
                        (mapcat asset-element (sort (keys @tracker)))
                        [(str (io/file dir-montage "montage.png"))])))
-
