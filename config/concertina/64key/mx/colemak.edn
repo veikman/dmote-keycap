@@ -1,13 +1,18 @@
-;; A sample set of keycaps for 64 ALPS-style switches on a Concertina,
+;; A sample set of keycaps for 64 MX-style switches on a Concertina,
 ;; a keyboard design bundled with the DMOTE application.
+
+;; Keycap skirts are fairly short on the main key clusters, for two reasons:
+;; - Concertina keys are densely packed in the main clusters, so long skirts
+;;   can collide there, but only there.
+;; - The short skirts are matched to the length of the stems. This leaves less
+;;   support material to be removed after printing.
+;;
+;; If you want to reuse this file for ALPS-style switches, which are shorter on
+;; the y axis and have simple stems, consider overriding the skirt length to 5
+;; mm everywhere.
 
 {;; A section of keys with mid-size top legends for letters, and
  ;; rotated, smaller legends on the top row in each column.
- ;; These keys go in relatively tight portions of the main key clusters and
- ;; therefore have short skirts, preventing collisions with MX switches.
- ;; The specific skirt length is selected to match the bottom of the stem,
- ;; simplifying printing.
- ;; Longer skirts (5 mm) are possible with ALPS-style switches.
  {:top-size [10 10 2.6]
   :bowl-radii [20 20 20]
   :skirt-length 3.6
