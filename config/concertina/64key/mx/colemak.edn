@@ -84,7 +84,7 @@
  ;; Another section for non-letter top legends in a larger font. Most of these
  ;; keys go in the thumb clusters and the rest go in navigational clusters.
  ;; More space is available in both, so skirts can be longer even with MX switches.
- {:top-size [10 10 2.6]
+ {:top-size [11 11 2.6]
   :bowl-radii [22 22 22]
   :skirt-length 5
   :legend {:faces {:top {:text-options {:style {:font-size "2.8mm"}}}
