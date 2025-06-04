@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    height="1mm"
    version="1.1"
    viewBox="0 0 1 1"
    width="1mm"
    id="svg865"
-   sodipodi:docname="vertical_bar_with_backslash.svg"
-   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
+   sodipodi:docname="backslash_with_vertical_bar.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <metadata
      id="metadata871">
     <rdf:RDF>
@@ -37,17 +37,21 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="2170"
-     inkscape:window-height="2139"
+     inkscape:window-width="2037"
+     inkscape:window-height="701"
      id="namedview867"
      showgrid="false"
      inkscape:zoom="16"
-     inkscape:cx="-8.6102824"
-     inkscape:cy="6.636927"
-     inkscape:window-x="1663"
-     inkscape:window-y="14"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg865" />
+     inkscape:cx="-8.625"
+     inkscape:cy="6.65625"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg865"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm" />
   <text
      style="font-size:5px;font-family:'DejaVu Sans Mono';text-align:center;dominant-baseline:middle;text-anchor:middle"
      x="0"
@@ -56,6 +60,6 @@
   <text
      style="font-size:5px;font-family:'DejaVu Sans Mono';text-align:center;dominant-baseline:middle;text-anchor:middle"
      x="0"
-     y="4"
+     y="3.4708333"
      id="text863-3">\</text>
 </svg>
