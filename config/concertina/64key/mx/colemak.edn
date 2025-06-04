@@ -97,9 +97,11 @@
                    :west {:text-options {:style {:font-size "1.8mm"} :y 2}}}}}
  [;; Left-hand-side navigation area.
   {:legend {:filename-suffix "page-up"
-            :faces {:top {:char "⤒" :text-options {:y "0.4mm"}}}}}
+            :faces {:top {:char "⇤"
+                          :text-options {:y "0.01mm" :transform "rotate(90, 0, 0)"}}}}}
   {:legend {:filename-suffix "page-down"
-            :faces {:top {:char "⤓" :text-options {:y "0.4mm"}}
+            :faces {:top {:char "⇥"
+                          :text-options {:y "0.01mm" :transform "rotate(90, 0, 0)"}}
                     :south {:unimportable "resources/legend/nontext/nav_castle.svg"}}}}
   {:legend {:filename-suffix "home"
             :faces {:top {:char "⇤"}
