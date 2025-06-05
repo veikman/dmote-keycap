@@ -147,9 +147,9 @@
             :faces {:top {:char "⎋"
                           :text-options {:style {:font-size "3.2mm"}}}}}}
   {:legend {:filename-suffix "pause"
-            :faces {:top {:char "⏯" :text-options {:style {:font-size "1.8mm"}}}}}}
+            :faces {:top {:char "⏯" :text-options {:style {:font-size "2.4mm"}}}}}}
   {:legend {:filename-suffix "volume-down_acceleration1"
-            :faces {:top {:char "🕩" :text-options {:style {:font-size "1.8mm"} :y 2}}
+            :faces {:top {:char "🕩" :text-options {:style {:font-size "2.4mm"} :y 2}}
                     :north {:unimportable "resources/legend/nontext/mouse_acceleration1.svg"}}}}
   {:legend {:filename-suffix "right-alt"
             :faces {:top {:char "⎇" :text-options {:transform "scale(-1,1)"}} :south {:char "}"}}}}
@@ -159,7 +159,7 @@
                                                  :font-size "2.4mm"}
                                          :y "0.5mm"}}}}}  ; Center.
   {:legend {:filename-suffix "volume-up_acceleration2"
-            :faces {:top {:char "🕪" :text-options {:style {:font-size "2.0mm"} :y 2}}
+            :faces {:top {:char "🕪" :text-options {:style {:font-size "2.4mm"} :y 2}}
                     :north {:unimportable "resources/legend/nontext/mouse_acceleration2.svg"}}}}
   {:legend {:filename-suffix "right-ctrl"
             :faces {:top {:char "⎈" :text-options {:style {:font-size "3.4mm"} :y 1}}

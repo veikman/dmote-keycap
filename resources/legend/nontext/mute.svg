@@ -36,13 +36,13 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="2036"
+     inkscape:window-width="1221"
      inkscape:window-height="702"
      id="namedview2320"
      showgrid="false"
      inkscape:zoom="16"
-     inkscape:cx="3.21875"
-     inkscape:cy="7.375"
+     inkscape:cx="3.25"
+     inkscape:cy="7.4375"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
@@ -52,20 +52,20 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm" />
   <text
-     style="font-size:7.46897px;font-family:'DejaVu Sans Mono';text-align:center;dominant-baseline:middle;text-anchor:middle;stroke-width:1.09787"
-     x="0.47917143"
-     y="1.6771157"
+     style="font-size:8.90941px;font-family:'DejaVu Sans Mono';text-align:center;dominant-baseline:middle;text-anchor:middle;stroke-width:1.3096"
+     x="0.6345216"
+     y="1.7887501"
      id="text2316">🕨</text>
   <text
      xml:space="preserve"
-     style="font-style:normal;font-weight:normal;font-size:11.6191px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.290478"
-     x="-1.8872989"
-     y="3.5861981"
+     style="font-style:normal;font-weight:normal;font-size:13.8599px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.346499"
+     x="-2.3565452"
+     y="4.0835457"
      id="text2330"
      transform="rotate(45)"><tspan
        sodipodi:role="line"
        id="tspan2328"
-       x="-1.8872989"
-       y="3.5861981"
-       style="font-size:5.42226px;stroke-width:0.290478">+</tspan></text>
+       x="-2.3565452"
+       y="4.0835457"
+       style="font-size:6.46798px;stroke-width:0.346499">+</tspan></text>
 </svg>
