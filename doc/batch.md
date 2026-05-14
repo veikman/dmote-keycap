@@ -14,14 +14,15 @@ The EDN file for a batch must contain a vector of maps, keyed by maps of
 properties, with vectors of individual switches as their values. Each
 individual switch must be represented either by a map of properties or by a
 shorthand format interpreted according to the parent map.
+Valid examples of the expected format are available under `config`.
 
-Valid examples of the expected format are available under `config`. Here is a
-usage example calling one of those examples without any further customization
+Here is a CLI usage example calling a file in `config` without customization
 through the CLI:
 
     lein run -- --batch config/concertina/64key/mx/colemak.edn --render
 
-OpenSCAD and Inkscape are required to run this example.
+To run that, you must have Leiningen, OpenSCAD, and Inkscape installed.
 
 For large batches with complex legends, add `--montage` for an easier means of
-inspecting the typesetting, using ImageMagick.
+inspecting the typesetting, using ImageMagick. In a batch, other CLI parameters
+apply to all caps. For example, `--supported` adds supports to all caps.

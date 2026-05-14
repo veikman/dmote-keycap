@@ -58,9 +58,10 @@ values associated with particular styles, for ease of use.
       bending the stem of a cap before it is connected to the rest of the cap
       at the very top.
     * `:nozzle-width`: The width of the printer nozzle that will be used to
-      print the cap. This parameter is only used to build supports, which will
-      have the width of the nozzle because this improves print speed and
-      quality.
+      print the cap. This parameter is only used to build supports. These
+      supports will have the width of the nozzle to improve print speed and
+      quality. If you’re using a narrow nozzle (less than 0.25 mm) and the
+      lines are not stable enough, consider user a higher value.
 * `:sectioned`: If true, the model is cut in half for a sectioned view.
   This is useful in previews and development.
 * The “error parameters”: `:error-body-positive`, `:error-side-negative`,
