@@ -116,6 +116,18 @@
           :desc (format "Text to render on the %s face" string)
           :assoc-fn (as :char)]]))))
 
+(defn- validate-args
+  "Parse CLI arguments and validate them in aggregate."
+  [raw]
+  (let [args (parse-opts raw (concat static-cli-options legend-cli-options)
+                         :in-order true)]
+    ;; Check for bad interactions between individually well-formed options.
+    (if (and (get-in args [:options :montage])
+             (not (get-in args [:options :render])))
+      (assoc args :errors
+        (conj (get args :errors []) "The --montage option is invalid without --render"))
+      args)))
+
 (defn- read-edn
   [{:keys [batch]}]
   (try
@@ -170,8 +182,7 @@
 (defn -main
   "Basic command-line interface logic."
   [& raw]
-  (let [args (parse-opts raw (concat static-cli-options legend-cli-options)
-                         :in-order true)
+  (let [args (validate-args raw)
         help-text (fn [] (println "dmote-keycap options:")
                          (println (:summary args)))
         version (fn [] (println "dmote-keycap version"
