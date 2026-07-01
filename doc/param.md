@@ -110,7 +110,7 @@ stem, that is a stem with a rectangular footprint.
 Both `:mx` and `:rect-mx` are known to work with genuine MX switches and
 Gateron’s KS-3 series. In Kailh’s PG1511 series, only the BOX subtype (e.g.
 CPG151101F) requires `:mx`. Be aware that some PG1511 switches feature shorter
-travel. There are no known types switches that require `:rect-mx`, but there is
+travel. There are no known types of switches that require `:rect-mx`, but there is
 more material in a `:rect-mx` stem, which can make it more sturdy.
 
 Minor differences in the lower body of switches, such as plate mount versus PCB
