@@ -295,12 +295,43 @@
 
 (defn- tuple-to-pillarspec [[x y z]] {:footprint [x y], :z-thickness z})
 
+(defn- skirt-footprint
+  "The [x y] size of the skirt at its widest point in each dimension.
+  This includes more factors than the measure/skirt-footprint function and may
+  replace that function in a future version."
+  [{:keys [skirt-space legend] :as options}]
+  (let [engraving-depth (:depth legend)
+        extra (* 2 (+ engraving-depth skirt-space))]
+    (map + (measure/skirt-footprint options) [extra extra])))
+
+(defn- skirt-chamfer-mask-sequences
+  "Sequence of shapes describing a mask for a chamfer around the bottom of the
+  skirt."
+  [{:keys [switch-type] :as options}]
+  (let [switch (measure/switch-footprint switch-type)
+        skirt (skirt-footprint options)
+        full-height (measure/switch-height switch-type)
+        transition-height (- (/ (apply max (map - skirt switch)) 2) full-height)]
+    [(inflate {:z-offset (- full-height)} (rounded-square {:footprint switch}))
+     (inflate {:z-offset transition-height} (rounded-square {:footprint skirt}))
+     (inflate {} (rounded-square {:footprint skirt}))]))
+
+(defn- skirt-chamfer-negative-sequences
+  "Sequence of shapes for use as a negative. Together with skirt-chamfer-mask-sequences,
+  this describes a chamfer around the bottom of the skirt of a keycap.
+  The hull of this sequencee is currently simple, having straight edges."
+  [{:keys [switch-type] :as options}]
+  (let [skirt (skirt-footprint options)
+        height (measure/switch-height switch-type)]
+    [(inflate {:z-offset (- height)} (rounded-square {:footprint skirt}))
+     (inflate {} (rounded-square {:footprint skirt}))]))
+
 (defn- minimal-shell-sequences
-  "The four layers of a minimal keycap shell.
+  "Six layers of a minimal keycap shell.
   Each layer is a sequence of 3D shapes ready for combination by lofting.
   They are returned in order from outermost to innermost.
   The first two are extended away from the switch by the top plate."
-  [{:keys [skirt-thickness skirt-space legend] :as options}]
+  [{:keys [skirt-thickness skirt-space switch-type legend] :as options}]
   (let [engraving-depth (:depth legend)
         inner-shell (tight-shell-sequence options)
         outer-top (->> (top-sizes options)
@@ -321,7 +352,10 @@
      (pillar inner-shell (mapv (partial model/offset (- skirt-thickness))
                                outer-stack))
      ;; The shape of the switch, for printer error compensation.
-     (pillar inner-shell (rounded-stack inner-shell))]))
+     (pillar inner-shell (rounded-stack inner-shell))
+     ;; Optional chamfer for the bottom of the skirt.
+     (skirt-chamfer-mask-sequences options)
+     (skirt-chamfer-negative-sequences options)]))
 
 (defn- engraved-legend
   "An extrusion from a 2D legend image into a 3D negative."
@@ -409,8 +443,9 @@
   "A minimal (tight) keycap body with a skirt descending from a top plate.
   The ‘top-size’ argument describes the plate, including the final thickness
   of the plate at its center."
-  [{:keys [skirt-length shell-sequence-fn] :as options}]
-  (let [[outermost intermediate interior _] (shell-sequence-fn options)
+  [{:keys [switch-type skirt-length shell-sequence-fn] :as options}]
+  (let [[outermost intermediate interior _
+         chamfer-mask chamfer-negative] (shell-sequence-fn options)
         side-legends (side-faces options)]
     (model/difference
       (maybe/difference
@@ -423,6 +458,9 @@
               (util/loft intermediate)))))
       (switch-body options)
       (vaulted-ceiling options)
+      (model/difference  ; Chamfer the bottom of the skirt.
+        (util/loft chamfer-negative)
+        (util/loft chamfer-mask))
       (model/intersection  ; Make sure the inner negative cuts off at z = 0.
         (util/loft interior)
         (model/translate [0 0 (- plenty)]
