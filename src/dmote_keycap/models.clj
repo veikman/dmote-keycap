@@ -307,24 +307,23 @@
 (defn- skirt-chamfer-mask-sequences
   "Sequence of shapes describing a mask for a chamfer around the bottom of the
   skirt."
-  [{:keys [switch-type] :as options}]
-  (let [switch (measure/switch-footprint switch-type)
-        skirt (skirt-footprint options)
-        full-height (measure/switch-height switch-type)
-        transition-height (- (/ (apply max (map - skirt switch)) 2) full-height)]
-    [(inflate {:z-offset (- full-height)} (rounded-square {:footprint switch}))
-     (inflate {:z-offset transition-height} (rounded-square {:footprint skirt}))
-     (inflate {} (rounded-square {:footprint skirt}))]))
+  [{:keys [skirt-length switch-type] :as options}]
+  (let [switch-xy (measure/switch-footprint switch-type)
+        skirt-xy (skirt-footprint options)
+        transition-height (- (/ (apply max (map - skirt-xy switch-xy)) 2) skirt-length)]
+    [(inflate {:z-offset (- skirt-length)} (rounded-square {:footprint switch-xy}))
+     (inflate {:z-offset transition-height} (rounded-square {:footprint skirt-xy}))
+     (inflate {} (rounded-square {:footprint skirt-xy}))]))
 
 (defn- skirt-chamfer-negative-sequences
-  "Sequence of shapes for use as a negative. Together with skirt-chamfer-mask-sequences,
-  this describes a chamfer around the bottom of the skirt of a keycap.
-  The hull of this sequencee is currently simple, having straight edges."
-  [{:keys [switch-type] :as options}]
-  (let [skirt (skirt-footprint options)
-        height (measure/switch-height switch-type)]
-    [(inflate {:z-offset (- height)} (rounded-square {:footprint skirt}))
-     (inflate {} (rounded-square {:footprint skirt}))]))
+  "Sequence of shapes for use as a negative. Together with
+  skirt-chamfer-mask-sequences, this describes a chamfer around the bottom of
+  the skirt of a keycap. The hull of this sequence is currently simple, having
+  straight edges."
+  [{:keys [skirt-length switch-type] :as options}]
+  (let [shape (rounded-square {:footprint (skirt-footprint options)})]
+    [(inflate {:z-offset (- skirt-length)} shape)
+     (inflate {} shape)]))
 
 (defn- minimal-shell-sequences
   "Six layers of a minimal keycap shell.
