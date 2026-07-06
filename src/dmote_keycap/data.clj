@@ -81,6 +81,7 @@
    :bowl-plate-offset 0
    :skirt-thickness 0.8
    :skirt-space 0.4
+   :skirt-chamfer 0
    :legend {:depth 0.4  ; Suitable for SLA engraving.
             :faces (into {}
                      (for [f face-keys]

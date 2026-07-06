@@ -12,8 +12,9 @@ This log follows the conventions of
 
 ### Added
 - Tweaks to stem support, specific to each switch type.
-- A chamfer along the outer bottom edge of the skirt of `minimal` keycaps.
-  This saves a little sanding to improve fit and comfort on exotic keyboards.
+- A configurable chamfer along the outer bottom edge of the skirt of `minimal`
+  keycaps. This saves a little sanding to improve fit and comfort on exotic
+  keyboards.
 
 ### Fixed
 - Minor improvements to vertical centering and font choice for the Concertina.

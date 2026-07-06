@@ -307,12 +307,12 @@
 (defn- skirt-chamfer-mask-sequences
   "Sequence of shapes describing a mask for a chamfer around the bottom of the
   skirt."
-  [{:keys [skirt-length switch-type] :as options}]
-  (let [switch-xy (measure/switch-footprint switch-type)
-        skirt-xy (skirt-footprint options)
-        transition-height (- (/ (apply max (map - skirt-xy switch-xy)) 2) skirt-length)]
-    [(inflate {:z-offset (- skirt-length)} (rounded-square {:footprint switch-xy}))
-     (inflate {:z-offset transition-height} (rounded-square {:footprint skirt-xy}))
+  [{:keys [skirt-length skirt-chamfer switch-type] :as options}]
+  (let [skirt-xy (skirt-footprint options)
+        bilateral (* 2 skirt-chamfer)
+        core-xy (map - skirt-xy [bilateral bilateral])]
+    [(inflate {:z-offset (- skirt-length)} (rounded-square {:footprint core-xy}))
+     (inflate {:z-offset (- skirt-chamfer skirt-length)} (rounded-square {:footprint skirt-xy}))
      (inflate {} (rounded-square {:footprint skirt-xy}))]))
 
 (defn- skirt-chamfer-negative-sequences

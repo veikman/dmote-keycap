@@ -79,6 +79,8 @@
    [nil "--skirt-space N" "Gap between switch and skirt"
     :default-desc (str (:skirt-space data/option-defaults))
     :parse-fn #(Float/parseFloat %)]
+   [nil "--skirt-chamfer N" "Inset of chamfer along outer bottom edge of keycap"
+    :parse-fn #(Float/parseFloat %)]
    [nil "--slope N"
     "The slope of the sides of a maquette; of details on a minimal cap"
     :default-desc (str (:slope data/option-defaults))

@@ -39,10 +39,21 @@ values associated with particular styles, for ease of use.
 * `:skirt-thickness`: The horizontal thickness of material in the outer walls
   of a `minimal` cap.
 * `:skirt-space`: A horizontal measure of space between the outer wall of a
-  `minimal` cap and the switch inside, where they are closest.
+  `minimal` cap and the switch inside, where they are closest. Like
+  `:skirt-thickness`, `:skirt-space` adds to the horizontal outer dimensions of
+  the cap.
 * `:skirt-length`: The length of material from the top of the stem
   down toward the switch mounting plate. By default, on a `minimal` cap, this
   is 1 mm less than the space available when the switch is pressed.
+  The effective length of the skirt is also affected by the
+  `:skirt-chamfer`, below.
+* `:skirt-chamfer`: A horizontal and vertical inset, in mm, to put a 45°
+  chamfer along the outer bottom edge of the skirt. Chamfering starts from the
+  level of the bottom of the skirt, tracking `:skirt-length` but not tracking
+  the real horizontal extent of the skirt on its way up, so the shorter
+  you make the skirt, the higher you must make `:skirt-chamfer` in order for
+  the negative space it controls to reach the skirt. If you make
+  `:skirt-chamfer` too large, it becomes a bevel that shortens the skirt.
 
 ### Design for manufacture (DFM)
 
