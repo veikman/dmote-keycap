@@ -39,6 +39,7 @@
                      :top-rotation vec
                      :bowl-radii vec
                      :bowl-plate-offset num
+                     :skirt-chamfer num
                      :skirt-length num
                      :skirt-thickness num
                      :skirt-space num
@@ -90,6 +91,7 @@
 (spec/def ::bowl-radii (spec/and (spec/nilable ::tarmi/point-3d)
                                  (partial not-any? zero?)))
 (spec/def ::bowl-plate-offset number?)
+(spec/def ::skirt-chamfer (spec/and number? #(>= % 0)))
 (spec/def ::skirt-length (spec/and number? #(>= % 0)))
 (spec/def ::skirt-thickness (spec/and number? #(> % 0)))
 (spec/def ::skirt-space (spec/and number? #(>= % 0)))
@@ -129,7 +131,8 @@
   (spec/keys :opt-un [::importable-filepath-fn
                       ::style ::unit-size ::top-size ::top-rotation
                       ::bowl-radii ::bowl-plate-offset
-                      ::skirt-length ::skirt-thickness ::skirt-space
+                      ::skirt-chamfer ::skirt-length ::skirt-thickness
+                      ::skirt-space
                       ::slope
                       ::legend
                       ::nozzle-width ::horizontal-support-height ::truss-offset
