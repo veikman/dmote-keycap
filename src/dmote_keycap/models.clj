@@ -503,10 +503,12 @@
     :as options}]
   (let [[stem-x stem-y] (stem-footprint switch-type 0)
         [skirt-x skirt-y] (mapv measure/key-length unit-size)
-        positive (first (shell-sequence-fn options))
+        shell (fn [layer] (util/loft (nth (shell-sequence-fn options) layer)))
         outline (skirt-perimeter-fn options)]
     (model/intersection
-      (util/loft positive)
+      (model/difference  ; The outermost shell, minus any skirt chamfer.
+        (shell 0)
+        (model/difference (shell 5) (shell 4)))
       (model/extrude-linear {:height plenty} outline)
       (model/translate [0 0 (+ (print-bed-level options)
                                (/ horizontal-support-height 2))]
